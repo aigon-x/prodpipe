@@ -1,0 +1,17 @@
+# Commit message template — AIGON Production Platform
+
+# <type>(<scope>): <opis>
+#
+# Typy: feat, fix, refactor, test, security, docs, build, ci, migration, chore
+# Scope: opcjonalny, np. runtime, mesh, fs, config, deployment
+#
+# Przykłady:
+#   feat(runtime): dodaj health endpoint
+#   fix(mesh): napraw TLS w fetch peerów
+#   chore: complete git genesis foundation
+#
+# Zasady:
+#   - jednoznaczny cel
+#   - atomowy commit
+#   - możliwy do rollbacku
+#   - nie mieszaj migracji z refaktorem
