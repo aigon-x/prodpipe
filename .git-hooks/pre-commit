@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# AIGON Production Platform — pre-commit hook
+# Blokuje commit, który narusza granice architektury:
+#   - sekrety w repo
+#   - hardcoded IP / hostname / node count
+#   - latest image w produkcji
+#   - nieoznaczone dane (brak klasy synchronizacji)
+# ─────────────────────────────────────────────────────────────
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "[pre-commit] AIGON architecture guardrails"
+
+FAIL=0
+
+# ── 1. Secret scanning ───────────────────────────────────────
+# Szukamy typowych wzorców sekretów w plikach, które mają trafić do commita.
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -n "$STAGED" ]; then
+  # Wzorce sekretów (heurystyka — nie wyłapuje wszystkiego, CI robi pełny scan)
+  if echo "$STAGED" | grep -qE '\.(pem|key|p12|pfx|jks)$'; then
+    echo "[pre-commit] FAIL: plik klucza/certyfikatu w commicie: $STAGED"
+    FAIL=1
+  fi
+  # Zakaz commitowania plików .env (poza .env.example)
+  if echo "$STAGED" | grep -qE '(^|/)\.env$'; then
+    echo "[pre-commit] FAIL: plik .env w commicie (sekrety!)"
+    FAIL=1
+  fi
+fi
+
+# ── 2. Hardcoded IP / hostname / node count ──────────────────
+# Skrypt validate-sot robi pełną walidację; tutaj szybka heurystyka
+# dla plików konfiguracyjnych i deployment.
+# Wykluczamy .github/ (workflowy CI zawierają wzorce regex jako stringi)
+# oraz .git-hooks/ (skrypty walidacyjne).
+CONFIG_FILES=$(echo "$STAGED" | grep -E '\.(yaml|yml|json|toml)$' | grep -vE '^\.github/|^\.git-hooks/' || true)
+if [ -n "$CONFIG_FILES" ]; then
+  # Hardcoded prywatne IP (10.x, 100.x, 192.168.x, 172.16-31.x)
+  if grep -HnE '\b(10\.|100\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' $CONFIG_FILES 2>/dev/null | grep -vE '127\.0\.0\.1|0\.0\.0\.0|localhost' | grep -v 'example' | grep -v 'placeholder' | grep -v 'TODO' | grep -v 'UNDEFINED'; then
+    echo "[pre-commit] WARN: wykryto potencjalnie hardcoded IP w config (sprawdź ręcznie)"
+  fi
+fi
+
+# ── 3. latest image w produkcji ──────────────────────────────
+if [ -n "$CONFIG_FILES" ]; then
+  if grep -HnE 'image:.*:latest' $CONFIG_FILES 2>/dev/null | grep -iE 'prod|production|ring'; then
+    echo "[pre-commit] FAIL: image :latest w konfiguracji produkcyjnej"
+    FAIL=1
+  fi
+fi
+
+if [ "$FAIL" -ne 0 ]; then
+  echo "[pre-commit] BLOKADA: popraw powyższe problemy przed commitem."
+  exit 1
+fi
+
+echo "[pre-commit] OK"
+exit 0

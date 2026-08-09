@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# AIGON Production Platform — pre-push hook
+# Blokuje push, który narusza politykę branchy lub zawiera
+# niezatwierdzone artefakty.
+# ─────────────────────────────────────────────────────────────
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "[pre-push] AIGON branch policy guard"
+
+BRANCH="$(git branch --show-current)"
+
+# ── 1. Zakaz bezpośredniego push na main ─────────────────────
+# main jest protected — zmiany idą przez PR.
+if [ "$BRANCH" = "main" ]; then
+  echo "[pre-push] FAIL: bezpośredni push na 'main' jest zabroniony."
+  echo "[pre-push] Zmiany idą przez PR (feature/fix/migration/security/release → main)."
+  exit 1
+fi
+
+# ── 2. Dozwolone prefiksy branchy ────────────────────────────
+case "$BRANCH" in
+  feature/*|fix/*|migration/*|security/*|release/*)
+    echo "[pre-push] OK: branch '$BRANCH' ma dozwolony prefiks."
+    ;;
+  *)
+    echo "[pre-push] FAIL: branch '$BRANCH' nie ma dozwolonego prefiksu."
+    echo "[pre-push] Dozwolone: feature/*, fix/*, migration/*, security/*, release/*"
+    exit 1
+    ;;
+esac
+
+echo "[pre-push] OK"
+exit 0

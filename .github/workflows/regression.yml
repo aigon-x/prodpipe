@@ -1,0 +1,16 @@
+name: Regression
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+  regression:
+    name: Regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder — regression tests
+        run: echo "Regression: brak implementacji (PHASE 9 — TEST SKELETON)"

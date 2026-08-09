@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read VERSION
+        run: cat VERSION
+      - name: Placeholder — release pipeline
+        run: echo "Release: brak implementacji (immutable image digests, deployment rings)"

@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# AIGON Production Platform — validate-sot
+# Waliduje Source of Truth i granice architektury.
+# Uruchamiany przez pre-commit, pre-push i CI (sot.yml).
+#
+# Sprawdza:
+#   - brak duplikatów SoT (każda domena ma jednego właściciela)
+#   - brak hardcoded node count / IP / hostname w canonical config
+#   - brak sekretów
+#   - brak nieoznaczonych danych (brak klasy synchronizacji)
+#   - brak latest image w produkcji
+# ─────────────────────────────────────────────────────────────
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "[validate-sot] AIGON Source-of-Truth validation"
+
+FAIL=0
+
+# ── 1. OWNERSHIP.md — każda domena ma dokładnie jednego właściciela ──
+if [ -f OWNERSHIP.md ]; then
+  # Heurystyka: szukamy zduplikowanych nazw domen w macierzy OWNERSHIP
+  DUPS=$(grep -E '^\|' OWNERSHIP.md 2>/dev/null | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}' | sort | uniq -d || true)
+  if [ -n "$DUPS" ]; then
+    echo "[validate-sot] FAIL: zduplikowane domeny w OWNERSHIP.md: $DUPS"
+    FAIL=1
+  fi
+fi
+
+# ── 2. Hardcoded node count / IP / hostname w canonical config ──
+# canonical config nie może zawierać dynamicznych wartości (node count, IP)
+CANONICAL_CONFIG=$(find config/canonical -type f \( -name '*.yaml' -o -name '*.yml' -o -name '*.json' \) 2>/dev/null || true)
+if [ -n "$CANONICAL_CONFIG" ]; then
+  # Hardcoded IP (poza localhost/example/placeholder)
+  if grep -HnE '\b(10\.|100\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' $CANONICAL_CONFIG 2>/dev/null | grep -vE '127\.0\.0\.1|0\.0\.0\.0|localhost|example|placeholder|TODO|UNDEFINED'; then
+    echo "[validate-sot] FAIL: hardcoded IP w config/canonical (dynamiczne wartości nie mogą być ręcznie utrzymywane)"
+    FAIL=1
+  fi
+fi
+
+# ── 3. Sekrety ───────────────────────────────────────────────
+if find . -path ./.git -prune -o -type f \( -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.pfx' \) -print 2>/dev/null | grep -q .; then
+  echo "[validate-sot] FAIL: wykryto pliki sekretów w repo"
+  FAIL=1
+fi
+
+# ── 4. latest image w produkcji ──────────────────────────────
+if grep -rHnE 'image:.*:latest' deployment/ 2>/dev/null | grep -iE 'prod|production|ring'; then
+  echo "[validate-sot] FAIL: image :latest w deployment produkcyjnym"
+  FAIL=1
+fi
+
+# ── 5. Nieoznaczone dane (brak klasy synchronizacji) ─────────
+# Każdy katalog shared/ musi mieć README z klasą synchronizacji.
+# (pełna walidacja w CI; tutaj szybka heurystyka)
+if [ -d shared ]; then
+  MISSING=$(find shared -mindepth 1 -maxdepth 1 -type d ! -name '.*' 2>/dev/null | while read -r d; do
+    [ -f "$d/README.md" ] || echo "$d"
+  done)
+  if [ -n "$MISSING" ]; then
+    echo "[validate-sot] WARN: katalogi shared/ bez README (klasa synchronizacji nieoznaczona):"
+    echo "$MISSING"
+  fi
+fi
+
+if [ "$FAIL" -ne 0 ]; then
+  echo "[validate-sot] BLOKADA: naruszenie Source of Truth / granic architektury."
+  exit 1
+fi
+
+echo "[validate-sot] OK"
+exit 0

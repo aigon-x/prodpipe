@@ -1,0 +1,67 @@
+name: CI — Build & Unit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-sot:
+    name: Source of Truth validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run validate-sot
+        run: |
+          chmod +x .git-hooks/validate-sot
+          ./.git-hooks/validate-sot
+
+  architecture-boundaries:
+    name: Architecture boundary checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject agent → canonical state
+        run: |
+          # agent/ nie może modyfikować config/canonical ani governance/
+          if git diff --name-only origin/main...HEAD | grep -E '^agents/.*(config/canonical|governance/)'; then
+            echo "FAIL: agent nie może pisać do canonical state / governance"
+            exit 1
+          fi
+      - name: Reject business → runtime internals
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -E '^business/.*(system/|filesystem/aigon-x-fs/)'; then
+            echo "FAIL: business nie może dotykać wewnętrznych runtime / aigon-x-fs"
+            exit 1
+          fi
+      - name: Reject hardcoded node count / IP
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -E '^config/canonical/' | xargs -r grep -lE '\b(10\.|100\.|192\.168\.)' ; then
+            echo "FAIL: hardcoded IP w canonical config"
+            exit 1
+          fi
+      - name: Reject secrets in repo
+        run: |
+          if git ls-files | grep -E '\.(pem|key|p12|pfx)$|\.env$'; then
+            echo "FAIL: sekrety w repo"
+            exit 1
+          fi
+      - name: Reject latest image in prod
+        run: |
+          if grep -rE 'image:.*:latest' deployment/ 2>/dev/null | grep -iE 'prod|ring'; then
+            echo "FAIL: image :latest w produkcji"
+            exit 1
+          fi
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder — unit tests
+        run: echo "Unit tests: brak implementacji (PHASE 9 — TEST SKELETON)"

@@ -1,0 +1,14 @@
+name: HELIOS — Final Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  helios:
+    name: HELIOS final gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder — HELIOS gate
+        run: echo "HELIOS: brak implementacji (final gate przed merge)"

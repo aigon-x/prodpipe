@@ -1,0 +1,139 @@
+# ─────────────────────────────────────────────────────────────
+# AIGON Production Platform — .gitignore
+# Git przechowuje SOURCE / CONTRACTS / DECLARATIONS / SCHEMAS /
+# DEPLOYMENT / POLICIES / TESTS. NIE przechowuje runtime state,
+# secrets, build artifacts, cache, ani danych użytkowników.
+# ─────────────────────────────────────────────────────────────
+
+# ── Secrets — NIGDY nie commitować ────────────────────────────
+*.env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+secrets/**/*.secret
+secrets/**/*.json
+secrets/**/*.yaml
+secrets/**/*.yml
+!secrets/schemas/**
+!secrets/templates/**
+
+# ── Build artifacts ──────────────────────────────────────────
+target/
+build/
+dist/
+out/
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.dll
+*.class
+*.jar
+*.war
+*.rlib
+*.rmeta
+*.wasm
+
+# ── Rust ─────────────────────────────────────────────────────
+Cargo.lock
+**/Cargo.lock
+!Cargo.lock
+target/
+
+# ── Node / JS ────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+.next/
+.nuxt/
+.vite/
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── IDE / editor ─────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Runtime state / data — NIE wchodzi do git ────────────────
+# Runtime state należy do Runtime, nie do repo.
+data/**/*.db
+data/**/*.sqlite
+data/**/*.sqlite3
+data/**/runtime-state/
+data/**/node-local/
+*.log
+logs/
+**/logs/
+
+# ── AIGON-X-FS runtime data — NIE wchodzi do git ─────────────
+# AIGON-X-FS przechowuje runtime data (knowledge, memory, artifacts,
+# evidence, user data). To NIE jest repo. Git trzyma tylko schematy.
+filesystem/**/data/
+filesystem/**/blocks/
+filesystem/**/chunks/
+filesystem/**/snapshots/
+filesystem/**/shards/
+
+# ── Artifacts — tylko manifesty/digesty w git, nie binaria ──
+artifacts/builds/*
+!artifacts/builds/.gitkeep
+artifacts/releases/*
+!artifacts/releases/.gitkeep
+artifacts/certificates/*
+!artifacts/certificates/.gitkeep
+
+# ── Generated config — regenerowane z canonical ──────────────
+config/generated/*
+!config/generated/.gitkeep
+
+# ── Governance generated ─────────────────────────────────────
+governance/generated/*
+!governance/generated/.gitkeep
+
+# ── Docs generated ───────────────────────────────────────────
+docs/generated/*
+!docs/generated/.gitkeep
+
+# ── Test artifacts ───────────────────────────────────────────
+tests/**/output/
+tests/**/artifacts/
+tests/**/coverage/
+coverage/
+*.profraw
+*.lcov
+
+# ── Terraform / IaC state ────────────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+
+# ── Misc ─────────────────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+.Trash-*

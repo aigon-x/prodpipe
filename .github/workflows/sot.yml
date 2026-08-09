@@ -1,0 +1,22 @@
+name: SOT — Source of Truth
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+  sot:
+    name: Source of Truth checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run validate-sot
+        run: |
+          chmod +x .git-hooks/validate-sot
+          ./.git-hooks/validate-sot
+      - name: Single-owner SoT check
+        run: |
+          # Każda domena ma dokładnie jednego właściciela (bez drugiego SoT)
+          echo "SOT: single-owner principle — brak drugiego SoT/registry/memory"

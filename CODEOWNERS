@@ -1,0 +1,94 @@
+# ─────────────────────────────────────────────────────────────
+# AIGON Production Platform — CODEOWNERS
+# Każda domena ma dokładnie jednego właściciela (OWNERSHIP.md).
+# Zmiany w domenie wymagają review właściciela.
+# Format: <ścieżka> <właściciel>
+# ─────────────────────────────────────────────────────────────
+
+# Root — architektura i governance
+/ARCHITECTURE.md            @aigon/architecture
+/OWNERSHIP.md               @aigon/architecture
+/SOURCE-OF-TRUTH.md         @aigon/architecture
+/DEPLOYMENT.md              @aigon/platform
+/SECURITY.md                @aigon/security
+/RECOVERY.md                @aigon/platform
+/MIGRATION.md               @aigon/platform
+/README.md                  @aigon/architecture
+/CONTRIBUTING.md            @aigon/architecture
+/CODEOWNERS                 @aigon/architecture
+/.gitignore                 @aigon/architecture
+/.gitattributes             @aigon/architecture
+/VERSION                    @aigon/release
+/LICENSE                    @aigon/architecture
+
+# Git / CI / hooks
+/.github/                   @aigon/platform
+/.git-hooks/                @aigon/platform
+
+# Aplikacje (user/business layer)
+/apps/                      @aigon/apps
+
+# System (runtime, cognition, kernel, planner, scheduler, learning,
+# memory, knowledge, evidence, governance, capabilities, mcp,
+# identity, registry)
+/system/                    @aigon/runtime
+
+# AIGON-X-FS
+/filesystem/                @aigon/fs
+
+# Mesh
+/mesh/                      @aigon/mesh
+
+# Agenci
+/agents/                    @aigon/agents
+
+# Modele / LLM Gateway
+/models/                    @aigon/models
+
+# Shared / Canonical Plane
+/shared/                    @aigon/architecture
+
+# Konfiguracja
+/config/                    @aigon/platform
+
+# Kontrakty
+/contracts/                 @aigon/architecture
+
+# Dane (schemas, migrations, seeds, fixtures)
+/data/                      @aigon/platform
+
+# Deployment
+/deployment/                @aigon/platform
+
+# Observability
+/observability/             @aigon/observability
+
+# Operacje
+/operations/                @aigon/platform
+
+# Testy
+/tests/                     @aigon/quality
+
+# Governance
+/governance/                @aigon/architecture
+
+# Business
+/business/                  @aigon/business
+
+# Security
+/security/                  @aigon/security
+
+# Secrets (tylko schematy/templates — nigdy wartości)
+/secrets/                   @aigon/security
+
+# Docs
+/docs/                      @aigon/architecture
+
+# Narzędzia
+/tools/                     @aigon/platform
+
+# Artifacts (tylko manifesty/digesty)
+/artifacts/                 @aigon/release
+
+# Archive (legacy/quarantine/cemetery)
+/archive/                   @aigon/platform

@@ -1,0 +1,24 @@
+name: Security
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * *'   # codziennie 04:23 UTC
+
+jobs:
+  security:
+    name: Security scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secret scan
+        run: |
+          if git ls-files | grep -E '\.(pem|key|p12|pfx)$|\.env$'; then
+            echo "FAIL: sekrety w repo"
+            exit 1
+          fi
+      - name: Placeholder — dependency/container scanning
+        run: echo "Security: brak implementacji (scanning — PHASE 9)"
