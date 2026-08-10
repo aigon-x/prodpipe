@@ -13,13 +13,13 @@
 AUDYT v1.0 ocenia **gotowość HUMAN PLANE** w dwóch warstwach:
 
 1. **Sekcja P SONDA** — 9 pozycji P-01..P-09 (testy manualne i UX), każda powiązana z gate'em rodziny `MAN-xx` / `UX-A-xx` / `UX-R-xx`.
-2. **Infrastruktura wspierająca** — migracja 0010, wymiar 15 tabeli doskonałości, definicja friction score, template charteru, sekcja `human:` w config registry.
+2. **Infrastruktura wspierająca** — migracja 0015, wymiar 15 tabeli doskonałości, definicja friction score, template charteru, sekcja `human:` w config registry.
 
 ### 1.2 Zakres audytu
 
 **W ZAKRESIE:**
 - Status 9 pozycji P-01..P-09 (COMPLETE / ABSENT / PARTIAL).
-- Istnienie i zastosowanie infrastruktury: migracja `0010_human_plane.sql`, wymiar 15 w tabeli `quality_index`, definicja `s_15`, template charteru, sekcja `human:` w `config/canonical/registry.yaml`.
+- Istnienie i zastosowanie infrastruktury: migracja `0015_human_plane.sql`, wymiar 15 w tabeli `quality_index`, definicja `s_15`, template charteru, sekcja `human:` w `config/canonical/registry.yaml`.
 - Wyliczenie wymiaru 15 (`s_15`) dla stanu bieżącego.
 
 **POZA ZAKRESEM:**
@@ -68,15 +68,15 @@ Metoda dowodowa: cytowanie ścieżek + identyfikatorów + konkretnych fragmentó
 
 | ID | Nazwa | Powiązany gate | STATUS | Dowód / lista braków | Rekomendacja |
 |---|---|---|---|---|---|
-| **P-01** | Pokrycie charterami (coverage) | MAN-01, MAN-02 | **ABSENT** | Tabela `manual_charters` **istnieje** (migracja 0010), ale **0 wierszy** — brak aktywnych charterów. Template charteru **istnieje** (`human-plane-charter-template.md`), ale nie wypełniono żadnego. Brak checków MAN-01/02 w `tools/verify/`. | P0: wypełnij chartere + checki MAN-01/02. |
-| **P-02** | UAT sign-off na digest artefaktu | MAN-03 | **ABSENT** | Tabela `uat_signoffs` **istnieje** (migracja 0010), ale **0 wierszy**. Brak checków MAN-03. Brak mechanizmu wiązania akceptacji z `artifact_digest`. | P0: check MAN-03 + pierwszy sign-off. |
-| **P-03** | Świeżość evidence przy releasie + rytm eksploracji | MAN-04, MAN-05 | **ABSENT** | Tabela `manual_sessions` **istnieje** (migracja 0010, `recorded_at`), ale **0 wierszy**. Brak checków MAN-04/05. Budżet wieku evidence per tier **istnieje** w config (`human.manual_evidence_max_age: 14`, `human.floors`), ale nie jest egzekwowany. | P0: checki MAN-04/05. |
-| **P-04** | MANUAL→AUTO conversion (pętla uczenia się) | MAN-06 | **ABSENT** | Kolumna `converted_test_id` **istnieje** (migracja 0010), ale **0 wierszy**. Brak definicji `conversion_rate` w kodzie (tylko design doc). | P1: check MAN-06 + metryka `conversion_rate`. |
+| **P-01** | Pokrycie charterami (coverage) | MAN-01, MAN-02 | **ABSENT** | Tabela `manual_charters` **istnieje** (migracja 0015), ale **0 wierszy** — brak aktywnych charterów. Template charteru **istnieje** (`human-plane-charter-template.md`), ale nie wypełniono żadnego. Brak checków MAN-01/02 w `tools/verify/`. | P0: wypełnij chartere + checki MAN-01/02. |
+| **P-02** | UAT sign-off na digest artefaktu | MAN-03 | **ABSENT** | Tabela `uat_signoffs` **istnieje** (migracja 0015), ale **0 wierszy**. Brak checków MAN-03. Brak mechanizmu wiązania akceptacji z `artifact_digest`. | P0: check MAN-03 + pierwszy sign-off. |
+| **P-03** | Świeżość evidence przy releasie + rytm eksploracji | MAN-04, MAN-05 | **ABSENT** | Tabela `manual_sessions` **istnieje** (migracja 0015, `recorded_at`), ale **0 wierszy**. Brak checków MAN-04/05. Budżet wieku evidence per tier **istnieje** w config (`human.manual_evidence_max_age: 14`, `human.floors`), ale nie jest egzekwowany. | P0: checki MAN-04/05. |
+| **P-04** | MANUAL→AUTO conversion (pętla uczenia się) | MAN-06 | **ABSENT** | Kolumna `converted_test_id` **istnieje** (migracja 0015), ale **0 wierszy**. Brak definicji `conversion_rate` w kodzie (tylko design doc). | P1: check MAN-06 + metryka `conversion_rate`. |
 | **P-05** | Niezależność SoD + jakość evidence | MAN-07, MAN-08 | **ABSENT** | Brak checków MAN-07 (separation of duties) i MAN-08 (kompletność evidence). Format evidence sesji **istnieje** (`human-plane-charter-template.md`), ale nie jest egzekwowany. Kontekst SoD w repo: tylko wymiar #3 w `aesthetics-plane-design.md` (design doc, bez checków SEC-D). | P1: checki MAN-07/08. |
-| **P-06** | UX automatable (a11y, CWV, visual regression, stany, tokens, błędy, i18n, klawiatura) | UX-A-01..08 | **ABSENT** | Brak checków UX-A-01..08 w `tools/verify/`. Brak integracji axe-core/pa11y, CWV budget, visual regression, design tokens conformance. Tabela `ux_studies` **istnieje** (migracja 0010), ale **0 wierszy**. | P0 (UX-A-01/02) / P2 (UX-A-04): dodaj checki UX-A-01..08. |
-| **P-07** | Badania użyteczności + task success + time-on-task + SUS | UX-R-01..04 | **ABSENT** | Tabela `ux_studies` **istnieje** (migracja 0010, `task_success_rate`, `time_on_task_sec`, `sus_score`), ale **0 wierszy**. Brak checków UX-R-01..04. Brak rytmu badań per tier. | P1: checki UX-R-01..04. |
+| **P-06** | UX automatable (a11y, CWV, visual regression, stany, tokens, błędy, i18n, klawiatura) | UX-A-01..08 | **ABSENT** | Brak checków UX-A-01..08 w `tools/verify/`. Brak integracji axe-core/pa11y, CWV budget, visual regression, design tokens conformance. Tabela `ux_studies` **istnieje** (migracja 0015), ale **0 wierszy**. | P0 (UX-A-01/02) / P2 (UX-A-04): dodaj checki UX-A-01..08. |
+| **P-07** | Badania użyteczności + task success + time-on-task + SUS | UX-R-01..04 | **ABSENT** | Tabela `ux_studies` **istnieje** (migracja 0015, `task_success_rate`, `time_on_task_sec`, `sus_score`), ale **0 wierszy**. Brak checków UX-R-01..04. Brak rytmu badań per tier. | P1: checki UX-R-01..04. |
 | **P-08** | RUM + heuristic + a11y z człowiekiem + dogfooding | UX-R-05..08 | **ABSENT** | Brak checków UX-R-05..08. Brak RUM/session replay, heuristic evaluation (Nielsen 10), a11y z człowiekiem, dogfooding gate. | P3: checki UX-R-05..08 + RUM anomaly detection. |
-| **P-09** | Warstwa 150%: friction budget + synthetic journeys + UX escape | (warstwa 150% A/B/C) | **ABSENT** | Tabela `friction_baselines` **istnieje** (migracja 0010), ale **0 wierszy**. Definicja friction score **istnieje** (`human-plane-friction-score.md`, wariant (b)), ale brak implementacji. Brak synthetic user journeys i UX escape analysis. | P2: checki friction + synthetic journeys. |
+| **P-09** | Warstwa 150%: friction budget + synthetic journeys + UX escape | (warstwa 150% A/B/C) | **ABSENT** | Tabela `friction_baselines` **istnieje** (migracja 0015), ale **0 wierszy**. Definicja friction score **istnieje** (`human-plane-friction-score.md`, wariant (b)), ale brak implementacji. Brak synthetic user journeys i UX escape analysis. | P2: checki friction + synthetic journeys. |
 
 **Self-check sekcji 2: COMPLETE** — wszystkie 9 pozycji P-01..P-09 ocenione z dowodami (grep/glob/brak plików). Wszystkie ABSENT — zgodnie z oczekiwaniem dla świeżego szkieletu.
 
@@ -84,17 +84,17 @@ Metoda dowodowa: cytowanie ścieżek + identyfikatorów + konkretnych fragmentó
 
 ## 3. Ocena infrastruktury
 
-> **Aktualizacja po domknięciu równoległych deliverabli (2026-08-10):** migracja 0010, sekcja `human:` w config, template charteru i wymiar 15 w design doc zostały utworzone. Poniższa tabela odzwierciedla stan **po** tych zmianach.
+> **Aktualizacja po domknięciu równoległych deliverabli (2026-08-10):** migracja 0015, sekcja `human:` w config, template charteru i wymiar 15 w design doc zostały utworzone. Poniższa tabela odzwierciedla stan **po** tych zmianach.
 
 | Element | Oczekiwane | Stan faktyczny | STATUS |
 |---|---|---|---|
-| **Migracja 0010** (`0010_human_plane.sql`) | Tabele `manual_charters`, `manual_sessions`, `uat_signoffs`, `ux_studies`, `friction_baselines` + `converted_test_id` | **ISTNIEJE.** `system/control-plane/state/migrations/0010_human_plane.sql` (worktree gateforge). Zawiera 5 tabel + `ALTER TABLE manual_sessions ADD COLUMN converted_test_id TEXT` + `UPDATE meta SET value='10'`. Zastosowana: `schema_version=10`, wszystkie 5 tabel + kolumna `converted_test_id` zweryfikowane w `canonical-state.db`. | **COMPLETE** |
-| **Wymiar 15 w tabeli doskonałości** | Wiersz 15 w tabeli `quality_index` | **ISTNIEJE W DESIGN DOC.** `aesthetics-plane-design.md:91` — wiersz 15 (Jakość ludzka, MAN+UX-A+UX-R, `s_15` formula). QI zaktualizowane do `prod_{i=1}^{15}` (linia 95). Brak wiersza 15 w migracji `0007_aesthetics_qi.sql` (tworzy `quality_index` z komentarzem "14 wymiarów") — wymaga aktualizacji migracji. | **PARTIAL** (design doc OK, migracja 0007 do aktualizacji) |
+| **Migracja 0015** (`0015_human_plane.sql`) | Tabele `manual_charters`, `manual_sessions`, `uat_signoffs`, `ux_studies`, `friction_baselines` + `converted_test_id` | **ISTNIEJE.** `system/control-plane/state/migrations/0015_human_plane.sql` (worktree gateforge). Zawiera 5 tabel + `ALTER TABLE manual_sessions ADD COLUMN converted_test_id TEXT` + `UPDATE meta SET value='15'`. Zastosowana: `schema_version=15`, wszystkie 5 tabel + kolumna `converted_test_id` zweryfikowane w `canonical-state.db`. | **COMPLETE** |
+| **Wymiar 15 w tabeli doskonałości** | Wiersz 15 w tabeli `quality_index` | **ISTNIEJE W DESIGN DOC.** `aesthetics-plane-design.md:91` — wiersz 15 (Jakość ludzka, MAN+UX-A+UX-R, `s_15` formula). QI zaktualizowane do `prod_{i=1}^{15}` (linia 95). Brak wiersza 15 w migracji `0009_aesthetics_qi.sql` (tworzy `quality_index` z komentarzem "14 wymiarów") — wymaga aktualizacji migracji. | **PARTIAL** (design doc OK, migracja 0009 do aktualizacji) |
 | **Definicja friction score** | Definicja pomiaru per journey | **ISTNIEJE W DESIGN DOC.** `human-plane-design.md:73`: `friction(ścieżka) = kliknięcia + pola formularza + zmiany kontekstu + czas oczekiwania`. Osobny doc `human-plane-friction-score.md` (wariant (b)) z pełną definicją, normalizacją, budżetem i worked example. Brak implementacji (brak checków, brak synthetic journeys). | **PARTIAL** (design doc + definicja, bez implementacji) |
 | **Template charteru** | Template charteru + format evidence sesji | **ISTNIEJE.** `human-plane-charter-template.md` (wariant (a)) — pełny template charteru (MAN-01/02), format evidence sesji eksploracyjnej (MAN-02/08), template UAT sign-off (MAN-03), wypełniony przykład. | **COMPLETE** |
 | **Config registry `human:` section** | Sekcja `human:` w `config/canonical/registry.yaml` | **ISTNIEJE.** Sekcja `human:` dodana w `config/registry.yaml` (worktree gateforge): `manual_evidence_max_age: 14`, `exploration_cadence_days: 30`, `task_success_target: 0.95`, `conversion_rate_target: 0.8`, `friction_budget_default: 20`, `floors:` per tier (tier-0..3). | **COMPLETE** |
 
-**Self-check sekcji 3: COMPLETE** — 5 elementów infrastruktury ocenionych z dowodami (glob migracji, grep registry.yaml, glob charter, treść migracji 0007). Migracja 0010, sekcja `human:` i template charteru **COMPLETE**; wymiar 15 i friction score **PARTIAL** (design doc, bez implementacji checków).
+**Self-check sekcji 3: COMPLETE** — 5 elementów infrastruktury ocenionych z dowodami (glob migracji, grep registry.yaml, glob charter, treść migracji 0007). Migracja 0015, sekcja `human:` i template charteru **COMPLETE**; wymiar 15 i friction score **PARTIAL** (design doc, bez implementacji checków).
 
 ---
 
@@ -110,10 +110,10 @@ s_15 = manual_coverage × evidence_freshness × min(1, task_success_actual/task_
 
 | Czynnik | Definicja | Wartość bieżąca | Dowód |
 |---|---|---|---|
-| `manual_coverage` | % wymaganych ścieżek z aktywnym charterem | **0** | Tabela `manual_charters` **istnieje** (migracja 0010), ale **0 wierszy** — brak aktywnych charterów. Template charteru istnieje (`human-plane-charter-template.md`), ale nie wypełniono żadnego. |
+| `manual_coverage` | % wymaganych ścieżek z aktywnym charterem | **0** | Tabela `manual_charters` **istnieje** (migracja 0015), ale **0 wierszy** — brak aktywnych charterów. Template charteru istnieje (`human-plane-charter-template.md`), ale nie wypełniono żadnego. |
 | `evidence_freshness` | % świeżych evidence (w budżecie wieku per tier) | **0** | Tabela `manual_sessions` **istnieje**, ale **0 wierszy** — brak sesji, brak evidence. |
 | `min(1, task_success_actual/task_success_target)` | skuteczność zadań (cap na 1) | **0** | Tabela `ux_studies` **istnieje**, ale **0 wierszy** — brak pomiaru task success. |
-| `conversion_rate` | MAN-06: findings → testy auto | **0** | Kolumna `converted_test_id` **istnieje** (migracja 0010), ale **0 wierszy** — brak findings, brak checków MAN-06. |
+| `conversion_rate` | MAN-06: findings → testy auto | **0** | Kolumna `converted_test_id` **istnieje** (migracja 0015), ale **0 wierszy** — brak findings, brak checków MAN-06. |
 
 ### 4.3 Wynik
 
@@ -133,7 +133,7 @@ s_15 = 0 × 0 × 0 × 0 = 0
 
 | Priorytet | Zakres | Pozycje P | Akcja |
 |---|---|---|---|
-| **P0** | Fundament: pokrycie, UAT na digest, świeżość przy releasie, a11y + CWV | P-01, P-02, P-03, P-06 (UX-A-01/02) | Migracja 0010 + template charteru + checki MAN-01/03/04 + UX-A-01/02 |
+| **P0** | Fundament: pokrycie, UAT na digest, świeżość przy releasie, a11y + CWV | P-01, P-02, P-03, P-06 (UX-A-01/02) | Migracja 0015 + template charteru + checki MAN-01/03/04 + UX-A-01/02 |
 | **P1** | Pętla uczenia się (conversion) + rytm badań + task success | P-04, P-05, P-07 | Kolumna `converted_test_id` + checki MAN-06/07/08 + tabela `ux_studies` + UX-R-01..04 |
 | **P2** | Warstwa 150% + kompletność stanów | P-06 (UX-A-04), P-09 | Tabela `friction_baselines` + definicja friction score + synthetic journeys + UX-A-04 |
 | **P3** | Domknięcie pętli skarg + sygnały frustracji | P-08 | UX escape analysis + RUM anomaly detection + UX-R-05..08 |
@@ -143,8 +143,8 @@ s_15 = 0 × 0 × 0 × 0 = 0
 > **Aktualizacja po domknięciu równoległych deliverabli (2026-08-10):** kroki P0-2, P0-4, P0-5 zostały **zrealizowane** w tej sesji. Poniżej oznaczono je `[DONE]`. Pozostałe kroki (P0-1, P0-3, P1-P3) pozostają otwarte.
 
 1. **P0-1 (metodyczny):** Dodaj **sekcję P** do SONDA (`docs/audit/sonda-package.md`) z pozycjami P-01..P-09 — obecnie sekcja P nie istnieje (patrz §1.5). To warunek wstępny dla wiarygodności kolejnych audytów. **Uwaga:** sekcja P **już istnieje** w `docs/00-foundation/SONDA.md` (P-01..P-09, utworzona w tej sesji) — pozostaje **ujednolicić** dwie SONDA (kartografia `docs/audit/sonda-package.md` vs diagnostyczna `docs/00-foundation/SONDA.md`), patrz §1.5.
-2. **P0-2 `[DONE]`:** Utworzono migrację `system/control-plane/state/migrations/0010_human_plane.sql` (tabele `manual_charters`, `manual_sessions`, `uat_signoffs`, `ux_studies`, `friction_baselines` + `ALTER TABLE manual_sessions ADD COLUMN converted_test_id`). Zaktualizowano `STATE_SCHEMA_VERSION` w `system/control-plane/state/lib.sh` (9 → 10). Migracja zastosowana: `schema_version=10`, 5 tabel + kolumna zweryfikowane w `canonical-state.db`.
-3. **P0-3:** Dodaj wymiar 15 do tabeli `quality_index` (migracja 0007 komentuje "14 wymiarów" — wymaga aktualizacji do 15) + wiersz 15 w design doc `aesthetics-plane-design.md` (**już istnieje**, linia 91, QI `prod_{i=1}^{15}` linia 95).
+2. **P0-2 `[DONE]`:** Utworzono migrację `system/control-plane/state/migrations/0015_human_plane.sql` (tabele `manual_charters`, `manual_sessions`, `uat_signoffs`, `ux_studies`, `friction_baselines` + `ALTER TABLE manual_sessions ADD COLUMN converted_test_id`). Zaktualizowano `STATE_SCHEMA_VERSION` w `system/control-plane/state/lib.sh` (9 → 15). Migracja zastosowana: `schema_version=15`, 5 tabel + kolumna zweryfikowane w `canonical-state.db`.
+3. **P0-3:** Dodaj wymiar 15 do tabeli `quality_index` (migracja 0009 komentuje "14 wymiarów" — wymaga aktualizacji do 15) + wiersz 15 w design doc `aesthetics-plane-design.md` (**już istnieje**, linia 91, QI `prod_{i=1}^{15}` linia 95).
 4. **P0-4 `[DONE]`:** Utworzono template charteru + format evidence sesji eksploracyjnej (`human-plane-charter-template.md`, wariant (a) design doc) — pełny template charteru (MAN-01/02), format evidence sesji (MAN-02/08), template UAT sign-off (MAN-03), wypełniony przykład.
 5. **P0-5 `[DONE]`:** Dodano sekcję `human:` do `config/registry.yaml` (klucze `human.manual_evidence_max_age`, `human.exploration_cadence_days`, `human.task_success_target`, `human.conversion_rate_target`, `human.friction_budget_default`, `human.floors` per tier) — zgodnie z CFG-001..008 (jednokanałowość, schema, klucze z floor/owner/tier/doc).
 6. **P1:** Dodaj checki MAN-06/07/08 + UX-R-01..04 do `tools/verify/` (moduł `human` w `config/canonical/gates.yaml` + `gen-profiles.sh`).
@@ -156,11 +156,11 @@ s_15 = 0 × 0 × 0 × 0 = 0
 Pozycja P-xx przechodzi z ABSENT/PARTIAL na COMPLETE, gdy:
 - istnieje check ID w `tools/verify/` (np. `MAN-01`, `UX-A-01`),
 - check ma test pozytywny + negatywny (wzorzec VV z wymiaru #2),
-- istnieje świeże evidence w tabelach migracji 0010,
+- istnieje świeże evidence w tabelach migracji 0015,
 - `s_15 > 0` (wymiar 15 przestaje zerować QI).
 
 ---
 
 ## TL;DR
 
-AUDYT v1.0 stwierdza: **HUMAN PLANE jest na etapie design doc + infrastruktura, zero evidence.** Wszystkie 9 pozycji P-01..P-09 to **ABSENT** (brak checków i evidence), ale infrastruktura została **zrealizowana w tej sesji**: migracja 0010 (5 tabel + `converted_test_id`, `schema_version=10`), sekcja `human:` w config, template charteru (`human-plane-charter-template.md`), wymiar 15 w design doc (QI `prod_{i=1}^{15}`). `s_15 = 0` (zeruje cały QI) — tabele istnieją, ale **0 wierszy evidence**. Znalezisko metodyczne: **istnieją DWIE SONDA** — kartografia `docs/audit/sonda-package.md` (bez sekcji P) vs diagnostyczna `docs/00-foundation/SONDA.md` (z sekcją P-01..P-09) — wymagają ujednolicenia. To oczekiwany stan świeżego szkieletu; plan P0-P3 domyka luki w kolejności: fundament (P0) → pętla uczenia się (P1) → warstwa 150% (P2) → domknięcie skarg (P3). Kroki P0-2/4/5 zrealizowane; otwarte: P0-1 (ujednolicenie SONDA), P0-3 (wiersz 15 w migracji 0007), P1-P3.
+AUDYT v1.0 stwierdza: **HUMAN PLANE jest na etapie design doc + infrastruktura, zero evidence.** Wszystkie 9 pozycji P-01..P-09 to **ABSENT** (brak checków i evidence), ale infrastruktura została **zrealizowana w tej sesji**: migracja 0015 (5 tabel + `converted_test_id`, `schema_version=15`), sekcja `human:` w config, template charteru (`human-plane-charter-template.md`), wymiar 15 w design doc (QI `prod_{i=1}^{15}`). `s_15 = 0` (zeruje cały QI) — tabele istnieją, ale **0 wierszy evidence**. Znalezisko metodyczne: **istnieją DWIE SONDA** — kartografia `docs/audit/sonda-package.md` (bez sekcji P) vs diagnostyczna `docs/00-foundation/SONDA.md` (z sekcją P-01..P-09) — wymagają ujednolicenia. To oczekiwany stan świeżego szkieletu; plan P0-P3 domyka luki w kolejności: fundament (P0) → pętla uczenia się (P1) → warstwa 150% (P2) → domknięcie skarg (P3). Kroki P0-2/4/5 zrealizowane; otwarte: P0-1 (ujednolicenie SONDA), P0-3 (wiersz 15 w migracji 0009), P1-P3.

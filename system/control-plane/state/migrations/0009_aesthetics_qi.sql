@@ -1,5 +1,6 @@
 -- ============================================================================
--- MIGRATION 0007 — AESTHETICS PLANE + QUALITY INDEX
+-- MIGRATION 0009 — AESTHETICS PLANE + QUALITY INDEX
+-- RESERVED_TABLES: aest_findings
 -- ============================================================================
 -- AESTHETICS PLANE to warstwa "piękna jako mierzalne właściwości". Ta migracja
 -- tworzy fundament mierzalności doskonałości:
@@ -22,7 +23,7 @@
 -- ============================================================================
 
 -- Rejestr findingów estetycznych (AEST-xx / MOD-xx / CONS-xx / DX-xx)
-CREATE TABLE aest_findings (
+CREATE TABLE IF NOT EXISTS aest_findings (
     id          INTEGER PRIMARY KEY,
     service_id  TEXT NOT NULL,
     check_id    TEXT NOT NULL,            -- AEST-xx / MOD-xx / CONS-xx / DX-xx
@@ -33,7 +34,7 @@ CREATE TABLE aest_findings (
 );
 
 -- Materializowany Quality Index per serwis/wymiar (0..1, wyliczony z evidence)
-CREATE TABLE quality_index (
+CREATE TABLE IF NOT EXISTS quality_index (
     id          INTEGER PRIMARY KEY,
     service_id  TEXT NOT NULL,
     dimension   TEXT NOT NULL,            -- 14 wymiarów doskonałości
@@ -43,9 +44,9 @@ CREATE TABLE quality_index (
 );
 
 -- Indeksy pomocnicze
-CREATE INDEX idx_aest_findings_service ON aest_findings(service_id);
-CREATE INDEX idx_quality_index_service ON quality_index(service_id);
-CREATE INDEX idx_quality_index_computed ON quality_index(computed_at);
+CREATE INDEX IF NOT EXISTS idx_aest_findings_service ON aest_findings(service_id);
+CREATE INDEX IF NOT EXISTS idx_quality_index_service ON quality_index(service_id);
+CREATE INDEX IF NOT EXISTS idx_quality_index_computed ON quality_index(computed_at);
 
 -- Zaktualizuj wersję schematu
-UPDATE meta SET value = '7' WHERE key = 'schema_version';
+UPDATE meta SET value = '9' WHERE key = 'schema_version';

@@ -788,7 +788,7 @@ config_materialize_snapshot() {
   local has_tbl
   has_tbl=$(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name='config_snapshots';" 2>/dev/null)
   if [ -z "$has_tbl" ]; then
-    config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0006 nie została zastosowana. Uruchom state.sh migrate."
+    config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0007 nie została zastosowana. Uruchom state.sh migrate."
   fi
 
   # INSERT snapshot (idempotentny po hash — UNIQUE).
@@ -850,7 +850,7 @@ config_get() {
   [ -f "$db" ] || config_fatal "Brak bazy StateStore: $db — config_get wymaga snapshotu"
   local has_tbl
   has_tbl=$(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name='config_snapshots';" 2>/dev/null)
-  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0006 nie została zastosowana"
+  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0007 nie została zastosowana"
 
   # Pobierz effective_json dla snapshotu.
   local eff
@@ -882,7 +882,7 @@ config_trace() {
   [ -f "$db" ] || config_fatal "Brak bazy StateStore: $db — config_trace wymaga snapshotu"
   local has_tbl
   has_tbl=$(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name='config_snapshots';" 2>/dev/null)
-  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0006 nie została zastosowana"
+  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0007 nie została zastosowana"
 
   local eff
   eff=$(sqlite3 "$db" "SELECT effective_json FROM config_snapshots WHERE id='$snapshot_id';" 2>/dev/null)
@@ -960,7 +960,7 @@ config_ratchet_update() {
   [ -f "$db" ] || config_fatal "Brak bazy StateStore: $db — config_ratchet_update wymaga bazy"
   local has_tbl
   has_tbl=$(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name='config_ratchet';" 2>/dev/null)
-  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_ratchet w StateStore — migracja 0006 nie została zastosowana"
+  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_ratchet w StateStore — migracja 0007 nie została zastosowana"
 
   # Pobierz obecną achieved_value.
   local cur
@@ -1097,7 +1097,7 @@ config_simulate() {
   [ -f "$db" ] || config_fatal "Brak bazy StateStore: $db — config_simulate wymaga bazy"
   local has_tbl
   has_tbl=$(sqlite3 "$db" "SELECT name FROM sqlite_master WHERE type='table' AND name='config_snapshots';" 2>/dev/null)
-  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0006 nie została zastosowana"
+  [ -n "$has_tbl" ] || config_fatal "Brak tabeli config_snapshots w StateStore — migracja 0007 nie została zastosowana"
 
   # Stary snapshot (ostatni wg id).
   local old_eff

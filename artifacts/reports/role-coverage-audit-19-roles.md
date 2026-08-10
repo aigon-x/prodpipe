@@ -105,7 +105,7 @@ Wymiary **VV, MAN, EXP, DATA, EDGE, BIZ, FIN, SUP, COMP, LEG, AI** są w `taxono
 - **GAP-UXR-02** Brak gate'a dla usability testing.
 - **GAP-UXR-03** Brak gate'a dla accessibility research (UX-R-04).
 - **GAP-UXR-04** Brak gate'a dla person/empathy maps.
-- **GAP-UXR-05** Brak gate'a dla friction baselines (migracja 0010 ghost).
+- **GAP-UXR-05** Brak gate'a dla friction baselines (migracja 0015 ghost).
 - **GAP-UXR-06** Brak gate'a dla UX-R sygnału do backlogu.
 
 ### 9. Product Designer — pokrycie ~5%
@@ -121,7 +121,7 @@ Wymiary **VV, MAN, EXP, DATA, EDGE, BIZ, FIN, SUP, COMP, LEG, AI** są w `taxono
 - **GAP-PM-02** EXP-01..04 wszystkie ABSENT per SONDA.md (linie 627-630).
 - **GAP-PM-03** Brak modułów biz/exp w gates.yaml.
 - **GAP-PM-04** taxonomy.sh waliduje tylko strukturę, nie pokrycie check→gate.
-- **GAP-PM-05** UAT sign-off (MAN-03) w wymiarze MAN nie BIZ/EXP; tabela `uat_signoffs` istnieje (migracja 0010) ale 0 wierszy.
+- **GAP-PM-05** UAT sign-off (MAN-03) w wymiarze MAN nie BIZ/EXP; tabela `uat_signoffs` istnieje (migracja 0015) ale 0 wierszy.
 - **GAP-PM-06** Brak golden datasets, priorytetyzacji, sunset, success metrics, feature flags (BIZ-04 tylko deklaracja).
 
 ### 11. Data Engineer — pokrycie ~5%
@@ -234,7 +234,7 @@ Wymiary **VV, MAN, EXP, DATA, EDGE, BIZ, FIN, SUP, COMP, LEG, AI** są w `taxono
 5. **Brak modułu human/data/vv w gates.yaml.**
 6. **taxonomy.sh nie weryfikuje check→gate** — fatalna luka meta-gate pozwalająca na setki niezaimplementowanych checków.
 7. **SELF-001 nie wykrywa wymiarów bez deklaracji** — tylko ghost moduły (skrypt zadeklarowany bez pliku), nie wymiary bez gate'a.
-8. **Rozjazd worktree gateforge vs main:** migracja 0010, sekcja `human:` w registry — istnieją w worktree, nie w main.
+8. **Rozjazd worktree gateforge vs main:** migracja 0015, sekcja `human:` w registry — istnieją w worktree, nie w main.
 9. **Orphany:** obs-*/sec-* w worktree'ach; debt/drift/history/reconcile/waivers/config w main — pliki istnieją, ale nie zadeklarowane w pipeline.
 10. **Brak CI dla narzędzi deweloperskich** — .github/workflows/* nie uruchamiają scaffold.sh, gen-profiles.sh, ani testów.
 

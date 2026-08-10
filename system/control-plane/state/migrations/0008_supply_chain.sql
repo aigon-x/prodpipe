@@ -1,0 +1,19 @@
+-- ============================================================================
+-- MIGRATION 0008 — DEPENDENCIES / SUPPLY CHAIN (contracts & SBOM)
+-- ============================================================================
+-- AIGON Production Platform — Supply Chain Plane.
+-- Rezerwacja numeru migracji dla warstwy zależności: SBOM, dependency graph,
+-- contracts, license inventory, provenance.
+--
+-- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
+-- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Ta migracja jest świadomie zdefiniowana jako forward-compatible placeholder.
+-- Supply Chain domain model (sbom / dependency / contract / license /
+-- provenance) zostanie dodany INKREMENTALNIE w ramach Supply Chain Plane.
+-- Numer 0006 jest zarezerwowany, aby utrzymać ciągłą, logicznie uporządkowaną
+-- sekwencję migracji.
+--
+-- RESERVED_TABLES: sbom dependency contract license provenance
+-- ============================================================================

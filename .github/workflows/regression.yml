@@ -12,5 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder — regression tests
-        run: echo "Regression: brak implementacji (PHASE 9 — TEST SKELETON)"
+      - name: Run regression gates (PRE_PUSH profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates PRE_PUSH

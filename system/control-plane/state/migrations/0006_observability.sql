@@ -1,0 +1,19 @@
+-- ============================================================================
+-- MIGRATION 0006 — OBSERVABILITY / TELEMETRY (evidence & monitoring)
+-- ============================================================================
+-- AIGON Production Platform — Observability Plane.
+-- Rezerwacja numeru migracji dla warstwy obserwowalności: telemetry, metrics,
+-- evidence lineage, monitoring, alerting.
+--
+-- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
+-- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Ta migracja jest świadomie zdefiniowana jako forward-compatible placeholder.
+-- Observability domain model (telemetry / metrics / evidence_lineage /
+-- monitoring / alerting) zostanie dodany INKREMENTALNIE w ramach Observability
+-- Plane. Numer 0005 jest zarezerwowany, aby utrzymać ciągłą, logicznie
+-- uporządkowaną sekwencję migracji.
+--
+-- RESERVED_TABLES: telemetry metric evidence_lineage monitoring alert
+-- ============================================================================

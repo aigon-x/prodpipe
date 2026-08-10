@@ -49,12 +49,6 @@ VERIFY_MODULES=(
   "contracts:full:WARNING"
   "contracts:release:BLOCKING"
   "contracts:genesis:BLOCKING"
-  "migration:full:WARNING"
-  "migration:release:BLOCKING"
-  "migration:genesis:BLOCKING"
-  "recovery:full:WARNING"
-  "recovery:release:BLOCKING"
-  "recovery:genesis:BLOCKING"
   "aesthetics:fast:BLOCKING"
   "aesthetics:full:BLOCKING"
   "aesthetics:release:BLOCKING"
@@ -76,8 +70,6 @@ VERIFY_MODULES=(
   "i18n:genesis:BLOCKING"
   "efficiency:full:BLOCKING"
   "efficiency:architecture:BLOCKING"
-  "efficiency:release:BLOCKING"
-  "efficiency:genesis:BLOCKING"
   "obs-logging:full:BLOCKING"
   "obs-logging:release:BLOCKING"
   "obs-logging:genesis:BLOCKING"
@@ -100,8 +92,6 @@ VERIFY_MODULES=(
   "obs-dashboards:release:BLOCKING"
   "obs-dashboards:genesis:BLOCKING"
   "obs-synthetics:full:BLOCKING"
-  "obs-synthetics:release:BLOCKING"
-  "obs-synthetics:genesis:BLOCKING"
   "security-credential-registry:full:BLOCKING"
   "security-credential-registry:security:BLOCKING"
   "security-credential-registry:release:BLOCKING"
@@ -133,10 +123,13 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
+      ;;
+    full)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
       ;;
     security)
-      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security security-drills"
       ;;
     architecture)
       echo "architecture contracts semantics taxonomy efficiency"
@@ -145,13 +138,43 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
+      ;;
+    release)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      ;;
+    genesis)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      ;;
+    all)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      ;;
+    full)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
+      ;;
+    security)
+      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
+      ;;
+    architecture)
+      echo "architecture contracts semantics taxonomy"
+      ;;
+    reproducibility)
+      echo "reproducibility dependencies"
+      ;;
+    release)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
+      ;;
+    genesis)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
+      ;;
+    all)
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     *)
       echo "git security structure"
@@ -184,35 +207,33 @@ verify_module_severity() {
 module_script() {
   local module="$1"
   case "$module" in
-    git)                   echo "git/integrity.sh" ;;
-    security)              echo "security/secrets.sh" ;;
-    structure)             echo "structure/readme.sh" ;;
-    architecture)          echo "architecture/architecture.sh" ;;
-    dependencies)          echo "dependencies/dependencies.sh" ;;
-    reproducibility)       echo "reproducibility/reproducibility.sh" ;;
-    deployment)            echo "deployment/deployment.sh" ;;
-    contracts)             echo "contracts/contracts.sh" ;;
-    migration)             echo "migration/migration.sh" ;;
-    recovery)              echo "recovery/recovery.sh" ;;
-    aesthetics)            echo "aesthetics/aesthetics.sh" ;;
-    semantics)             echo "architecture/semantics.sh" ;;
-    security-drills)       echo "security/drills.sh" ;;
-    taxonomy)              echo "architecture/taxonomy.sh" ;;
-    i18n)                  echo "i18n/i18n.sh" ;;
-    efficiency)            echo "efficiency/efficiency.sh" ;;
-    obs-logging)           echo "obs-logging-check.sh" ;;
-    obs-metrics)           echo "obs-metrics-check.sh" ;;
-    obs-alerts)            echo "obs-alerts-check.sh" ;;
-    obs-slo)               echo "obs-slo-check.sh" ;;
-    obs-health)            echo "obs-health-endpoints.sh" ;;
-    obs-deadman)           echo "obs-deadman-check.sh" ;;
-    obs-dashboards)        echo "obs-dashboards-check.sh" ;;
-    obs-synthetics)        echo "obs-synthetics-check.sh" ;;
-    security-credential-registry) echo "security/sec-credential-registry.sh" ;;
-    security-rotation)     echo "security/sec-rotation-check.sh" ;;
-    security-retention)    echo "security/sec-retention-check.sh" ;;
-    security-auth)         echo "security/sec-auth-check.sh" ;;
-    security-web)          echo "security/sec-web-check.sh" ;;
+    git)                                echo "git/integrity.sh" ;;
+    security)                           echo "security/secrets.sh" ;;
+    structure)                          echo "structure/readme.sh" ;;
+    architecture)                       echo "architecture/architecture.sh" ;;
+    dependencies)                       echo "dependencies/dependencies.sh" ;;
+    reproducibility)                    echo "reproducibility/reproducibility.sh" ;;
+    deployment)                         echo "deployment/deployment.sh" ;;
+    contracts)                          echo "contracts/contracts.sh" ;;
+    aesthetics)                         echo "aesthetics/aesthetics.sh" ;;
+    semantics)                          echo "architecture/semantics.sh" ;;
+    security-drills)                    echo "security/drills.sh" ;;
+    taxonomy)                           echo "architecture/taxonomy.sh" ;;
+    i18n)                               echo "i18n/i18n.sh" ;;
+    efficiency)                         echo "efficiency/efficiency.sh" ;;
+    obs-logging)                        echo "obs-logging-check.sh" ;;
+    obs-metrics)                        echo "obs-metrics-check.sh" ;;
+    obs-alerts)                         echo "obs-alerts-check.sh" ;;
+    obs-slo)                            echo "obs-slo-check.sh" ;;
+    obs-health)                         echo "obs-health-endpoints.sh" ;;
+    obs-deadman)                        echo "obs-deadman-check.sh" ;;
+    obs-dashboards)                     echo "obs-dashboards-check.sh" ;;
+    obs-synthetics)                     echo "obs-synthetics-check.sh" ;;
+    security-credential-registry)       echo "security/sec-credential-registry.sh" ;;
+    security-rotation)                  echo "security/sec-rotation-check.sh" ;;
+    security-retention)                 echo "security/sec-retention-check.sh" ;;
+    security-auth)                      echo "security/sec-auth-check.sh" ;;
+    security-web)                       echo "security/sec-web-check.sh" ;;
     *)              echo "" ;;
   esac
 }

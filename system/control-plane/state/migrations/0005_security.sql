@@ -1,0 +1,18 @@
+-- ============================================================================
+-- MIGRATION 0005 — SECURITY PLANE (security domain model)
+-- ============================================================================
+-- AIGON Production Platform — Security Plane.
+-- Rezerwacja numeru migracji dla warstwy bezpieczeństwa: policy, findings,
+-- vulnerability inventory, secret management, compliance.
+--
+-- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
+-- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Ta migracja jest świadomie zdefiniowana jako forward-compatible placeholder.
+-- Security domain model (policy / findings / vulnerability / secret) zostanie
+-- dodany INKREMENTALNIE w ramach Security Plane. Numer 0004 jest zarezerwowany,
+-- aby utrzymać ciągłą, logicznie uporządkowaną sekwencję migracji.
+--
+-- RESERVED_TABLES: policy finding vulnerability secret compliance
+-- ============================================================================

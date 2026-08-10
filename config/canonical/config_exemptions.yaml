@@ -21,7 +21,7 @@ exemptions:
   # 1. evidence→baza (meta-gate)
   - key: evidence.persist_to_db
     reason: "Bez zapisu evidence do bazy audyt umiera — każdy wynik gate'a musi wskazywać DOKŁADNY config (snapshot_id), który podjął decyzję."
-    enforced_by: "lib/config.sh (config_resolve) + migrations/0006_config_plane.sql (evidence.snapshot_id)"
+    enforced_by: "lib/config.sh (config_resolve) + migrations/0007_config_plane.sql (evidence.snapshot_id)"
     change_requires: "Zmiana kodu + ADR + pełny proces (review CODEOWNERS + CFG-SIM)."
 
   # 2. SELF-001 / fail-closed

@@ -1,5 +1,6 @@
 -- ============================================================================
--- MIGRATION 0009 — OBSERVABILITY BASELINE (SLO + ALERTS)
+-- MIGRATION 0013 — OBSERVABILITY BASELINE (SLO + ALERTS)
+-- RESERVED_TABLES: slo alerts
 -- ============================================================================
 -- OBS-BASELINE: szablon rodzi obserwowalne projekty. Ta migracja tworzy
 -- fundament operacyjności w StateStore:
@@ -21,7 +22,7 @@
 -- ============================================================================
 
 -- Rejestr SLO (Service Level Objectives)
-CREATE TABLE slo (
+CREATE TABLE IF NOT EXISTS slo (
     id          INTEGER PRIMARY KEY,
     service_id  TEXT NOT NULL,            -- service_id z .skeleton.yaml
     sli         TEXT NOT NULL,            -- nazwa wskaźnika (availability, latency_p99, ...)
@@ -33,7 +34,7 @@ CREATE TABLE slo (
 );
 
 -- Rejestr alertów
-CREATE TABLE alerts (
+CREATE TABLE IF NOT EXISTS alerts (
     id          INTEGER PRIMARY KEY,
     alert_id    TEXT NOT NULL UNIQUE,     -- unikalny identyfikator alertu
     severity    TEXT NOT NULL,            -- critical | warning | info (OBS-12)
@@ -44,9 +45,9 @@ CREATE TABLE alerts (
 );
 
 -- Indeksy pomocnicze
-CREATE INDEX idx_slo_service ON slo(service_id);
-CREATE INDEX idx_alerts_severity ON alerts(severity);
-CREATE INDEX idx_alerts_status ON alerts(status);
+CREATE INDEX IF NOT EXISTS idx_slo_service ON slo(service_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
 
 -- Zaktualizuj wersję schematu
-UPDATE meta SET value = '9' WHERE key = 'schema_version';
+UPDATE meta SET value = '13' WHERE key = 'schema_version';

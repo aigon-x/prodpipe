@@ -1,0 +1,40 @@
+# ============================================================================
+# restore-drill.cron — CRON FRAGMENT dla restore drill (Resilience Plane)
+# ============================================================================
+# AIGON Production Platform — Resilience Plane (sub-deliverable "a").
+#
+# Ten plik jest SZABLONEM (dokumentowanym), NIE żywym cronem systemowym.
+# Harmonogram drill'a wynika z restore_drill_max_age w config/registry.yaml
+# (domyślnie 7 dni → cadence tygodniowa). Po przekroczeniu limitu gate
+# RES-B-02 (tools/verify/gates/domains/resilience.sh) i ten cron wymuszają
+# nowy drill.
+#
+# Pipeline: cron → restore → walidacja → evidence → destroy
+#   * restore-drill.sh wykonuje pełny cykl end-to-end w środowisku scratch.
+#   * Drill NIGDY nie działa na produkcji (--env prod jest odrzucane).
+#   * Każdy przebieg zapisuje evidence do artifacts/evidence/resilience/.
+#
+# Aby włączyć jako żywy cron:
+#   1. Skopiuj ten fragment do /etc/cron.d/restore-drill (root).
+#   2. Upewnij się, że state.sh jest zainicjalizowany i ma backup.
+#   3. Wrapper poniżej najpierw pobiera świeży SID (state.sh backup),
+#      a następnie uruchamia drill z tym SID.
+#
+# Cadence: domyślnie tygodniowo (poniedziałek 03:00). Dostosuj do
+# restore_drill_max_age z config/registry.yaml.
+#
+# Przykładowa linia cron (co tydzień, poniedziałek 03:00):
+#   0 3 * * 1  root  /opt/PROD/tools/resilience/restore-drill/restore-drill-wrapper.sh
+#
+# Wrapper (przykład — pobiera świeży SID przed drill'em):
+#   #!/usr/bin/env bash
+#   set -euo pipefail
+#   ROOT="/opt/PROD"
+#   STATE_SH="$ROOT/system/control-plane/state/state.sh"
+#   DRILL="$ROOT/tools/resilience/restore-drill/restore-drill.sh"
+#   SID="$("$STATE_SH" backup "cron-drill-$(date +%s)" | sed -E 's/.*canonical-state-([^.]*)\.db/\1/')"
+#   exec "$DRILL" --sid "$SID" --env scratch
+# ============================================================================
+
+# ── Cron line (szablon) ─────────────────────────────────────────────────────
+# 0 3 * * 1  root  /opt/PROD/tools/resilience/restore-drill/restore-drill-wrapper.sh

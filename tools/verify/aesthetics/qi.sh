@@ -12,7 +12,7 @@
 # kodem. Doskonałość = brak słabych ogniw.
 #
 # Checki:
-#   QI-001  Query — tabela quality_index istnieje (migracja 0007 uruchomiona)
+#   QI-001  Query — tabela quality_index istnieje (migracja 0009 uruchomiona)
 #   QI-002  Scorecard — 14 wierszy (wymiar, score, waga, wkład) + QI końcowy
 #   QI-003  Świeżość evidence — dimension score bez świeżego evidence = 0
 #           (nie NULL — ZERO). computed_at starszy niż próg z configu = 0.
@@ -65,13 +65,13 @@ fi
 say ""
 say "--- QI-001: Query (tabela quality_index istnieje) ---"
 # WHY: kalkulator QI czyta z tabeli quality_index (materializowany stan).
-# Brak tabeli = migracja 0007 nie uruchomiona = nie ma skąd liczyć QI.
-# SOURCE: docs/architecture/aesthetics-plane-design.md (migracja 0011/0007).
+# Brak tabeli = migracja 0009 nie uruchomiona = nie ma skąd liczyć QI.
+# SOURCE: docs/architecture/aesthetics-plane-design.md (migracja 0009).
 # EVIDENCE: sqlite_master dla tabeli quality_index.
 # EXPECTED: tabela istnieje. ACTUAL: obecność/brak tabeli.
 # SEVERITY: BLOCKING. REMEDIATION: uruchom state.sh migrate.
 if [ ! -f "$DB" ]; then
-  fail "QI-001 Query" BLOCKING "Brak bazy StateStore: $DB — uruchom state.sh migrate (migracja 0007 tworzy quality_index)."
+  fail "QI-001 Query" BLOCKING "Brak bazy StateStore: $DB — uruchom state.sh migrate (migracja 0009 tworzy quality_index)."
   evidence_record "verify:aesthetics:qi:no-db" "module" "aesthetics/qi.sh"
   verify_module_exit
 fi
@@ -79,9 +79,9 @@ fi
 TABLE_OK=0
 if sqlite3 "$DB" "SELECT name FROM sqlite_master WHERE type='table' AND name='quality_index';" 2>/dev/null | grep -q 'quality_index'; then
   TABLE_OK=1
-  pass "QI-001 Query" BLOCKING "Tabela quality_index istnieje (migracja 0007 uruchomiona)."
+  pass "QI-001 Query" BLOCKING "Tabela quality_index istnieje (migracja 0009 uruchomiona)."
 else
-  fail "QI-001 Query" BLOCKING "Brak tabeli quality_index — uruchom state.sh migrate (migracja 0007 tworzy quality_index)."
+  fail "QI-001 Query" BLOCKING "Brak tabeli quality_index — uruchom state.sh migrate (migracja 0009 tworzy quality_index)."
   evidence_record "verify:aesthetics:qi:no-table" "module" "aesthetics/qi.sh"
   verify_module_exit
 fi

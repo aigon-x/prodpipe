@@ -1,0 +1,9 @@
+gate_id=GATE-038
+domain=WIRING
+name=G-INTEG — dwukierunkowa macierz połączeń
+command=tools/verify/gates/domains/wiring.sh
+exit_code=1
+status=FAIL
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-038 G-INTEG (WIRING GATE) === [PASS] INTEG-001 declared→exists (brak FALSE GATE)        Każdy gate w registry ma skrypt implementacji. [PASS] INTEG-002 exists→declared (brak ORPHAN)        Każdy skrypt domains/ ma wpis w registry. [INFO] INTEG-003 consumed→defined (env vars)        Brak config/.env.example — pomijam (nie jest wymagany w tym repo). [INFO] INTEG-004 defined→consumed (env vars)        Brak config/.env.example — pomijam. [FAIL] INTEG-005 runtime completeness (

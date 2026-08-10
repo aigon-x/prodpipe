@@ -1,0 +1,9 @@
+gate_id=GATE-006
+domain=STRUCTURE
+name=Struktura katalogów zgodna z kontraktem
+command=tools/verify/gates/domains/structure.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-006 STRUCTURE === [PASS] STRUCTURE-001 wymagane katalogi        Wszystkie wymagane katalogi obecne. [PASS] STRUCTURE-002 brak meta-system        Brak katalogów meta-system. [PASS] STRUCTURE-003 tools/verify/gates istnieje        Katalog gates obecny.  === RESULT === Checks: 3  PASS: 3  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

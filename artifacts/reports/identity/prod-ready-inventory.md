@@ -63,10 +63,10 @@ Dowody:
 **Wniosek: uniwersalny szkielet stanu control-plane, NIE stan runtime.**
 
 - `system/control-plane/state/schema.sql` — 24 encje: meta, cluster, node, runtime, service, image, network, port, volume, agent, skill, project, capability, configuration, policy, contract, deployment, baseline, snapshot, event, evidence, drift, debt, decision, artifact, document.
-- Migracje: 0001_initial.sql (24 tabele, meta init), 0002_history_hash.sql, 0003_gate_runs_waivers.sql, 0006_config_plane.sql, 0007_aesthetics_qi.sql, 0008_change_intelligence.sql.
+- Migracje: 0001_initial.sql (24 tabele, meta init), 0002_history_hash.sql, 0003_gate_runs_waivers.sql, 0007_config_plane.sql, 0009_aesthetics_qi.sql, 0011_change_intelligence.sql.
 - `lib.sh` — StateStore functions (state_init/migrate/hash/snapshot/backup/restore/verify/rollback). `state.sh` — CLI.
 
-**Zawartość bazy `canonical-state.db` (401KB, schema_version=7, database_id=aigon-canonical-state):**
+**Zawartość bazy `canonical-state.db` (401KB, schema_version=16, database_id=aigon-canonical-state):**
 - evidence: **354** (telemetria gate'ów)
 - debt: **13**
 - snapshot: **1**
@@ -117,7 +117,7 @@ Dowody:
 - **Procesy**: brak procesów /opt/Prod-ready (ps aux — zero dopasowań).
 - **Kontenery**: brak kontenerów /opt/Prod-ready (docker ps — zero dopasowań). Kontenery Docker należą do realnego runtime AIGON.
 - **Porty**: brak portów /opt/Prod-ready (ss -tlnp — zero dopasowań).
-- **Bazy**: `system/control-plane/state/data/canonical-state.db` (401KB, schema_version=7, database_id=aigon-canonical-state) + kopie w worktrees (.qwen/worktrees/{testforge,gateforge,config-zero}/.../canonical-state.db) + backupy w data/backups/. Żadna z nich nie przechowuje stanu runtime.
+- **Bazy**: `system/control-plane/state/data/canonical-state.db` (401KB, schema_version=16, database_id=aigon-canonical-state) + kopie w worktrees (.qwen/worktrees/{testforge,gateforge,config-zero}/.../canonical-state.db) + backupy w data/backups/. Żadna z nich nie przechowuje stanu runtime.
 
 ---
 

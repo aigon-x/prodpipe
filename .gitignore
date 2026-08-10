@@ -119,6 +119,8 @@ artifacts/releases/*
 !artifacts/releases/.gitkeep
 artifacts/certificates/*
 !artifacts/certificates/.gitkeep
+artifacts/reports/gates/*
+!artifacts/reports/gates/.gitkeep
 
 # ── Generated config — regenerowane z canonical ──────────────
 config/generated/*

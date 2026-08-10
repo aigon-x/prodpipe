@@ -100,10 +100,10 @@ $$QI = 100 \times \prod_{i=1}^{15} s_i^{w_i}, \qquad \sum_i w_i = 1$$
 - Metryka konkurencyjna: $\Delta QI$ tydzień do tygodnia — prędkość jakości.
 - Reguła: dimension score bez świeżego evidence = 0 (nie NULL — ZERO).
 
-## Migracja 0011: aesthetics + quality index
+## Migracja 0009: aesthetics + quality index
 
 ```sql
--- migrations/0011_aesthetics_qi.sql
+-- migrations/0009_aesthetics_qi.sql
 CREATE TABLE aest_findings (
   id INTEGER PRIMARY KEY,
   service_id TEXT NOT NULL,

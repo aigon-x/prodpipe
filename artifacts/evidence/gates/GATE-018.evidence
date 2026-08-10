@@ -1,0 +1,9 @@
+gate_id=GATE-018
+domain=GIT-HOOKS
+name=pre-commit/pre-push/validate-sot działają
+command=tools/verify/gates/domains/git-hooks.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-018 GIT-HOOKS === [PASS] GIT-HOOKS-001 .git-hooks istnieje        Katalog .git-hooks obecny. [PASS] GIT-HOOKS-002 pre-commit istnieje        pre-commit obecny. [PASS] GIT-HOOKS-003 pre-push istnieje        pre-push obecny. [PASS] GIT-HOOKS-004 pre-commit set -euo pipefail        pre-commit ma set -euo pipefail. [PASS] GIT-HOOKS-005 pre-commit wywołuje verify.sh gates        pre-commit wywołuje verify.sh gates. [PASS] GIT-HOOKS-006 pre-push wywołuje verify.sh gates        pre-push wyw

@@ -83,7 +83,7 @@ context_rules:
     compensations: []
 YAML
 
-# Tymczasowa baza StateStore z tabelami Config Plane (migracja 0006).
+# Tymczasowa baza StateStore z tabelami Config Plane (migracja 0007).
 TEST_DB="$TEST_DIR/canonical-state.db"
 sqlite3 "$TEST_DB" <<'SQL'
 CREATE TABLE config_snapshots (

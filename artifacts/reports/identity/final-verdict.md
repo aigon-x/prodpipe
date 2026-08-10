@@ -50,7 +50,7 @@
 - **0 plików programistycznych** (.py/.go/.rs/.ts/.js) — tylko bash/YAML/SQL.
 - **0 zachowania runtime** — brak tick loop, schedulera, wykonania zadań, agentów, LLM, mesh, worker pools, daemon, systemd.
 - **0 procesów/kontenerów/portów** należących do Prod-ready.
-- **canonical-state.db** (401KB, schema_version=7) — przechowuje tylko telemetrię gate'ów (354 evidence, 13 debt, 1 snapshot, 4 meta, 0 wierszy w tabelach runtime).
+- **canonical-state.db** (401KB, schema_version=16) — przechowuje tylko telemetrię gate'ów (354 evidence, 13 debt, 1 snapshot, 4 meta, 0 wierszy w tabelach runtime).
 - **Wszystkie `system/*` to placeholdery** (README + .gitkeep, STATUS: UNDEFINED).
 - **Gate'y tylko certyfikują** (PASS/FAIL) — nie wykonują.
 

@@ -21,7 +21,7 @@ Uzasadnienie: niniejszy dokument jest design doc — definiuje baseline obserwow
 
 System Quality Gates (Sekcja 9 w `ARCHITECTURE.md`) definiuje gate'y G0–G8. OBS-BASELINE dodaje warstwę **obserwowalności** — gwarancję, że projekt rodzący się z szablonu jest od pierwszego dnia operacyjny: da się go logować, mierzyć, alarmować i diagnozować.
 
-Zasada P0#1: każdy gate zapisuje wynik do StateStore (tabela `evidence`). Gate bez evidence = FAIL (meta-gate `VERIFY-EVIDENCE-COMPLETE`). OBS-BASELINE rozszerza to o **dane operacyjne** — SLO i alerty trafiają do StateStore (migracja 0009).
+Zasada P0#1: każdy gate zapisuje wynik do StateStore (tabela `evidence`). Gate bez evidence = FAIL (meta-gate `VERIFY-EVIDENCE-COMPLETE`). OBS-BASELINE rozszerza to o **dane operacyjne** — SLO i alerty trafiają do StateStore (migracja 0013).
 
 **Problem:** świeże projekty rodzą się bez obserwowalności — brak strukturalnego logowania, metryk, alertów, health endpoints, SLO. To prowadzi do "czarnych skrzynek": serwis działa, ale nikt nie wie jak, i nikt nie wie kiedy przestanie działać. OBS-BASELINE rozwiązuje to u źródła — szablon rodzi obserwowalne projekty.
 
@@ -71,9 +71,9 @@ Niektóre moduły są **warunkowe** — zależą od cech projektu z `.skeleton.y
 
 Moduły obs-* są rejestrowane w `config/canonical/gates.yaml` (metadata-driven) i uruchamiane przez `verify.sh` w profilach `full`, `release`, `genesis`. `gen-profiles.sh` regeneruje `profiles.sh`.
 
-### 5.4 StateStore (migracja 0009)
+### 5.4 StateStore (migracja 0013)
 
-Migracja `0009_observability.sql` tworzy tabele `slo` i `alerts` w StateStore. SLO i alerty są częścią canonical state — źródło prawdy w git. `alert_ref` w SLO wskazuje na `alert_id` w `alerts` (korelacja cel→alarm).
+Migracja `0013_observability.sql` tworzy tabele `slo` i `alerts` w StateStore. SLO i alerty są częścią canonical state — źródło prawdy w git. `alert_ref` w SLO wskazuje na `alert_id` w `alerts` (korelacja cel→alarm).
 
 ### 5.5 Fail-closed
 
@@ -115,7 +115,7 @@ Każdy check OBS-XX jest **fail-closed**: brak manifestu, brak danych, błąd wa
 - `config/canonical/dashboards.yaml`: rejestr dashboardów (OBS-15).
 - `config/canonical/synthetics.yaml`: rejestr syntetyków (OBS-16).
 - `.skeleton.yaml`: manifest cech projektu (web/events/tier).
-- Migracja `0009_observability.sql`: tabele `slo` i `alerts`.
+- Migracja `0013_observability.sql`: tabele `slo` i `alerts`.
 - `tools/verify/obs-*.sh`: moduły checków OBS-XX.
 
 ## 9. Source of Truth

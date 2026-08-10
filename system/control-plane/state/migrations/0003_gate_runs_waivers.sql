@@ -1,5 +1,6 @@
 -- ============================================================================
 -- MIGRATION 0003 — GATE RUNS + WAIVERS (governance/audyt)
+-- RESERVED_TABLES: gate_runs
 -- ============================================================================
 -- P1: gate_runs rejestruje KAŻDE uruchomienie gate'a (kto, co, kiedy, wynik).
 --     To jest surowiec dla risk prediction (S7) — dane treningowe.

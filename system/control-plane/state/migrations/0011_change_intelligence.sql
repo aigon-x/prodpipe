@@ -1,5 +1,6 @@
 -- ============================================================================
--- MIGRATION 0008 — CHANGE INTELLIGENCE / ENGINEERING EFFICIENCY GATE
+-- MIGRATION 0011 — CHANGE INTELLIGENCE / ENGINEERING EFFICIENCY GATE
+-- RESERVED_TABLES: fingerprint_cache change_proposals prediction_accuracy change_scope duplicate_work
 -- ============================================================================
 -- Warstwa "inteligencji zmiany" — mierzy i uczy się kosztu/ryzyka zmian,
 -- wykrywa duplikację pracy i pilnuje minimalnego zakresu (Minimal Change Gate).
@@ -20,7 +21,7 @@
 -- ============================================================================
 
 -- Dowodowy cache build (CACHE HIT = udowodnione identyczne wejścia)
-CREATE TABLE fingerprint_cache (
+CREATE TABLE IF NOT EXISTS fingerprint_cache (
     fingerprint_id  TEXT PRIMARY KEY,
     artifact_path   TEXT NOT NULL,
     source_hash     TEXT NOT NULL,
@@ -37,7 +38,7 @@ CREATE TABLE fingerprint_cache (
 );
 
 -- CHANGE PROPOSAL (predicted affected set + expected czas/ryzyko) PRZED zmianą
-CREATE TABLE change_proposals (
+CREATE TABLE IF NOT EXISTS change_proposals (
     proposal_id     TEXT PRIMARY KEY,
     title           TEXT NOT NULL,
     description     TEXT,
@@ -59,7 +60,7 @@ CREATE TABLE change_proposals (
 );
 
 -- PREDICTED vs ACTUAL po zmianie (pipeline się uczy)
-CREATE TABLE prediction_accuracy (
+CREATE TABLE IF NOT EXISTS prediction_accuracy (
     accuracy_id     TEXT PRIMARY KEY,
     proposal_id     TEXT REFERENCES change_proposals(proposal_id),
     actual_files    INTEGER,
@@ -73,7 +74,7 @@ CREATE TABLE prediction_accuracy (
 );
 
 -- Log analizy minimalnego zakresu (Minimal Change Gate)
-CREATE TABLE change_scope (
+CREATE TABLE IF NOT EXISTS change_scope (
     scope_id        TEXT PRIMARY KEY,
     change_ref      TEXT NOT NULL,
     files_changed   INTEGER,
@@ -89,7 +90,7 @@ CREATE TABLE change_scope (
 );
 
 -- Log REQUEST -> CAN I REUSE? -> YES/NO (Duplicate Work Gate)
-CREATE TABLE duplicate_work (
+CREATE TABLE IF NOT EXISTS duplicate_work (
     request_id      TEXT PRIMARY KEY,
     request_desc    TEXT NOT NULL,
     can_reuse       TEXT NOT NULL DEFAULT 'UNKNOWN',
@@ -99,9 +100,9 @@ CREATE TABLE duplicate_work (
 );
 
 -- Indeksy pomocnicze
-CREATE INDEX idx_fingerprint_artifact ON fingerprint_cache(artifact_path);
-CREATE INDEX idx_prediction_proposal ON prediction_accuracy(proposal_id);
-CREATE INDEX idx_scope_change ON change_scope(change_ref);
+CREATE INDEX IF NOT EXISTS idx_fingerprint_artifact ON fingerprint_cache(artifact_path);
+CREATE INDEX IF NOT EXISTS idx_prediction_proposal ON prediction_accuracy(proposal_id);
+CREATE INDEX IF NOT EXISTS idx_scope_change ON change_scope(change_ref);
 
 -- Zaktualizuj wersję schematu
-UPDATE meta SET value = '8' WHERE key = 'schema_version';
+UPDATE meta SET value = '11' WHERE key = 'schema_version';

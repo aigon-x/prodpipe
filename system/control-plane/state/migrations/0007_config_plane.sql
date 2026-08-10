@@ -1,5 +1,5 @@
 -- ============================================================================
--- MIGRATION 0006 — CONFIG PLANE (snapshoty, ratchet, kill-switches)
+-- MIGRATION 0007 — CONFIG PLANE (snapshoty, ratchet, kill-switches)
 -- ============================================================================
 -- Config Plane to warstwa, która pozwala systemowi konfigurować sam siebie
 -- i sam to sprawdzać (self-hosting). Ta migracja tworzy fundament audytowalności
@@ -25,7 +25,7 @@
 -- ============================================================================
 
 -- Materializowany effective config per run (reprodukowalność decyzji)
-CREATE TABLE config_snapshots (
+CREATE TABLE IF NOT EXISTS config_snapshots (
     id                  INTEGER PRIMARY KEY,
     hash                TEXT NOT NULL UNIQUE,   -- hash zmaterializowanego effective configu
     git_sha             TEXT NOT NULL,          -- wersja źródeł configu
@@ -40,7 +40,7 @@ CREATE TABLE config_snapshots (
 ALTER TABLE evidence ADD COLUMN snapshot_id INTEGER REFERENCES config_snapshots(id);
 
 -- Stan ratchetingu per serwis/klucz (anti-entropy: wartość może TYLKO rosnąć)
-CREATE TABLE config_ratchet (
+CREATE TABLE IF NOT EXISTS config_ratchet (
     service_id      TEXT NOT NULL,
     key             TEXT NOT NULL,
     achieved_value  REAL NOT NULL,              -- ostatnia osiągnięta wartość
@@ -49,7 +49,7 @@ CREATE TABLE config_ratchet (
 );
 
 -- L7: awaryjne kill-switche z pełnym audytem (nawet one wygasają)
-CREATE TABLE config_kill_switches (
+CREATE TABLE IF NOT EXISTS config_kill_switches (
     id          INTEGER PRIMARY KEY,
     key         TEXT NOT NULL,
     value       TEXT NOT NULL,
@@ -60,4 +60,4 @@ CREATE TABLE config_kill_switches (
 );
 
 -- Zaktualizuj wersję schematu
-UPDATE meta SET value = '6' WHERE key = 'schema_version';
+UPDATE meta SET value = '7' WHERE key = 'schema_version';

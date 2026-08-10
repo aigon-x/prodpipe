@@ -1,0 +1,19 @@
+-- ============================================================================
+-- MIGRATION 0010 — PERFORMANCE / OPTIMALITY (benchmarks & complexity)
+-- ============================================================================
+-- AIGON Production Platform — Optimality Plane.
+-- Rezerwacja numeru migracji dla warstwy optymalności: perf_benchmarks,
+-- complexity budget, hot path profiling, algorithm currency.
+--
+-- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
+-- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Ta migracja jest świadomie zdefiniowana jako forward-compatible placeholder.
+-- Optimality domain model (perf_benchmarks / complexity / hot_path /
+-- algorithm_currency) zostanie dodany INKREMENTALNIE w ramach Optimality Plane.
+-- Numer 0007 jest zarezerwowany, aby utrzymać ciągłą, logicznie uporządkowaną
+-- sekwencję migracji.
+--
+-- RESERVED_TABLES: perf_benchmark complexity_budget hot_path algorithm_currency
+-- ============================================================================

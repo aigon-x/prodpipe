@@ -100,7 +100,7 @@ Zmiana configu, która **odbiera komukolwiek gate'a albo luzuje próg, nie może
 ## Schemat DB: snapshoty, waivers, ratchet
 
 ```sql
--- migrations/0006_config_plane.sql
+-- migrations/0007_config_plane.sql
 CREATE TABLE config_snapshots (
   id INTEGER PRIMARY KEY,
   hash TEXT NOT NULL UNIQUE,          -- hash zmaterializowanego effective configu
@@ -169,7 +169,7 @@ Zmiana tych rzeczy = zmiana kodu + ADR + pełny proces. Root bootstrap (ścieżk
 | Krok | Co | Zależność |
 |---|---|---|
 | 1 | `config/registry.yaml` + `config_get` + zakaz bezpośredniego `getenv` | fundament, ~1 dzień |
-| 2 | Migracja 0006 (snapshoty) + `snapshot_id` w evidence | resolver v1 (tylko L0+L3) |
+| 2 | Migracja 0007 (snapshoty) + `snapshot_id` w evidence | resolver v1 (tylko L0+L3) |
 | 3 | `profiles.sh` → `config/profiles/*.yaml` (generowane, nie utrzymywane ręcznie) | S0 metadata-driven |
 | 4 | Floors (L1) + walidacja tighten/relax w resolverze | po 2 |
 | 5 | Context rules + klasyfikacja z diffu + kompensacje | po 4 |

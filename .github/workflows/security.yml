@@ -20,5 +20,7 @@ jobs:
             echo "FAIL: sekrety w repo"
             exit 1
           fi
-      - name: Placeholder — dependency/container scanning
-        run: echo "Security: brak implementacji (scanning — PHASE 9)"
+      - name: Run security gates (CI profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates CI

@@ -1,0 +1,9 @@
+gate_id=GATE-019
+domain=STATE
+name=StateStore spójny, schema_version zgodna
+command=tools/verify/gates/domains/state.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-019 STATE === [PASS] STATE-001 state.sh istnieje        state.sh obecny. [PASS] STATE-002 lib.sh istnieje        lib.sh obecny. [PASS] STATE-003 schema_version zdefiniowana        STATE_SCHEMA_VERSION=9. [PASS] STATE-004 state.sh set -euo pipefail        state.sh ma set -euo pipefail. [PASS] STATE-005 tabela evidence w migracji        Tabela evidence zdefiniowana w migracji.  === RESULT === Checks: 5  PASS: 5  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

@@ -56,5 +56,16 @@ case "$BRANCH" in
     ;;
 esac
 
+# ── 3. Quality Gates (PRE_PUSH profile) ─────────────────────
+# Uruchamia system gate'ów jakości (OPERATION GATEFORGE).
+# PRE_PUSH = pełniejszy zestaw gate'ów przed push.
+if [ -f "tools/verify/verify.sh" ]; then
+  echo "[pre-push] Running quality gates (PRE_PUSH)..."
+  if ! bash tools/verify/verify.sh gates PRE_PUSH; then
+    echo "[pre-push] FAIL: quality gates nie przeszły."
+    exit 1
+  fi
+fi
+
 echo "[pre-push] OK"
 exit 0

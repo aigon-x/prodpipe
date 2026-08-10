@@ -24,13 +24,13 @@ PASS=0; FAIL=0
 t_pass() { PASS=$((PASS+1)); echo "  [PASS] $*"; }
 t_fail() { FAIL=$((FAIL+1)); echo "  [FAIL] $*"; }
 
-# --- Helper: izolowana baza z migracją 0007 --------------------------------
-# Tworzy tymczasową bazę, stosuje migracje 0001 + 0007 (0007 zależy od meta
+# --- Helper: izolowana baza z migracją 0009 --------------------------------
+# Tworzy tymczasową bazę, stosuje migracje 0001 + 0009 (0009 zależy od meta
 # z 0001), ustawia VERIFY_STATE_DB. Zwraca ścieżkę bazy.
 setup_db() {
     local db="$1"
     sqlite3 "$db" < "$MIGRATIONS_DIR/0001_initial.sql" 2>/dev/null || return 1
-    sqlite3 "$db" < "$MIGRATIONS_DIR/0007_aesthetics_qi.sql" 2>/dev/null || return 1
+    sqlite3 "$db" < "$MIGRATIONS_DIR/0009_aesthetics_qi.sql" 2>/dev/null || return 1
     return 0
 }
 
@@ -56,7 +56,7 @@ echo ""
 echo "--- T1: QI = 100 (wszystkie 14 wymiarów = 1.0) ---"
 DB1="$(mktemp)"
 if ! setup_db "$DB1"; then
-    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0007)"
+    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0009)"
 else
     insert_scores "$DB1" "1.0" "datetime('now')"
     OUT="$(VERIFY_STATE_DB="$DB1" QI_TIER="default" bash "$QI_MODULE" 2>&1)"
@@ -74,7 +74,7 @@ echo ""
 echo "--- T2: QI = 0 (jeden wymiar = 0 — średnia geometryczna) ---"
 DB2="$(mktemp)"
 if ! setup_db "$DB2"; then
-    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0007)"
+    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0009)"
 else
     # 13 wymiarów = 1.0, dim3 (bezpieczeństwo) = 0.
     i=0
@@ -100,7 +100,7 @@ echo ""
 echo "--- T3: Nieświeży evidence (computed_at stary) → score = 0 ---"
 DB3="$(mktemp)"
 if ! setup_db "$DB3"; then
-    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0007)"
+    t_fail "Nie udało się przygotować bazy testowej (migracje 0001+0009)"
 else
     # Wszystkie wymiary świeże = 1.0, ale dim7 (świeżość) ma stary computed_at.
     i=0

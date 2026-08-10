@@ -1,0 +1,9 @@
+gate_id=GATE-016
+domain=DOCUMENTATION
+name=Dokumentacja zgodna z kontraktem 12-sekcyjnym
+command=tools/verify/gates/domains/documentation.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-016 DOCUMENTATION === [PASS] DOCUMENTATION-001 docs/ istnieje        Katalog docs obecny. [PASS] DOCUMENTATION-002 docs/generated/gates istnieje        Katalog docs/generated/gates obecny. [WARN] DOCUMENTATION-003 README 12 sekcji        README.md brakuje 12 sekcji: [## 1. Purpose] [## 2. Owner] [## 3. Source of Truth] [## 4. Contains] [## 5. Does Not Contain] [## 6. Dependencies] [## 7. Consumers] [## 8. Synchronization] [## 9. Lifecycle] [## 10. Security] [## 11. Recovery] [## 12. Dri

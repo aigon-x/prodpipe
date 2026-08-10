@@ -106,12 +106,12 @@ QI aktualizuje się do **15 wymiarów**:
 
 $$QI = 100 \times \prod_{i=1}^{15} s_i^{w_i}, \qquad \sum_i w_i = 1$$
 
-## Migracja 0010: human plane
+## Migracja 0015: human plane
 
-> **Uwaga o numeracji**: migracja nosi numer **0010** (nie 0012), aby zachować ciągłość sekwencji 0001–0010 wymaganą przez gate MIGRATION-002 oraz zgodność `STATE_SCHEMA_VERSION=10` z ostatnią migracją (MIGRATION-003). Numeracja 0012 z `schema_version=10` łamała idempotencję (`state_migrate` porównuje numer pliku z `schema_version`).
+> **Uwaga o numeracji**: po pełnej re-numeracji chronologicznej (2026-08-10) migracja nosi numer **0015** (sekwencja 0001–0016). `STATE_SCHEMA_VERSION=16` w `lib.sh` odpowiada ostatniej migracji (0016_contracts).
 
 ```sql
--- migrations/0010_human_plane.sql
+-- migrations/0015_human_plane.sql
 CREATE TABLE manual_charters (        -- MAN-01/02: udokumentowane charters
   charter_id      TEXT PRIMARY KEY,
   service_id      TEXT NOT NULL,

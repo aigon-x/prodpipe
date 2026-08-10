@@ -140,9 +140,30 @@ case "$SUBCOMMAND" in
   waivers)
     run_module "waivers/sweeper.sh"
     ;;
+  gates)
+    # System gate'ów jakości (OPERATION GATEFORGE).
+    # Uruchamia enforcement dla profilu (domyślnie LOCAL_FAST) + meta-gate.
+    # PROFILE: LOCAL_FAST | PRE_PUSH | CI | RELEASE
+    GATES_PROFILE="${PROFILE:-LOCAL_FAST}"
+    say "=== GATES (profile: $GATES_PROFILE) ==="
+    # Enforcement: uruchamia wszystkie gate'y przypisane do profilu.
+    bash "$VERIFY_DIR/gates/enforcement.sh" "$GATES_PROFILE"
+    gates_rc=$?
+    if [ "$gates_rc" -ne 0 ]; then
+      VERIFY_FAIL=$((VERIFY_FAIL + 1))
+      fail "gates enforcement" BLOCKING "Enforcement zakończył się kodem $gates_rc."
+    fi
+    # Meta-gate: weryfikuje spójność całego systemu gate'ów.
+    bash "$VERIFY_DIR/gates/gate-integrity.sh"
+    integrity_rc=$?
+    if [ "$integrity_rc" -ne 0 ]; then
+      VERIFY_FAIL=$((VERIFY_FAIL + 1))
+      fail "gates gate-integrity" BLOCKING "Meta-gate zakończył się kodem $integrity_rc."
+    fi
+    ;;
   *)
     say "Nieznana subkomenda: $SUBCOMMAND"
-    say "Dostępne: reconcile | drift | history | debt | waivers"
+    say "Dostępne: reconcile | drift | history | debt | waivers | gates"
     exit 2
     ;;
 esac

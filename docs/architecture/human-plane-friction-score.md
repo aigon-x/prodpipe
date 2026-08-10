@@ -148,7 +148,7 @@ Reguła świeżości (z HUMAN PLANE): **pomiar bez świeżości = nieważny**. F
 
 ### 2.3 Jak zapisywany jest wynik
 
-Wynik zapisywany jest w tabeli `friction_baselines` (migracja 0010):
+Wynik zapisywany jest w tabeli `friction_baselines` (migracja 0015):
 
 ```sql
 CREATE TABLE friction_baselines (     -- warstwa 150% A: budżety tarcia
@@ -324,7 +324,7 @@ friction = kliknięcia + pola + konteksty + czas(normalizowany)   → jedna licz
 budżet   = z configu (human.friction_budget_default, per-tier floors)
 gate     = measured > budget → OVER_BUDGET → FAIL (ratchet: może tylko maleć)
 pomiar   = manual walkthrough + synthetic robot + RUM
-zapis    = friction_baselines (migracja 0010), snapshot configu przypięty
+zapis    = friction_baselines (migracja 0015), snapshot configu przypięty
 akcja    = dominująca składowa → diagnoza → redukcja → waiver (wygasa)
 feedback = OVER_BUDGET → UX escape analysis (150% C) → wymiar 15 (task success)
 ```

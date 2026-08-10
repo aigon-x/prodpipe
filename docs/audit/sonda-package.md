@@ -32,9 +32,9 @@
 **Mechanizmy z dowodami:**
 
 - **`system/control-plane/state/schema.sql`** — 24 encje + meta. `CREATE TABLE` dla: `meta`, `cluster`, `node`, `runtime`, `service`, `image`, `network`, `port`, `volume`, `agent`, `skill`, `project`, `capability`, `configuration`, `policy`, `contract`, `deployment`, `baseline`, `snapshot`, `event`, `evidence`, `drift`, `debt`, `decision`, `artifact`, `document` (26 trafień `CREATE TABLE`).
-- **`system/control-plane/state/lib.sh`** — `STATE_SCHEMA_VERSION="6"` (linia 27); funkcje `state_init`, `state_migrate`, `state_generation`, `state_hash`, `state_history_hash`, `state_snapshot`, `state_backup_*`, `state_restore`, `state_verify`, `state_rollback_*`.
+- **`system/control-plane/state/lib.sh`** — `STATE_SCHEMA_VERSION="16"` (linia 24); funkcje `state_init`, `state_migrate`, `state_generation`, `state_hash`, `state_history_hash`, `state_snapshot`, `state_backup_*`, `state_restore`, `state_verify`, `state_rollback_*`.
 - **`system/control-plane/state/state.sh`** — komendy `init/migrate/generation/bump/hash/snapshot/backup/restore/verify/status/rollback`.
-- **Migracje** (`system/control-plane/state/migrations/`): `0001_initial.sql`, `0002_history_hash.sql`, `0003_gate_runs_waivers.sql`, `0006_config_plane.sql`. **0004 i 0005 ABSENT** (glob `migrations/*.sql` → tylko 4 pliki).
+- **Migracje** (`system/control-plane/state/migrations/`): `0001_initial.sql`, `0002_history_hash.sql`, `0003_gate_runs_waivers.sql`, `0007_config_plane.sql`. **0004 i 0005 ABSENT** (glob `migrations/*.sql` → tylko 4 pliki).
 - **`system/control-plane/state/tests/test_state.sh`** — testy **T1-T15**: fresh db, migration, idempotency, duplicate identity, invalid schema, generation, state hashing, snapshot, verify, rollback, history hash, tamper detection **F4**, backup manifest **F5**, restore test, retention.
 
 **PERM / RES:** patrz sekcje L i K — checki `PERM-*` i `RES-*` ABSENT (dowód w sekcji L/K).

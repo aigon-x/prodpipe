@@ -1,0 +1,123 @@
+# ============================================================================
+# config/registry.yaml — CANONICAL CONFIGURATION REGISTRY
+# ============================================================================
+# AIGON Production Platform — kanoniczne źródło prawdy dla konfiguracji.
+# Ten plik jest JEDYNYM źródłem prawdy dla wartości resilience (RTO/RPO,
+# restore drill / game day cadence, floors per tier). Wartości NIE są
+# hardkodowane w skryptach — skrypty czytają stąd (RULE ZERO: prawda ze źródła).
+#
+# Sekcja `resilience:` jest konsumowana przez:
+#   * tools/verify/gates/domains/resilience.sh (GATE-039, checks RES-B-01..04)
+#   * tools/resilience/restore-drill/restore-drill.sh (pipeline restore drill)
+#   * system/control-plane/state/migrations/0014_resilience.sql (resilience_requirements)
+#
+# Jednostki: rto/rpo w minutach, *_max_age w dniach.
+# ============================================================================
+
+resilience:
+  # RTO — Recovery Time Objective: maksymalny dopuszczalny czas przywrócenia
+  # usługi po awarii (minuty).
+  rto: 15
+
+  # RPO — Recovery Point Objective: maksymalna dopuszczalna utrata danych
+  # (minuty). Determines backup cadence.
+  rpo: 5
+
+  # restore_drill_max_age — maksymalny wiek ostatniego udanego restore drill
+  # (dni). Po przekroczeniu resilience.sh (RES-B-02) i cron wymuszają nowy drill.
+  restore_drill_max_age: 7
+
+  # dr_game_day_max_age — maksymalny wiek ostatniego Disaster Recovery game day
+  # (dni). Game day to pełne, zaplanowane ćwiczenie DR (agent B: docs/resilience/game-day/).
+  dr_game_day_max_age: 30
+
+  # floors — minimalne wymagania odporności per tier. Tier-0 to najbardziej
+  # krytyczne usługi (najostrzejsze RTO/RPO), tier-3 najmniej krytyczne.
+  floors:
+    tier-0:
+      rto: 15
+      rpo: 5
+      restore_drill_max_age: 7
+      dr_game_day_max_age: 30
+    tier-1:
+      rto: 30
+      rpo: 15
+      restore_drill_max_age: 14
+      dr_game_day_max_age: 60
+    tier-2:
+      rto: 60
+      rpo: 30
+      restore_drill_max_age: 30
+      dr_game_day_max_age: 90
+    tier-3:
+      rto: 120
+      rpo: 60
+      restore_drill_max_age: 60
+      dr_game_day_max_age: 180
+
+human:
+  # manual_evidence_max_age — maksymalny wiek świeżego evidence manualnego
+  # (dni). Po przekroczeniu evidence manualne jest nieważne (zasada:
+  # "Evidence manualne bez świeżości = nieważne"). Wymagane przy release tier-1.
+  manual_evidence_max_age: 14
+
+  # exploration_cadence_days — rytm eksploracji (sesji testowych) per tier.
+  # Tier-0 to najbardziej krytyczne usługi (najczęstszy rytm), tier-3 najmniej.
+  exploration_cadence_days: 30
+
+  # task_success_target — docelowy wskaźnik skuteczności zadań (0..1).
+  # Wymiar 15: min(1, task_success_actual/task_success_target).
+  task_success_target: 0.95
+
+  # conversion_rate_target — docelowy wskaźnik konwersji manual→auto (0..1).
+  # MAN-06: |findings przekute na testy auto| / |findings manualne|.
+  conversion_rate_target: 0.8
+
+  # friction_budget_default — domyślny budżet tarcia per journey (warstwa 150% A).
+  # friction(ścieżka) = kliknięcia + pola formularza + zmiany kontekstu + czas oczekiwania.
+  friction_budget_default: 20
+
+  # floors — minimalne wymagania human plane per tier.
+  floors:
+    tier-0:
+      manual_evidence_max_age: 7
+      exploration_cadence_days: 14
+      task_success_target: 0.98
+      conversion_rate_target: 0.9
+      friction_budget_default: 15
+    tier-1:
+      manual_evidence_max_age: 14
+      exploration_cadence_days: 30
+      task_success_target: 0.95
+      conversion_rate_target: 0.8
+      friction_budget_default: 20
+    tier-2:
+      manual_evidence_max_age: 30
+      exploration_cadence_days: 60
+      task_success_target: 0.9
+      conversion_rate_target: 0.7
+      friction_budget_default: 25
+    tier-3:
+      manual_evidence_max_age: 60
+      exploration_cadence_days: 90
+      task_success_target: 0.85
+      conversion_rate_target: 0.6
+      friction_budget_default: 30
+
+contracts:
+  # integrity_enabled — czy gate kontraktów (contracts/contracts.sh) jest aktywny.
+  # Gdy false, moduł contracts jest pomijany w certyfikacji.
+  integrity_enabled: true
+
+  # max_breaking — maksymalna liczba łamiących zmian kontraktów (breaking changes)
+  # dozwolona bez blokady. 0 = żadna łamiąca zmiana nie przechodzi.
+  max_breaking: 0
+
+  # contract_locations — lokalizacje, w których szukamy kontraktów API.
+  # Moduł contracts.sh sprawdza te ścieżki (CONTRACT-001).
+  contract_locations:
+    - api/openapi.yaml
+    - openapi.yaml
+    - contracts/openapi.yaml
+    - contracts/*.yaml
+    - contracts/*/contract.md
