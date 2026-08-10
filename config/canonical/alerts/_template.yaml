@@ -1,0 +1,50 @@
+# ============================================================================
+# alerts/_template.yaml — AIGON Production Platform — OBS-BASELINE
+# ============================================================================
+# Szablon alertu. Każdy alert w projekcie MUSI mieć komplet pól zdefiniowanych
+# w tym szablonie (OBS-05, OBS-11, OBS-12):
+#
+#   * name        — unikalna nazwa alertu (identyfikator)
+#   * severity    — klasa krytyczności (critical | warning | info)
+#   * condition   — warunek wyzwalający (wyrażenie/opis)
+#   * runbook_ref — ścieżka do runbooka (procedura reakcji) — WYMAGANE (OBS-05)
+#   * owner       — zespół/osoba odpowiedzialna — WYMAGANE (OBS-11)
+#
+# OBS-BASELINE: szablon rodzi obserwowalne projekty. Ten plik jest źródłem
+# prawdy dla alertów — obs-alerts-check.sh weryfikuje, że:
+#   * OBS-05  każdy alert ma runbook_ref (alert bez runbooka = FAIL)
+#   * OBS-11  każdy alert ma owner (alert bez właściciela = FAIL)
+#   * OBS-12  każdy alert ma severity z dozwolonego zbioru
+#             (critical | warning | info) — inna wartość = FAIL
+#
+# ZASADA TEMPLATE: świeży projekt (zero kodu domenowego) ma alerty RED
+# (Rate/Errors/Duration) jako placeholder — NIE są to realne integracje.
+# Scaffold substytuuje nazwy serwisu przy tworzeniu nowego projektu.
+#
+# Konwencja: jeden plik YAML na alert (alerts/<nazwa>.yaml) lub jeden plik
+# z listą `alerts:`. obs-alerts-check.sh akceptuje obie formy.
+# ============================================================================
+
+schema_version: 1
+
+# ── Lista alertów ───────────────────────────────────────────────────────────
+# Każdy alert MUSI mieć: name, severity, condition, runbook_ref, owner.
+# severity dozwolone: critical | warning | info.
+alerts:
+  - name: "template_high_error_rate"
+    severity: "critical"          # OBS-12: dozwolony zbiór
+    condition: "template_errors_total / template_requests_total > 0.05 przez 5 min"
+    runbook_ref: "runbooks/template-high-error-rate.md"   # OBS-05: WYMAGANE
+    owner: "platform-oncall"       # OBS-11: WYMAGANE
+
+  - name: "template_slo_budget_exhausted"
+    severity: "critical"
+    condition: "template_slo_budget_ratio < 0.1"
+    runbook_ref: "runbooks/template-slo-budget.md"
+    owner: "platform-oncall"
+
+  - name: "template_latency_p99_high"
+    severity: "warning"
+    condition: "template_request_duration_seconds p99 > 1.0s przez 10 min"
+    runbook_ref: "runbooks/template-latency.md"
+    owner: "platform-oncall"

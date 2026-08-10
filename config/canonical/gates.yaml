@@ -125,6 +125,52 @@ gates:
     profiles:
       full: BLOCKING
       architecture: BLOCKING
+  - module: obs-logging
+    script: obs-logging-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-metrics
+    script: obs-metrics-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-alerts
+    script: obs-alerts-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-slo
+    script: obs-slo-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-health
+    script: obs-health-endpoints.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-deadman
+    script: obs-deadman-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-dashboards
+    script: obs-dashboards-check.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: obs-synthetics
+    script: obs-synthetics-check.sh
+    profiles:
+      full: BLOCKING
       release: BLOCKING
       genesis: BLOCKING
 
@@ -132,9 +178,13 @@ gates:
 profiles:
   fast: [git, security, structure, aesthetics]
   full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
+  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
   security: [git, security, security-drills]
   architecture: [architecture, contracts, semantics, taxonomy, efficiency]
   reproducibility: [reproducibility, dependencies]
   release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
   genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
   all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
+  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
+  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
+  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]

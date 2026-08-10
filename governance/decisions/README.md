@@ -19,6 +19,7 @@ Dokumenty ADR (kontekst, decyzja, konsekwencje), rejestr decyzji.
 | ADR | Tytuł | Status |
 |---|---|---|
 | [ADR-0001](ADR-0001-risk-prediction-s7.md) | Risk Prediction (S7) w System Quality Gates | PROPOSED |
+| [ADR-0011](ADR-0011-observability-baseline.md) | Observability Baseline (OBS-BASELINE) | PROPOSED |
 
 ## 5. Does Not Contain
 Nie zawiera stanu runtime, sekretów, danych biznesowych.
