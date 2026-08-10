@@ -1,0 +1,68 @@
+# ============================================================================
+# config_exemptions.yaml — KONSTYTUCJA NIEKONFIGUROWALNYCH dla Config Plane.
+# ============================================================================
+# Paradoks najlepszego configu: jego siłą jest lista rzeczy niekonfigurowalnych.
+# Inaczej zmiana configu może wyłączyć siatkę bezpieczeństwa
+# (np. gates.self-001.enabled: false → ghost moduły wracają).
+#
+# Każdy wpis: key, reason, enforced_by, change_requires.
+# Zmiana któregokolwiek z tych wpisów = zmiana kodu + ADR + pełny proces.
+# Te wpisy NIE podlegają warstwom L0-L7 — są ponad configiem.
+#
+# Root bootstrap (ścieżka do DB, ścieżka registry) to JEDYNE stałe wpisy —
+# bez daty wygaśnięcia, explicite.
+# ============================================================================
+
+schema_version: 1
+
+# ── Niekonfigurowalne (meta-gate'y i inwarianty bezpieczeństwa) ────────────
+# Każdy wpis jest twardo wymuszany w kodzie resolvera / pipeline'u.
+exemptions:
+  # 1. evidence→baza (meta-gate)
+  - key: evidence.persist_to_db
+    reason: "Bez zapisu evidence do bazy audyt umiera — każdy wynik gate'a musi wskazywać DOKŁADNY config (snapshot_id), który podjął decyzję."
+    enforced_by: "lib/config.sh (config_resolve) + migrations/0006_config_plane.sql (evidence.snapshot_id)"
+    change_requires: "Zmiana kodu + ADR + pełny proces (review CODEOWNERS + CFG-SIM)."
+
+  # 2. SELF-001 / fail-closed
+  - key: self.fail_closed
+    reason: "Bez fail-closed FALSE GATE wraca — KAŻDY błąd resolvera = exit 2, zero fallbacków. Nieznany klucz = FATAL (nie default)."
+    enforced_by: "lib/config.sh (config_resolve/config_get — exit 2 na każdy błąd)"
+    change_requires: "Zmiana kodu + ADR + pełny proces."
+
+  # 3. wygasanie waiverów
+  - key: waivers.expiry_mandatory
+    reason: "Bez obowiązkowego expires_at wyjątki są wieczne. Waiver bez expires_at = config nie przechodzi walidacji; wygasły waiver = nie istnieje."
+    enforced_by: "lib/config.sh (walidacja waivers przy loadzie) + registry.schema.json (required: expires_at)"
+    change_requires: "Zmiana kodu + ADR + pełny proces."
+
+  # 4. mechanizm floorów
+  - key: floors.enforcement
+    reason: "Bez egzekwowania floorów L1 jest dekoracją. Relax poniżej floora = REJECTED (zapisane w trace). Floorów nie da się wyłączyć."
+    enforced_by: "lib/config.sh (config_resolve — egzekwowanie floorów w kroku 4)"
+    change_requires: "Zmiana kodu + ADR + pełny proces."
+
+  # 5. walidacja configu przy loadzie
+  - key: config.load_validation
+    reason: "Bez walidacji przy loadzie zły config = cichy fallback. Każdy load przechodzi schema + inwarianty + kompletność kompensacji."
+    enforced_by: "lib/config.sh (config_resolve — walidacja finalna w kroku 6) + registry.schema.json"
+    change_requires: "Zmiana kodu + ADR + pełny proces."
+
+  # 6. jednokanałowość config_get
+  - key: config.single_channel_get
+    reason: "Bez jednokanałowości CFG-001 jest zgadywaniem. lib/config.sh to JEDYNY kanał dostępu — zakaz jq/getenv poza tym plikiem."
+    enforced_by: "lib/config.sh (config_get) + gate'y struktury (zakaz bezpośredniego getenv)"
+    change_requires: "Zmiana kodu + ADR + pełny proces."
+
+# ── Root bootstrap — JEDYNE stałe wpisy ────────────────────────────────────
+# Bez daty wygaśnięcia, explicite. To fundament, na którym stoi cały Config
+# Plane — nie może być konfigurowany ani wygaszony.
+root_bootstrap:
+  - key: bootstrap.db_path
+    reason: "Ścieżka do bazy SQLite (config_snapshots, config_ratchet, config_kill_switches). Bez niej resolver nie ma gdzie zapisać snapshotu/trace."
+    enforced_by: "lib/config.sh (stała ścieżka w kodzie)"
+    change_requires: "Zmiana kodu + ADR + pełny proces. NIEKONFIGUROWALNE — stały wpis bez expires_at."
+  - key: bootstrap.registry_path
+    reason: "Ścieżka do config/canonical/registry.yaml (źródło prawdy L0-L7). Bez niej resolver nie ma skąd czytać defaultów/floorów."
+    enforced_by: "lib/config.sh (stała ścieżka w kodzie)"
+    change_requires: "Zmiana kodu + ADR + pełny proces. NIEKONFIGUROWALNE — stały wpis bez expires_at."

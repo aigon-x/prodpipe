@@ -1,0 +1,379 @@
+# ============================================================================
+# registry.yaml — ŹRÓDŁO PRAWDY dla Config Plane (warstwy L0-L7).
+# ============================================================================
+# Ten plik jest jedynym miejscem, w którym definiuje się:
+#   - defaulty (L0) i org floors (L1) dla kluczy gate'ów
+#   - profile (L2/L3) i ich listy modułów
+#   - context rules (L5) — reguły kontekstowe z diffu
+#   - waivers (L6) — wyjątki, które WYGAŚAJĄ
+#   - kill-switches (L7) — awaryjne, które WYGAŚAJĄ
+#   - ratchet / reload / owner / tier / doc per klucz
+#
+# Resolver (lib/config.sh) czyta ten plik przy każdym runie i liczy
+# effective config per serwis × kontekst. KAŻDY błąd = exit 2 (fail-closed).
+#
+# 4 prawa configu (z design doc):
+#   1. Tighten zawsze przechodzi — podniesienie progu nie wymaga zgody.
+#   2. Relax wymaga waivera — obniżenie poniżej floora = REJECTED bez waivera.
+#   3. Wyjątki wygasają — waiver bez expires_at jest nielegalny.
+#   4. Każda decyzja ma trace — resolver zapisuje snapshot + trace.
+#
+# NIE edytuj tego pliku ręcznie bez przejścia przez gate'y configu
+# (CFG-001..008 + CFG-SIM). Zmiany registry = tylko platform (CODEOWNERS).
+# ============================================================================
+
+schema_version: 1
+
+# ── Gates (L0 defaulty + L1 floors + ratchet + reload + owner + tier + doc) ─
+# Każdy klucz gate'a ma: default, floor, ratchet, reload, owner, tier, doc.
+# Klucze pokrywają WSZYSTKIE moduły z config/canonical/gates.yaml:
+#   git, security, structure, architecture, dependencies, reproducibility,
+#   deployment, contracts, migration, recovery
+# oraz klucze CFG-* (Config Plane self-hosting) z design doc.
+#
+# floor (L1) to twarde minimum, którego serwis NIE może obniżyć bez waivera.
+# ratchet: true = wartość per-serwis może TYLKO rosnąć (anti-entropy).
+# reload: hot = działa od następnego runu; cold = wymaga redeployu.
+gates:
+  # ── git ────────────────────────────────────────────────────────────────
+  git.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate integralności git (git/integrity.sh) jest aktywny."
+  git.integrity.max_dirty_files:
+    default: 0
+    floor: 0
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba brudnych plików w drzewie przed gate'em."
+
+  # ── security ───────────────────────────────────────────────────────────
+  security.secrets.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate wykrywania sekretów (security/secrets.sh) jest aktywny."
+  security.sast.max_critical:
+    default: 0
+    floor: 0
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba krytycznych znalezisk SAST. Floor=0 — nie da się obniżyć bez waivera."
+  security.sast.max_high:
+    default: 5
+    floor: 3
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba wysokich znalezisk SAST."
+
+  # ── structure ──────────────────────────────────────────────────────────
+  structure.readme.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate struktury/README (structure/readme.sh) jest aktywny."
+  structure.readme.required_sections:
+    default: 5
+    floor: 3
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Minimalna liczba wymaganych sekcji README."
+
+  # ── architecture ───────────────────────────────────────────────────────
+  architecture.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate spójności architektury (architecture/architecture.sh) jest aktywny."
+  architecture.integrity.max_violations:
+    default: 0
+    floor: 0
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba naruszeń architektonicznych."
+
+  # ── dependencies ───────────────────────────────────────────────────────
+  dependencies.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate zależności (dependencies/dependencies.sh) jest aktywny."
+  dependencies.integrity.max_outdated:
+    default: 10
+    floor: 5
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba przestarzałych zależności."
+
+  # ── reproducibility ────────────────────────────────────────────────────
+  reproducibility.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate reprodukowalności (reproducibility/reproducibility.sh) jest aktywny."
+  reproducibility.integrity.max_pinned_drift:
+    default: 0
+    floor: 0
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba dryfów od przypiętych wersji."
+
+  # ── deployment ─────────────────────────────────────────────────────────
+  deployment.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate wdrożeniowy (deployment/deployment.sh) jest aktywny."
+  deployment.integrity.max_manual_steps:
+    default: 3
+    floor: 1
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba ręcznych kroków w pipeline wdrożeniowym."
+
+  # ── contracts ──────────────────────────────────────────────────────────
+  contracts.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate kontraktów (contracts/contracts.sh) jest aktywny."
+  contracts.integrity.max_breaking:
+    default: 0
+    floor: 0
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba łamiących zmian kontraktów."
+
+  # ── migration ──────────────────────────────────────────────────────────
+  migration.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate migracji (migration/migration.sh) jest aktywny."
+  migration.integrity.max_pending:
+    default: 5
+    floor: 2
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalna liczba oczekujących migracji."
+
+  # ── recovery ───────────────────────────────────────────────────────────
+  recovery.integrity.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Czy gate odzyskiwania (recovery/recovery.sh) jest aktywny."
+  recovery.integrity.max_rpo_minutes:
+    default: 60
+    floor: 15
+    ratchet: true
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "Maksymalny cel punktu odzyskiwania (RPO) w minutach."
+
+  # ── Config Plane self-hosting (CFG-*) ──────────────────────────────────
+  cfg.schema.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "CFG-001: walidacja schema przy loadzie configu. NIEKONFIGUROWALNE (patrz config_exemptions.yaml)."
+  cfg.docs.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "CFG-002: każdy klucz musi mieć doc."
+  cfg.keys.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "CFG-003: nieznany klucz = FATAL (nie default)."
+  cfg.defaults.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "CFG-004: defaulty muszą istnieć dla każdego klucza."
+  cfg.simulation.enabled:
+    default: true
+    floor: true
+    ratchet: false
+    reload: hot
+    owner: platform
+    tier: stable
+    doc: "CFG-SIM: symulacja dry-run przed zastosowaniem zmiany configu."
+
+# ── Profile (L2/L3) — listy modułów ────────────────────────────────────────
+# Profile odwzorowują poziomy z gates.yaml (L0-L3) + profile specjalne.
+# Kolejność listy = kolejność uruchamiania modułów.
+profiles:
+  fast: [git, security, structure]
+  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  security: [git, security]
+  architecture: [architecture, contracts]
+  reproducibility: [reproducibility, dependencies]
+  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+
+# ── Context rules (L5) — reguły kontekstowe z diffu ────────────────────────
+# Resolver klasyfikuje kontekst Z DIFFU (nie z deklaracji): task_type, files,
+# tier. Każda reguła dopasowuje się do kontekstu i może:
+#   - wybrać profil (profile)
+#   - tighten/relax konkretne klucze (gates)
+#   - dodać kompensacje (compensations) — wymagane przy relaxie
+#
+# FORMAT wyrażeń warunkowych (parser w osobnym strumieniu — tu dokumentacja):
+#   applies_when:  lista warunków; WSZYSTKIE muszą być spełnione (AND).
+#   when:          alias dla pojedynczego warunku (AND z applies_when).
+#   Warunek:       { field: <task_type|files|tier>, op: <eq|ne|in|match|glob>,
+#                    value: <wartość lub lista> }
+#   files.match:   glob na ścieżce pliku (np. "**/migrations/**").
+#   files.glob:    alias dla match.
+#   task_type:     eq|in — np. { task_type: { eq: hotfix } }.
+#   tier:          eq|in — np. { tier: { in: [1, 2] } }.
+#
+# Kompensacje: gdy reguła relaxuje klucz, MUSI podać kompensację (inny klucz
+# tightenowany), inaczej reguła jest odrzucona (fail-closed).
+context_rules:
+  # Hotfix: wąski zakres plików, szybszy profil, ale security NIE jest luzowane.
+  - id: hotfix-narrow-scope
+    applies_when:
+      - { field: task_type, op: eq, value: hotfix }
+      - { field: files, op: glob, value: "**/*.{ts,go,rs}" }
+    profile: fast
+    gates:
+      structure.readme.required_sections: { tighten: 3 }
+    compensations: []
+    doc: "Hotfix w wąskim zakresie — profil fast, struktura README nie jest wymagana w pełni."
+
+  # Migracja: dotyka plików migracji → wymaga pełnego profilu + kompensacja.
+  - id: migration-touch
+    applies_when:
+      - { field: files, op: glob, value: "**/migrations/**" }
+    profile: full
+    gates:
+      migration.integrity.max_pending: { tighten: 1 }
+    compensations: []
+    doc: "Zmiana dotyka migracji — pełny profil, mniej oczekujących migracji."
+
+  # Tier 1 (krytyczny): zawsze pełny profil, security zaostrzone.
+  - id: tier1-critical
+    applies_when:
+      - { field: tier, op: eq, value: 1 }
+    profile: release
+    gates:
+      security.sast.max_high: { tighten: 1 }
+    compensations: []
+    doc: "Serwis tier 1 — profil release, SAST high zaostrzone do 1."
+
+  # Przykład RELAXU z kompensacją: legacy serwis dostaje luz na outdated
+  # zależności, ale w zamian musi utrzymać zero krytycznych SAST.
+  - id: legacy-deps-relax
+    applies_when:
+      - { field: task_type, op: eq, value: legacy-maintenance }
+      - { field: tier, op: eq, value: 3 }
+    profile: full
+    gates:
+      dependencies.integrity.max_outdated: { relax: 15 }
+    compensations:
+      - security.sast.max_critical: { tighten: 0 }
+    doc: "Legacy tier 3 — luz na outdated zależności, kompensacja: zero krytycznych SAST."
+
+# ── Waivers (L6) — wyjątki, które WYGAŚAJĄ ─────────────────────────────────
+# Każdy waiver MUSI mieć expires_at. Waiver bez expires_at = config nie
+# przechodzi walidacji (nielegalny). Wygasły waiver = nie istnieje.
+waivers:
+  - id: wv-e2e-legacy-suite
+    check_id: e2e-legacy-suite
+    key: security.sast.max_critical
+    value: 2
+    justification: "Migracja runnera E2E, ticket PLAT-1234."
+    approved_by: "@platform-lead"
+    expires_at: "2026-09-01"
+  - id: wv-deps-outdated-q3
+    check_id: deps-outdated-q3
+    key: dependencies.integrity.max_outdated
+    value: 12
+    justification: "Kwarantanna zależności do Q3, ticket PLAT-1300."
+    approved_by: "@platform-lead"
+    expires_at: "2026-09-30"
+
+# ── Kill-switches (L7) — awaryjne, które WYGAŚAJĄ ──────────────────────────
+# Awaryjne wyłączenia. Nawet kill-switch MUSI mieć expires_at (pełny audit).
+# Aktywacja kill-switcha = pełny proces + wpis w audycie.
+kill_switches:
+  - id: ks-deploy-freeze
+    key: deployment.integrity.enabled
+    value: false
+    activated_by: "@platform-lead"
+    reason: "Freeze wdrożeń podczas awarii produkcyjnej INC-2026-0810."
+    expires_at: "2026-08-12"
+  - id: ks-migration-hold
+    key: migration.integrity.enabled
+    value: false
+    activated_by: "@platform-lead"
+    reason: "Wstrzymanie migracji do czasu naprawy bazy, INC-2026-0811."
+    expires_at: "2026-08-13"

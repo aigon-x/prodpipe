@@ -1,0 +1,72 @@
+# ============================================================================
+# registry.example.yaml — PRZYKŁAD użycia registry.yaml (Config Plane).
+# ============================================================================
+# Ten plik pokazuje, jak serwis może tightenować/relaxować klucze gate'ów
+# oraz jak wygląda waiver. To NIE jest źródło prawdy — źródłem prawdy jest
+# config/canonical/registry.yaml. Ten plik to dokumentacja wzorców użycia.
+#
+# Resolver liczy effective config per serwis × kontekst i zapisuje pełny ślad
+# (snapshot + trace). Każda decyzja jest audytowalna.
+# ============================================================================
+
+schema_version: 1
+
+# ── Serwis: jak tightenować / relaxować ────────────────────────────────────
+# Serwis definiuje własne wartości w configu serwisu (L4). Resolver nakłada
+# je na defaulty (L0) i floors (L1) z registry.yaml.
+service:
+  id: billing-api
+  tier: 1
+
+gates:
+  # ✅ TIGHTEN powyżej defaultu — przechodzi bez pytania (prawo #1).
+  # default=80 (registry) → serwis ustawia 95. Tighten zawsze przechodzi.
+  coverage.min_percent: 95
+
+  # ✅ Tighten na kluczu z registry.yaml — podniesienie progu, bez zgody.
+  security.sast.max_high: 1        # default=5, floor=3 → 1 >= 3, tighten OK
+
+  # ❌ RELAX poniżej floora — ODRZUCONE bez waivera (prawo #2).
+  # security.sast.max_critical: 3  # floor=0 → 3 > 0 to RELAX → REJECTED
+  #   (odkomentowanie tej linii = config nie przechodzi walidacji)
+
+  # ❌ RELAX na kluczu z ratchet:true — wymaga waivera (anti-entropy).
+  # dependencies.integrity.max_outdated: 15  # ratchet → może tylko rosnąć
+
+# ── Waiver: jak wygląda legalny wyjątek ────────────────────────────────────
+# Waiver pozwala na RELAX poniżej floora. MUSI mieć expires_at (prawo #3).
+# Wygasły waiver = nie istnieje. Waiver bez expires_at = config nielegalny.
+waivers:
+  - id: wv-billing-sast-critical
+    check_id: security-sast-critical
+    key: security.sast.max_critical
+    value: 2                        # floor=0, ale waiver pozwala na 2
+    justification: "Migracja runnera E2E, ticket PLAT-1234."
+    approved_by: "@platform-lead"
+    expires_at: 2026-09-01          # OBOWIĄZKOWE — bez tego waiver nielegalny
+
+# ── Context rules (L5) — jak serwis może reagować na kontekst z diffu ──────
+# Reguły w registry.yaml dopasowują się do kontekstu (task_type, files, tier)
+# i mogą tightenować/relaxować klucze. Tu przykład, jak wygląda reguła.
+context_rules:
+  - id: billing-hotfix
+    applies_when:
+      - { field: task_type, op: eq, value: hotfix }
+      - { field: files, op: glob, value: "**/billing/**" }
+    profile: fast
+    gates:
+      structure.readme.required_sections: { tighten: 3 }
+    compensations: []
+    doc: "Hotfix w billing — profil fast, README nie wymagane w pełni."
+
+# ── Trace: jak resolver odpowiada na 'dlaczego ten gate zablokował?' ───────
+# Każdy run liczy effective config i zapisuje pełny ślad (snapshot + trace).
+# Przykładowy trace dla coverage.min_percent=95:
+#   snapshot: cfg-a3f9c2
+#   key: gates.coverage.min_percent, value: 95
+#   trace:
+#     - { layer: L0 default,  value: 80 }
+#     - { layer: L1 floor,    constraint: ">=60" }
+#     - { layer: L3 profile,  value: 80 }
+#     - { layer: L4 service,  value: 95, result: "WIN (tighten)" }
+#     - { layer: L5 hotfix,   value: 70, result: "REJECTED (relax bez waivera)" }

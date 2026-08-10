@@ -1,0 +1,267 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aigon.pl/schemas/config/registry.schema.json",
+  "title": "AIGON Config Plane — registry.yaml schema",
+  "description": "JSON Schema walidujący strukturę config/canonical/registry.yaml (źródło prawdy Config Plane, warstwy L0-L7).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "gates",
+    "profiles",
+    "context_rules",
+    "waivers",
+    "kill_switches"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Wersja schematu registry. Zmiana struktury = bump wersji."
+    },
+
+    "gates": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/gateKey"
+      },
+      "description": "L0/L1 — pełne definicje kluczy gate'ów (default, floor, ratchet, reload, owner, tier, doc)."
+    },
+
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "git", "security", "structure", "architecture", "dependencies",
+            "reproducibility", "deployment", "contracts", "migration", "recovery"
+          ]
+        },
+        "uniqueItems": true
+      },
+      "description": "L2/L3 — profile (fast/full/release/genesis + specjalne) z listami modułów w kolejności uruchamiania."
+    },
+
+    "context_rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/contextRule"
+      },
+      "description": "L5 — reguły kontekstowe z diffu (task_type, files, tier) → profil + tighten/relax + kompensacje."
+    },
+
+    "waivers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/waiver"
+      },
+      "description": "L6 — wyjątki. Każdy MUSI mieć expires_at (inaczej config nie przechodzi walidacji)."
+    },
+
+    "kill_switches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/killSwitch"
+      },
+      "description": "L7 — awaryjne wyłączenia. Każdy MUSI mieć expires_at (pełny audit)."
+    }
+  },
+
+  "definitions": {
+    "gateKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "floor", "ratchet", "reload", "owner", "tier", "doc"],
+      "properties": {
+        "default": {
+          "type": ["number", "boolean"],
+          "description": "L0 — wartość domyślna klucza."
+        },
+        "floor": {
+          "type": ["number", "boolean"],
+          "description": "L1 — minimalny próg, którego serwis nie może obniżyć bez waivera."
+        },
+        "ratchet": {
+          "type": "boolean",
+          "description": "Anti-entropy: true = wartość może tylko rosnąć."
+        },
+        "reload": {
+          "type": "string",
+          "enum": ["hot", "cold"],
+          "description": "hot = od następnego runu; cold = wymaga redeployu."
+        },
+        "owner": {
+          "type": "string",
+          "enum": ["platform", "service-owner"],
+          "description": "Właściciel klucza."
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["stable", "beta", "deprecated"],
+          "description": "Dojrzałość klucza."
+        },
+        "doc": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Obowiązkowy opis klucza (CFG-002)."
+        }
+      }
+    },
+
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "op", "value"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": ["task_type", "files", "tier"],
+          "description": "Pole kontekstu klasyfikowane Z DIFFU."
+        },
+        "op": {
+          "type": "string",
+          "enum": ["eq", "ne", "in", "match", "glob"],
+          "description": "Operator porównania. files używa glob/match; task_type i tier używają eq/in."
+        },
+        "value": {
+          "type": ["string", "number", "array"],
+          "description": "Wartość lub lista wartości (dla op=in)."
+        }
+      }
+    },
+
+    "contextRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applies_when", "profile", "gates", "compensations", "doc"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unikalny identyfikator reguły."
+        },
+        "applies_when": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/condition" },
+          "minItems": 1,
+          "description": "Warunki — WSZYSTKIE muszą być spełnione (AND)."
+        },
+        "when": {
+          "$ref": "#/definitions/condition",
+          "description": "Alias dla pojedynczego warunku (AND z applies_when)."
+        },
+        "profile": {
+          "type": "string",
+          "description": "Profil wybrany przez regułę (np. fast, full, release)."
+        },
+        "gates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "tighten": { "type": ["number", "boolean"] },
+              "relax": { "type": ["number", "boolean"] }
+            },
+            "additionalProperties": false
+          },
+          "description": "Tighten/relax konkretnych kluczy."
+        },
+        "compensations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "tighten": { "type": ["number", "boolean"] }
+              },
+              "additionalProperties": false
+            }
+          },
+          "description": "Kompensacje — wymagane przy relaxie (inaczej reguła odrzucona, fail-closed)."
+        },
+        "doc": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Opis reguły."
+        }
+      }
+    },
+
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "check_id", "key", "value", "justification", "approved_by", "expires_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unikalny identyfikator waivera."
+        },
+        "check_id": {
+          "type": "string",
+          "description": "Identyfikator checka, którego dotyczy wyjątek."
+        },
+        "key": {
+          "type": "string",
+          "description": "Klucz gate'a, którego dotyczy wyjątek."
+        },
+        "value": {
+          "type": ["number", "boolean"],
+          "description": "Wartość dozwolona przez waiver."
+        },
+        "justification": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Uzasadnienie (ticket)."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Kto zatwierdził."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date",
+          "description": "OBOWIĄZKOWE — data wygaśnięcia. Waiver bez expires_at jest nielegalny."
+        }
+      }
+    },
+
+    "killSwitch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "key", "value", "activated_by", "reason", "expires_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unikalny identyfikator kill-switcha."
+        },
+        "key": {
+          "type": "string",
+          "description": "Klucz gate'a do wyłączenia."
+        },
+        "value": {
+          "type": ["number", "boolean"],
+          "description": "Wartość awaryjna."
+        },
+        "activated_by": {
+          "type": "string",
+          "description": "Kto aktywował."
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Powód awaryjny (incident)."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date",
+          "description": "OBOWIĄZKOWE — nawet kill-switch wygasa."
+        }
+      }
+    }
+  }
+}
