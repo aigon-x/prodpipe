@@ -1,0 +1,190 @@
+# ============================================================================
+# manifest.yaml — TESTFORGE test manifest
+# ============================================================================
+# Lista testów, poziomy (L0-L6), właściciele, zależności.
+#
+# Poziomy:
+#   L0 STATIC      — lint, format, shellcheck, yamllint, secret scan
+#   L1 UNIT        — testy jednostkowe per moduł
+#   L2 COMPONENT   — testy komponentów
+#   L3 CONTRACT    — testy kontraktów (verify engine)
+#   L4 INTEGRATION — testy integracyjne
+#   L5 E2E         — testy end-to-end
+#   L6 SYSTEM      — soak, chaos, certyfikacja
+#
+# required: true  — test MUSI przejść do certyfikacji
+# required: false — test informacyjny (nie blokuje certyfikacji)
+# ============================================================================
+
+version: 1
+
+tests:
+  # ── L1 UNIT ──────────────────────────────────────────────────────────────
+  - id: UNIT-001
+    name: state subsystem unit tests
+    level: L1
+    path: tests/unit/state.test.sh
+    owner: state
+    depends: []
+    required: true
+
+  - id: UNIT-002
+    name: testforge lib unit tests
+    level: L1
+    path: tests/unit/testforge-lib.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── L3 CONTRACT (verify engine) ──────────────────────────────────────────
+  - id: CONTRACT-001
+    name: verify engine contract tests
+    level: L3
+    path: tests/contract/verify.test.sh
+    owner: verify
+    depends: []
+    required: true
+
+  # ── L4 INTEGRATION ───────────────────────────────────────────────────────
+  - id: INTEGRATION-001
+    name: state + verify integration
+    level: L4
+    path: tests/integration/state-verify.test.sh
+    owner: testforge
+    depends: [UNIT-001, CONTRACT-001]
+    required: true
+
+  # ── L5 E2E ───────────────────────────────────────────────────────────────
+  - id: E2E-001
+    name: full pipeline e2e
+    level: L5
+    path: tests/e2e/pipeline.test.sh
+    owner: testforge
+    depends: [INTEGRATION-001]
+    required: true
+
+  # ── SECURITY ─────────────────────────────────────────────────────────────
+  - id: SECURITY-001
+    name: secret scan security tests
+    level: L0
+    path: tests/security/secret-scan.test.sh
+    owner: security
+    depends: []
+    required: true
+
+  # ── DRIFT ────────────────────────────────────────────────────────────────
+  - id: DRIFT-001
+    name: drift detection tests
+    level: L4
+    path: tests/drift/drift.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── RECOVERY ─────────────────────────────────────────────────────────────
+  - id: RECOVERY-001
+    name: recovery tests
+    level: L6
+    path: tests/recovery/recovery.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── REPRODUCIBILITY ──────────────────────────────────────────────────────
+  - id: REPRO-001
+    name: reproducibility test
+    level: L6
+    path: tests/reproducibility/reproducibility.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── CLEAN-ROOM ───────────────────────────────────────────────────────────
+  - id: CLEANROOM-001
+    name: clean-room test
+    level: L6
+    path: tests/clean-room/clean-room.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── NEGATIVE ─────────────────────────────────────────────────────────────
+  - id: NEGATIVE-001
+    name: negative tests
+    level: L1
+    path: tests/negative/negative.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── GOLDEN ───────────────────────────────────────────────────────────────
+  - id: GOLDEN-001
+    name: golden file tests
+    level: L1
+    path: tests/golden/golden.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── SNAPSHOT ─────────────────────────────────────────────────────────────
+  - id: SNAPSHOT-001
+    name: snapshot tests
+    level: L1
+    path: tests/snapshot/snapshot.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── PROPERTY ─────────────────────────────────────────────────────────────
+  - id: PROPERTY-001
+    name: property tests
+    level: L1
+    path: tests/property/property.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── MIGRATION ────────────────────────────────────────────────────────────
+  - id: MIGRATION-001
+    name: migration tests
+    level: L4
+    path: tests/migration/migration.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── PERFORMANCE ──────────────────────────────────────────────────────────
+  - id: PERFORMANCE-001
+    name: performance tests
+    level: L6
+    path: tests/performance/performance.test.sh
+    owner: testforge
+    depends: []
+    required: false
+
+  # ── META ─────────────────────────────────────────────────────────────────
+  - id: META-001
+    name: meta-tests (testy testów)
+    level: L6
+    path: tests/meta/meta.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── MUTATION ─────────────────────────────────────────────────────────────
+  - id: MUTATION-001
+    name: mutation tests
+    level: L6
+    path: tests/mutation/mutation.test.sh
+    owner: testforge
+    depends: []
+    required: true
+
+  # ── FAULT-INJECTION ──────────────────────────────────────────────────────
+  - id: FAULT-001
+    name: fault injection tests
+    level: L6
+    path: tests/fault-injection/fault-injection.test.sh
+    owner: testforge
+    depends: []
+    required: true
