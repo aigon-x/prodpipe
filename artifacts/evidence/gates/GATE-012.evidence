@@ -4,6 +4,6 @@ name=Migracje StateStore spójne
 command=tools/verify/gates/domains/migration.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T02:56:02Z
-head=26093aa
-output==== GATE-012 MIGRATION === [PASS] MIGRATION-001 katalog migracji        Katalog migracji obecny. [PASS] MIGRATION-002 migracje sekwencyjne        Migracje w ciągłej sekwencji (ostatnia: 9). [PASS] MIGRATION-003 schema_version spójna        STATE_SCHEMA_VERSION=9 == ostatnia migracja 0009.  === RESULT === Checks: 3  PASS: 3  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS
+timestamp=2026-08-10T13:06:44Z
+head=f3d49e2
+output==== GATE-012 MIGRATION === [PASS] MIGRATION-001 katalog migracji        Katalog migracji obecny. [PASS] MIGRATION-002 migracje sekwencyjne        Migracje w ciągłej sekwencji (ostatnia: 17). [PASS] MIGRATION-003 schema_version spójna        STATE_SCHEMA_VERSION=17 == ostatnia migracja 0017.  === RESULT === Checks: 3  PASS: 3  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

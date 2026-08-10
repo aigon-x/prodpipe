@@ -460,6 +460,22 @@ GATE_REGISTRY=(
     'wszystkie RES-B-01..04 checki PASS (registry.yaml resilience keys, state.sh backup/restore, restore drill pipeline, migration 0014)' \
     'brak kluczy resilience w registry.yaml, brak backup/restore w state.sh, brak pipeline restore drill, brak migration 0014' \
     '0' 'pre-commit' 'true' 'exit_code' 'tools/verify/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_resilience.sh' 'IMPLEMENTED' )"
+
+  # ── LIFECYCLE (GATE-040) — LIFECYCLE PLANE ─────────────────
+  # Weryfikuje wykonywalny cykl życia oprogramowania: konstytucja
+  # docs/00-foundation/LIFECYCLE.md definiuje fazy F00-F17, gate'y G0-G17,
+  # uniwersalny state machine (IDEA→RETIRED), model artefaktów i traceability,
+  # a StateStore ma tabele lifecycle (requirement/change/verification/release).
+  # To NIE jest checklista — to gate, który sprawdza czy proces jest wykonywalny.
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-040' 'LIFECYCLE' 'LIFECYCLE PLANE — Evidence-Driven Software Lifecycle' \
+    'Lifecycle gate: weryfikuje ze cykl zycia oprogramowania jest kompletny, spojny i wykonywalny. Sprawdza ze docs/00-foundation/LIFECYCLE.md definiuje fazy F00-F17, gatey G0-G17, uniwersalny state machine (IDEA->RETIRED, nigdy DONE), model artefaktow (CHANGE_ID->...->VERIFICATION_ID) i traceability matrix, oraz ze StateStore ma tabele lifecycle (requirement/change/verification/release). Checks LIFECYCLE-001..009. Zasada: przechodzimy dalej bo spelnilismy kontrakt i mamy dowod, nie bo skonczylismy prace.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/lifecycle/lifecycle.sh' \
+    'docs/00-foundation/LIFECYCLE.md, system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-040.evidence' \
+    'wszystkie LIFECYCLE-001..009 checki PASS (konstytucja, state machine, fazy F00-F17, gatey G0-G17, model artefaktow, traceability, tabele StateStore, registry)' \
+    'brak konstytucji LIFECYCLE.md, niekompletny state machine, brak faz/gateow, brak tabel lifecycle w StateStore, brak wpisu w registry' \
+    '0' 'release' 'true' 'exit_code' 'docs/00-foundation/LIFECYCLE.md' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_lifecycle.sh' 'IMPLEMENTED' )"
 )
 
 # ── Funkcje zapytań registry ─────────────────────────────────

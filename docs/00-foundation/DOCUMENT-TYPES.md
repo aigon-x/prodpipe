@@ -31,6 +31,7 @@ Definiuje kanoniczne typy dokumentów. Każdy dokument w repo musi mieć przypis
 | `POSTMORTEM` | Analiza po awarii | Po incydencie | Gdy to raport (INCIDENT) | Incident owner | Summary, Root cause, Actions | ACTIVE→CLOSED | Git |
 | `BASELINE` | Punkt odniesienia | Certyfikacja | Gdy to release (RELEASE-NOTES) | Release owner | Scope, Evidence, Status | ACTIVE→SUPERSEDED | Git |
 | `RELEASE-NOTES` | Notatki wydania | Nowy release | Gdy to baseline (BASELINE) | Release owner | Changes, Migration, Rollback | ACTIVE | Git |
+| `LIFECYCLE` | Konstytucja cyklu życia oprogramowania | Definicja faz/gate'ów/artefaktów | Gdy to polityka (POLICY) | Lifecycle owner | Phases, Gates, Artifacts, State machine, Traceability | ACTIVE→SUPERSEDED | Git |
 
 ## 3. Zasady
 

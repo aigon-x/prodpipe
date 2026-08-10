@@ -4,6 +4,6 @@ name=Kontrakty README/API spełnione
 command=tools/verify/gates/domains/contracts.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T02:56:02Z
-head=26093aa
+timestamp=2026-08-10T13:06:44Z
+head=f3d49e2
 output==== GATE-011 CONTRACTS === [PASS] CONTRACTS-001 README.md istnieje        README.md obecny. [PASS] CONTRACTS-002 README nie jest placeholderem        README.md nie jest placeholderem. [WARN] CONTRACTS-003 README ma Purpose        README.md nie ma jawnej sekcji Purpose. [PASS] CONTRACTS-004 README niepusty        README.md ma 4662 bajtów.  === RESULT === Checks: 4  PASS: 3  FAIL: 0  WARN: 1  INFO: 0 CERTIFICATION: PASS

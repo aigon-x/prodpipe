@@ -1,0 +1,430 @@
+# ============================================================================
+# pipelines.yaml — Pipeline Operating System (metadata-driven). ŹRÓDŁO PRAWDY.
+# ============================================================================
+# Ten plik jest jedynym miejscem, w którym definiuje się pipeline'y:
+#   - identyfikator (id) — P-<seq>
+#   - rodzina (family) — PRODUCT/DESIGN/SECURITY/CODE/BUILD/DEPLOYMENT/RUNTIME/RECOVERY
+#   - ścieżka skryptu (script) — względem tools/automation/
+#   - klasa wykonania (class) — FAST | STANDARD | DEEP | RELEASE | CONTINUOUS
+#   - status — IMPLEMENTED | PROPOSED
+#   - zależności (depends) — pipeline'y, które muszą przejść PRZED tym
+#   - kontrakt (contract) — 8 faz wspólnego Pipeline Contract
+#
+# pipelines.sh jest GENEROWANY z tego pliku przez tools/automation/core/gen-pipelines.sh.
+# NIE edytuj pipelines.sh ręcznie — edytuj ten plik i uruchom generator.
+#
+# Wspólny Pipeline Contract (każdy pipeline):
+#   DISCOVER → CONTRACT → EXECUTE → TEST → EVIDENCE → VERIFY → REGISTER → REPORT
+#
+# Klasy wykonania:
+#   FAST       — <10s, pre-commit, oczywiste błędy
+#   STANDARD   — <1-3min, pre-push, pełna certyfikacja lokalna
+#   DEEP       — minuty, CI, niezależna weryfikacja
+#   RELEASE    — pełna certyfikacja baseline/release
+#   CONTINUOUS — ciągłe monitorowanie / asynchroniczne
+#
+# Mapowanie na StateStore:
+#   - P-003/P-043/P-044 konsumują migrację 0017 (lifecycle plane: requirement/change/verification/release)
+#   - P-014/P-045/P-046 konsumują migrację 0011 (change intelligence: change_proposals/prediction_accuracy/change_scope/duplicate_work)
+#   - Każdy pipeline zapisuje evidence przez evidence_record() (P0#1)
+# ============================================================================
+
+schema_version: 1
+
+# ── Rodziny pipeline'ów ─────────────────────────────────────────────────────
+families:
+  PRODUCT:     "Produkt i odkrywanie (Product & Discovery)"
+  DESIGN:      "Projekt i architektura (Design & Architecture)"
+  SECURITY:    "Bezpieczeństwo (Security)"
+  CODE:        "Kod i jakość (Code & Quality)"
+  BUILD:       "Budowa i release (Build & Release)"
+  DEPLOYMENT:  "Wdrożenie (Deployment)"
+  RUNTIME:     "Runtime i operacje (Runtime & Operations)"
+  RECOVERY:    "Odzysk i governance (Recovery & Governance)"
+
+# ── Pipeline'y ──────────────────────────────────────────────────────────────
+# Każdy pipeline: id, family, script, class, status, depends, contract.
+# contract to 8-fazowy Pipeline Contract (DISCOVER..REPORT).
+pipelines:
+  # ── PRODUCT / DISCOVERY ──────────────────────────────────────────────────
+  - id: P-001
+    family: PRODUCT
+    script: product/discovery.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-002
+    family: PRODUCT
+    script: product/requirements.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-001]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-003
+    family: PRODUCT
+    script: product/traceability.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-002]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-004
+    family: PRODUCT
+    script: product/prioritization.sh
+    class: FAST
+    status: PROPOSED
+    depends: [P-002]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-005
+    family: PRODUCT
+    script: product/roadmap.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-004]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-006
+    family: PRODUCT
+    script: product/backlog.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-005]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-007
+    family: PRODUCT
+    script: product/acceptance.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-003]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── DESIGN / ARCHITECTURE ────────────────────────────────────────────────
+  - id: P-008
+    family: DESIGN
+    script: design/architecture.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-002]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-009
+    family: DESIGN
+    script: design/design-doc.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-008]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-010
+    family: DESIGN
+    script: design/contracts.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-009]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-011
+    family: DESIGN
+    script: design/interface.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-010]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-012
+    family: DESIGN
+    script: design/data-model.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-010]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-013
+    family: DESIGN
+    script: design/tech-debt.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-008]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-014
+    family: DESIGN
+    script: design/change-impact.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-003]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── SECURITY ─────────────────────────────────────────────────────────────
+  - id: P-015
+    family: SECURITY
+    script: security/threat-model.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-008]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-016
+    family: SECURITY
+    script: security/secrets.sh
+    class: FAST
+    status: PROPOSED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-017
+    family: SECURITY
+    script: security/dependency-scan.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-016]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-018
+    family: SECURITY
+    script: security/static-analysis.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-017]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-019
+    family: SECURITY
+    script: security/penetration.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-018]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-020
+    family: SECURITY
+    script: security/compliance.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-019]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── CODE / QUALITY ───────────────────────────────────────────────────────
+  - id: P-021
+    family: CODE
+    script: code/unit-tests.sh
+    class: FAST
+    status: PROPOSED
+    depends: [P-010]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-022
+    family: CODE
+    script: code/integration-tests.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-021]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-023
+    family: CODE
+    script: code/e2e-tests.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-022]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-024
+    family: CODE
+    script: code/lint.sh
+    class: FAST
+    status: PROPOSED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-025
+    family: CODE
+    script: code/format.sh
+    class: FAST
+    status: PROPOSED
+    depends: [P-024]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-026
+    family: CODE
+    script: code/coverage.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-021]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-027
+    family: CODE
+    script: code/performance.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-022]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-028
+    family: CODE
+    script: code/review.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-025]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── BUILD / RELEASE ──────────────────────────────────────────────────────
+  - id: P-029
+    family: BUILD
+    script: build/build.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-028]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-030
+    family: BUILD
+    script: build/artifact.sh
+    class: STANDARD
+    status: PROPOSED
+    depends: [P-029]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-031
+    family: BUILD
+    script: build/sbom.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-030]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-032
+    family: BUILD
+    script: build/reproducibility.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-030]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-033
+    family: BUILD
+    script: build/release.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-031, P-032]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── DEPLOYMENT ───────────────────────────────────────────────────────────
+  - id: P-034
+    family: DEPLOYMENT
+    script: deployment/deploy.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-033]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-035
+    family: DEPLOYMENT
+    script: deployment/rollback.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-034]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-036
+    family: DEPLOYMENT
+    script: deployment/canary.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-034]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-037
+    family: DEPLOYMENT
+    script: deployment/blue-green.sh
+    class: RELEASE
+    status: PROPOSED
+    depends: [P-034]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-038
+    family: DEPLOYMENT
+    script: deployment/infrastructure.sh
+    class: DEEP
+    status: PROPOSED
+    depends: [P-034]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── RUNTIME / OPERATIONS ─────────────────────────────────────────────────
+  - id: P-039
+    family: RUNTIME
+    script: runtime/pipeline-governance.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-040
+    family: RUNTIME
+    script: runtime/gap-discovery.sh
+    class: CONTINUOUS
+    status: IMPLEMENTED
+    depends: [P-039]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-041
+    family: RUNTIME
+    script: runtime/temporal-assurance.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-042
+    family: RUNTIME
+    script: runtime/knowledge-consistency.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-043
+    family: RUNTIME
+    script: runtime/self-certification.sh
+    class: CONTINUOUS
+    status: IMPLEMENTED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-044
+    family: RUNTIME
+    script: runtime/continuous-certification.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-043]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-045
+    family: RUNTIME
+    script: runtime/change-risk.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-014]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-046
+    family: RUNTIME
+    script: runtime/selective-verification.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-045]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-047
+    family: RUNTIME
+    script: runtime/unknown-management.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-048
+    family: RUNTIME
+    script: runtime/source-of-truth.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-049
+    family: RUNTIME
+    script: runtime/generated-artifact.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-050
+    family: RUNTIME
+    script: runtime/documentation.sh
+    class: CONTINUOUS
+    status: PROPOSED
+    depends: [P-040]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+  # ── RECOVERY / GOVERNANCE ────────────────────────────────────────────────
+  - id: P-051
+    family: RECOVERY
+    script: recovery/max-decomposition.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-003]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+# ── Klasy wykonania → domyślna lista pipeline'ów ────────────────────────────
+# Każda klasa uruchamia pipeline'y, które mają w niej działać (status IMPLEMENTED).
+# UWAGA: każda klasa MUSI mieć dokładnie JEDNĄ definicję (last-wins, jak w gates.yaml).
+classes:
+  FAST: [P-016, P-021, P-024, P-025]
+  STANDARD: [P-001, P-002, P-003, P-004, P-005, P-006, P-007, P-009, P-010, P-011, P-013, P-017, P-018, P-022, P-026, P-028, P-029, P-030]
+  DEEP: [P-008, P-012, P-014, P-015, P-019, P-023, P-027, P-038, P-051]
+  RELEASE: [P-020, P-031, P-032, P-033, P-034, P-035, P-036, P-037]
+  CONTINUOUS: [P-039, P-040, P-041, P-042, P-043, P-044, P-045, P-046, P-047, P-048, P-049, P-050]

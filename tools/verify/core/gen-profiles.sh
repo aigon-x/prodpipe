@@ -116,6 +116,11 @@ verify_profile_modules() {
 MID
 
     # Wypisz case dla profili z YAML (sekcja profiles:).
+    # UWAGA: deduplikujemy klucze profili (last-wins). Duplikaty kluczy w YAML
+    # powodowałyby zduplikowane case branches, a bash case first-match-wins
+    # pomijałby późniejsze warianty (bug: obs-* i security-* nie działały).
+    # Last-wins gwarantuje, że ostatnia definicja profilu wygrywa. Zachowujemy
+    # kolejność pierwszego wystąpienia profilu (czytelność wygenerowanego pliku).
     awk '
         /^profiles:/ { in_profiles=1; next }
         in_profiles && /^  [a-z]+:/ {
@@ -127,12 +132,20 @@ MID
             rest=substr(line, index(line, ":")+1)
             gsub(/[\[\] ]/, "", rest)
             gsub(/,/, " ", rest)
-            print "    " profile ")"
-            print "      echo \"" rest "\""
-            print "      ;;"
+            # last-wins: nadpisujemy poprzednią definicję tego samego profilu
+            if (!(profile in profs)) { order[++n]=profile }
+            profs[profile]=rest
             next
         }
         in_profiles && /^[a-z]+:/ { in_profiles=0 }
+        END {
+            for (i=1; i<=n; i++) {
+                p=order[i]
+                print "    " p ")"
+                print "      echo \"" profs[p] "\""
+                print "      ;;"
+            }
+        }
     ' "$GATES_YAML"
 
     cat <<'MID2'

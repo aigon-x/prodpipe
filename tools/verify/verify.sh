@@ -189,9 +189,31 @@ case "$SUBCOMMAND" in
       warn "config compiler" "Brak kompilatora: $ROOT/tools/config/config-compiler.sh"
     fi
     ;;
+  pipelines)
+    # PIPELINE OPERATING SYSTEM — delegacja do tools/automation.
+    # Uruchamia pipeline'y (P-001..P-051) przez orchestrator automation.sh.
+    # PROFILE: verify | audit | release | deploy | certify | list
+    # (domyślnie verify = FAST+STANDARD, pre-commit/pre-push).
+    say ""
+    say "────────────────────────────────────────────────────────────"
+    say "MODUŁ: pipelines (Pipeline Operating System)"
+    say "────────────────────────────────────────────────────────────"
+    if [ -f "$ROOT/tools/automation/automation.sh" ]; then
+      bash "$ROOT/tools/automation/automation.sh" "${PROFILE:-verify}"
+      rc=$?
+      if [ "$rc" -ne 0 ]; then
+        VERIFY_FAIL=$((VERIFY_FAIL + 1))
+        fail "pipelines automation" BLOCKING "Pipeline Operating System zwrócił kod $rc (oczekiwano 0)."
+      else
+        pass "pipelines automation" BLOCKING "Pipeline Operating System zakończył się sukcesem."
+      fi
+    else
+      fail "pipelines automation" BLOCKING "Brak orchestratora: $ROOT/tools/automation/automation.sh (fail-closed)"
+    fi
+    ;;
   *)
     say "Nieznana subkomenda: $SUBCOMMAND"
-    say "Dostępne: reconcile | drift | history | debt | waivers | gates | config"
+    say "Dostępne: reconcile | drift | history | debt | waivers | gates | config | pipelines"
     exit 2
     ;;
 esac

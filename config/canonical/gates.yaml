@@ -194,25 +194,25 @@ gates:
       security: BLOCKING
       release: BLOCKING
       genesis: BLOCKING
+  - module: lifecycle
+    script: lifecycle/lifecycle.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
 
 # ── Profile → domyślna lista modułów (kolejność uruchamiania) ───────────────
+# UWAGA: każdy profil MUSI mieć dokładnie JEDNĄ definicję. Duplikaty kluczy
+# powodują, że generator (awk fallback) wypisuje wszystkie wystąpienia,
+# a bash case first-match-wins pomija późniejsze warianty (bug: obs-* i
+# security-* nie działały w full/release/genesis/all). Każdy profil łączy
+# wszystkie moduły, które mają w nim działać.
 profiles:
   fast: [git, security, structure, aesthetics]
-  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
-  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
-  security: [git, security, security-drills]
+  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics, security-credential-registry, security-rotation, security-retention, security-auth, security-web, lifecycle]
+  security: [git, security, security-drills, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
   architecture: [architecture, contracts, semantics, taxonomy, efficiency]
   reproducibility: [reproducibility, dependencies]
-  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
-  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
-  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency]
-  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
-  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
-  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics]
-  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
-  security: [git, security, security-drills, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
-  architecture: [architecture, contracts, semantics, taxonomy]
-  reproducibility: [reproducibility, dependencies]
-  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
-  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
-  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, security-credential-registry, security-rotation, security-retention, security-auth, security-web]
+  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics, security-credential-registry, security-rotation, security-retention, security-auth, security-web, lifecycle]
+  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics, security-credential-registry, security-rotation, security-retention, security-auth, security-web, lifecycle]
+  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, aesthetics, semantics, security-drills, taxonomy, i18n, efficiency, obs-logging, obs-metrics, obs-alerts, obs-slo, obs-health, obs-deadman, obs-dashboards, obs-synthetics, security-credential-registry, security-rotation, security-retention, security-auth, security-web, lifecycle]

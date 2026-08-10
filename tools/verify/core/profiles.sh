@@ -112,6 +112,9 @@ VERIFY_MODULES=(
   "security-web:security:BLOCKING"
   "security-web:release:BLOCKING"
   "security-web:genesis:BLOCKING"
+  "lifecycle:full:BLOCKING"
+  "lifecycle:release:BLOCKING"
+  "lifecycle:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -123,13 +126,10 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
-      ;;
-    full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web lifecycle"
       ;;
     security)
-      echo "git security security-drills"
+      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     architecture)
       echo "architecture contracts semantics taxonomy efficiency"
@@ -138,43 +138,13 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web lifecycle"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web lifecycle"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency"
-      ;;
-    release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
-      ;;
-    genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
-      ;;
-    all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
-      ;;
-    full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
-      ;;
-    security)
-      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
-      ;;
-    architecture)
-      echo "architecture contracts semantics taxonomy"
-      ;;
-    reproducibility)
-      echo "reproducibility dependencies"
-      ;;
-    release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
-      ;;
-    genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
-      ;;
-    all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
+      echo "git security structure architecture dependencies reproducibility deployment contracts aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web lifecycle"
       ;;
     *)
       echo "git security structure"
@@ -234,6 +204,7 @@ module_script() {
     security-retention)                 echo "security/sec-retention-check.sh" ;;
     security-auth)                      echo "security/sec-auth-check.sh" ;;
     security-web)                       echo "security/sec-web-check.sh" ;;
+    lifecycle)                          echo "lifecycle/lifecycle.sh" ;;
     *)              echo "" ;;
   esac
 }

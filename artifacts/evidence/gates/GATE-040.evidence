@@ -1,0 +1,9 @@
+gate_id=GATE-040
+domain=LIFECYCLE
+name=LIFECYCLE PLANE — Evidence-Driven Software Lifecycle
+command=tools/verify/lifecycle/lifecycle.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T13:06:44Z
+head=f3d49e2
+output==== LIFECYCLE PLANE === [PASS] LIFECYCLE-001 LIFECYCLE.md istnieje        Konstytucja lifecycle obecna. [PASS] LIFECYCLE-002 LIFECYCLE.md nie jest placeholderem        Konstytucja nie jest placeholderem. [PASS] LIFECYCLE-003 state machine zdefiniowany        Pełny state machine obecny. [PASS] LIFECYCLE-004 fazy F00-F17 zdefiniowane        Fazy F00 i F17 obecne. [PASS] LIFECYCLE-005 gate'y G0-G17 zdefiniowane        Gate'y G0 i G17 obecne. [PASS] LIFECYCLE-006 model artefaktów zdefiniowany     
