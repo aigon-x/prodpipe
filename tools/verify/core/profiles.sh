@@ -55,6 +55,10 @@ VERIFY_MODULES=(
   "recovery:full:WARNING"
   "recovery:release:BLOCKING"
   "recovery:genesis:BLOCKING"
+  "aesthetics:fast:BLOCKING"
+  "aesthetics:full:BLOCKING"
+  "aesthetics:release:BLOCKING"
+  "aesthetics:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -63,10 +67,10 @@ verify_profile_modules() {
   local profile="$1"
   case "$profile" in
     fast)
-      echo "git security structure"
+      echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
       ;;
     security)
       echo "git security"
@@ -78,13 +82,13 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
       ;;
     *)
       echo "git security structure"
@@ -127,6 +131,7 @@ module_script() {
     contracts)             echo "contracts/contracts.sh" ;;
     migration)             echo "migration/migration.sh" ;;
     recovery)              echo "recovery/recovery.sh" ;;
+    aesthetics)            echo "aesthetics/aesthetics.sh" ;;
     *)              echo "" ;;
   esac
 }

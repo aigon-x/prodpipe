@@ -1,0 +1,86 @@
+# ============================================================================
+# qi-weights.yaml — Quality Index: wagi 14 wymiarów doskonałości per tier
+# ============================================================================
+# AESTHETICS PLANE — kalkulator QI (wariant c).
+#
+# QI = 100 × ∏_{i=1}^{14} s_i^{w_i},  ∑ w_i = 1
+#
+# Średnia geometryczna ważona — jeden wymiar na zero → cały indeks na zero.
+# Wagi zależą od tieru serwisu:
+#   * default — równe wagi (1/14 każdy) — brak configu tieru.
+#   * tier1   — bezpieczeństwo (dim3) i odporność (dim4) ważniejsze
+#               (systemy krytyczne: dziurawe bezpieczeństwo = zero).
+#   * tier3   — piękno (dim9) i spójność (dim11) ważniejsze
+#               (systemy frontowe/eksponowane: spójność = niższy cognitive load).
+#
+# Wymiary (numeracja z design doca):
+#   dim1  Spójność szkieletu (INTEG)
+#   dim2  Poprawność (G0-G5+VV)
+#   dim3  Bezpieczeństwo (SEC)
+#   dim4  Odporność (RES)
+#   dim5  Uprawnienia (PERM)
+#   dim6  Konfigurowalność (CFG)
+#   dim7  Świeżość (CUR)
+#   dim8  Optymalność (OPT+EFF)
+#   dim9  Piękno (AEST)
+#   dim10 Nowoczesność (MOD)
+#   dim11 Spójność (CONS)
+#   dim12 DX
+#   dim13 Dowodliwość (META)
+#   dim14 Uczenie się (CORR+escape)
+#
+# Zasada: wagi MUSZĄ sumować się do 1.0 per tier (weryfikowane przez QI-005
+# i test test-aesthetics-qi.sh).
+# ============================================================================
+
+qi_weights:
+  # Równe wagi: 13 × 0.0714 + 1 × 0.0718 = 1.0000
+  default:
+    dim1: 0.0714
+    dim2: 0.0714
+    dim3: 0.0714
+    dim4: 0.0714
+    dim5: 0.0714
+    dim6: 0.0714
+    dim7: 0.0714
+    dim8: 0.0714
+    dim9: 0.0714
+    dim10: 0.0714
+    dim11: 0.0714
+    dim12: 0.0714
+    dim13: 0.0714
+    dim14: 0.0718
+
+  # Bezpieczeństwo i odporność ważniejsze: 0.15 + 0.12 + 11×0.0608 + 0.0612 = 1.0000
+  tier1:
+    dim1: 0.0608
+    dim2: 0.0608
+    dim3: 0.1500
+    dim4: 0.1200
+    dim5: 0.0608
+    dim6: 0.0608
+    dim7: 0.0608
+    dim8: 0.0608
+    dim9: 0.0608
+    dim10: 0.0608
+    dim11: 0.0608
+    dim12: 0.0608
+    dim13: 0.0608
+    dim14: 0.0612
+
+  # Piękno i spójność ważniejsze: 0.12 + 0.12 + 11×0.0633 + 0.0637 = 1.0000
+  tier3:
+    dim1: 0.0633
+    dim2: 0.0633
+    dim3: 0.0633
+    dim4: 0.0633
+    dim5: 0.0633
+    dim6: 0.0633
+    dim7: 0.0633
+    dim8: 0.0633
+    dim9: 0.1200
+    dim10: 0.0633
+    dim11: 0.1200
+    dim12: 0.0633
+    dim13: 0.0633
+    dim14: 0.0637

@@ -1,0 +1,209 @@
+# ─────────────────────────────────────────────────────────────
+# spectral-rules.yaml — AEST-08 API design lint ruleset
+# AIGON Production Platform — AESTHETICS PLANE
+#
+# Ruleset spectral dla OpenAPI 3.x. Każda reguła ma:
+#   description — co sprawdza
+#   given       — JSONPath do miejsca w dokumencie OpenAPI
+#   then        — funkcja walidująca (spectral functions)
+#   severity    — error (blokuje) | warn (nie blokuje)
+#   message     — actionable: "co i jak naprawić" (DX-04)
+#
+# Kategorie (mapowane na checki AEST-08-01..05):
+#   AEST-08-01 naming      — operationId camelCase, ścieżki kebab-case,
+#                            brak wielkich liter, brak trailing slash
+#   AEST-08-02 paginacja   — limit/offset (lub page/per_page) spójne,
+#                            odpowiedź paginowana ma total/next
+#   AEST-08-03 format błędów — RFC 7807 problem+json, spójny errors array
+#   AEST-08-04 wersjonowanie — prefiks /v{n} lub header API-Version,
+#                            info.version obecny i semver
+#   AEST-08-05 ogólne      — info.title, info.description, servers,
+#                            operationId unikalne
+#
+# Użycie:
+#   spectral lint <openapi.yaml> --ruleset config/aesthetics/spectral-rules.yaml
+# ─────────────────────────────────────────────────────────────
+extends: []
+
+rules:
+  # ═══════════════════════════════════════════════════════════
+  # AEST-08-01 — NAMING
+  # ═══════════════════════════════════════════════════════════
+  aest-08-01-operation-id-camelcase:
+    description: operationId musi być w camelCase
+    given: $.paths[*][*].operationId
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-zA-Z0-9]*$"
+    message: "operationId '{{value}}' nie jest w camelCase — użyj np. 'getUserById' (mała litera na początku, bez myślników i podkreśleń)."
+
+  aest-08-01-path-kebab-case:
+    description: ścieżki muszą być w kebab-case
+    given: $.paths[*]~
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/?(?:[a-z0-9]+(?:-[a-z0-9]+)*)(?:/\\{[^/]+\\}|/[a-z0-9]+(?:-[a-z0-9]+)*)*/?$"
+    message: "Ścieżka '{{value}}' nie jest w kebab-case — używaj małych liter i myślników (np. '/user-profiles/{id}'), nie podkreśleń ani camelCase."
+
+  aest-08-01-path-no-uppercase:
+    description: ścieżki nie mogą zawierać wielkich liter
+    given: $.paths[*]~
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[^A-Z]*$"
+    message: "Ścieżka '{{value}}' zawiera wielkie litery — zamień na małe litery w kebab-case (np. '/user-profiles' zamiast '/UserProfiles')."
+
+  aest-08-01-path-no-trailing-slash:
+    description: ścieżki nie mogą kończyć się ukośnikiem
+    given: $.paths[*]~
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[^/]+$|^.*[^/]$"
+    message: "Ścieżka '{{value}}' kończy się ukośnikiem — usuń trailing slash (np. '/users' zamiast '/users/')."
+
+  # ═══════════════════════════════════════════════════════════
+  # AEST-08-02 — PAGINACJA
+  # ═══════════════════════════════════════════════════════════
+  aest-08-02-pagination-params-consistent:
+    description: parametry paginacji muszą być spójne (limit/offset lub page/per_page)
+    given: $.paths[*][*].parameters[?(@.in=='query' && (@.name=='limit' || @.name=='offset' || @.name=='page' || @.name=='per_page'))]
+    severity: warn
+    then:
+      function: truthy
+    message: "Parametr paginacji '{{value}}' — używaj spójnej pary: 'limit'+'offset' LUB 'page'+'per_page' w całym API, nie mieszaj obu konwencji."
+
+  aest-08-02-pagination-response-total:
+    description: odpowiedź paginowana musi mieć pole total
+    given: $.paths[*][*].responses[200].content[*].schema
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          properties:
+            total:
+              type: integer
+            next:
+              type: [string, "null"]
+    message: "Odpowiedź 200 (lista) powinna zawierać pole 'total' (całkowita liczba) i 'next' (kursor/URL następnej strony) — patrz konwencja paginacji AEST-08-02."
+
+  # ═══════════════════════════════════════════════════════════
+  # AEST-08-03 — FORMAT BŁĘDÓW (RFC 7807 problem+json)
+  # ═══════════════════════════════════════════════════════════
+  aest-08-03-error-rfc7807:
+    description: schemat błędu musi być zgodny z RFC 7807 (type, title, status, detail)
+    given: $.paths[*][*].responses[4*].content[*].schema
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required: [type, title, status, detail]
+          properties:
+            type:
+              type: string
+            title:
+              type: string
+            status:
+              type: integer
+            detail:
+              type: string
+    message: "Odpowiedź błędu (4xx/5xx) nie jest zgodna z RFC 7807 — dodaj pola 'type', 'title', 'status', 'detail' (problem+json)."
+
+  aest-08-03-error-errors-array:
+    description: błędy walidacji muszą być w spójnym errors array
+    given: $.paths[*][*].responses[4*].content[*].schema
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                type: object
+                required: [code, message]
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+    message: "Odpowiedź błędu powinna zawierać spójny 'errors' array z polami 'code' i 'message' — patrz katalog kodów błędów AEST-07."
+
+  # ═══════════════════════════════════════════════════════════
+  # AEST-08-04 — WERSJONOWANIE
+  # ═══════════════════════════════════════════════════════════
+  aest-08-04-path-version-prefix:
+    description: ścieżki muszą mieć prefiks wersji /v{n}
+    given: $.paths[*]~
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/v[0-9]+(/|$)"
+    message: "Ścieżka '{{value}}' nie ma prefiksu wersji — dodaj '/v1' (np. '/v1/users'). Alternatywnie użyj nagłówka 'API-Version'."
+
+  aest-08-04-info-version-present:
+    description: info.version musi być obecny
+    given: $.info
+    severity: error
+    then:
+      function: truthy
+    message: "Brak 'info.version' — dodaj wersję API w formacie semver (np. '1.2.0')."
+
+  aest-08-04-info-version-semver:
+    description: info.version musi być semver
+    given: $.info.version
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    message: "info.version '{{value}}' nie jest poprawnym semver — użyj formatu MAJOR.MINOR.PATCH (np. '1.2.0')."
+
+  # ═══════════════════════════════════════════════════════════
+  # AEST-08-05 — OGÓLNE
+  # ═══════════════════════════════════════════════════════════
+  aest-08-05-info-title-present:
+    description: info.title musi być obecny
+    given: $.info
+    severity: error
+    then:
+      function: truthy
+    message: "Brak 'info.title' — dodaj tytuł API (np. 'Billing API')."
+
+  aest-08-05-info-description-present:
+    description: info.description musi być obecny
+    given: $.info
+    severity: warn
+    then:
+      function: truthy
+    message: "Brak 'info.description' — dodaj opis API (co robi, dla kogo, jak używać)."
+
+  aest-08-05-servers-defined:
+    description: servers musi być zdefiniowane
+    given: $.servers
+    severity: warn
+    then:
+      function: truthy
+    message: "Brak 'servers' — zdefiniuj co najmniej jeden serwer (URL bazowy API)."
+
+  aest-08-05-operation-id-unique:
+    description: operationId musi być unikalne
+    given: $.paths[*][*].operationId
+    severity: error
+    then:
+      function: unique
+    message: "operationId '{{value}}' nie jest unikalne — każde operationId musi być unikalne w całym dokumencie."

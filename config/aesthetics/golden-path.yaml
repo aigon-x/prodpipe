@@ -1,0 +1,28 @@
+# ─────────────────────────────────────────────────────────────
+# golden-path.yaml — AIGON Production Platform — AESTHETICS PLANE
+# Definicja GOLDEN PATH (CONS-01) jako danych konfiguracyjnych.
+#
+# Golden path = "ten sam problem = to samo rozwiązanie". Każdy serwis
+# i katalog z kodem MUSI mieć standardowy layout i standardowe targety.
+# Odstępstwo od golden path = kandydat do waivera (NIGDY ciche ignorowanie).
+#
+# Plik czyta tools/verify/aesthetics/fitness.sh (prosty parser YAML
+# w bash — grep/sed, bez jq, zgodnie ze wzorcem repo).
+#
+# Struktura:
+#   golden_path.layout.required_files — pliki wymagane w każdym katalogu serwisu
+#   golden_path.layout.required_dirs  — katalogi wymagane w każdym katalogu serwisu
+#   golden_path.targets.<target>      — akceptowalne komendy dla targetu
+#   golden_path.service_roots         — katalogi, których bezpośrednie podkatalogi to serwisy
+#   golden_path.exclude               — katalogi wykluczone z weryfikacji
+# ─────────────────────────────────────────────────────────────
+golden_path:
+  layout:
+    required_files: [Makefile, README.md]
+    required_dirs: [src, tests]
+  targets:
+    test: [make test, npm test, cargo test, go test]
+    verify: [make verify, npm run verify]
+    deploy: [make deploy, npm run deploy]
+  service_roots: [apps, agents]
+  exclude: [.git, .github, .qwen, tools, system, config, docs]
