@@ -14,6 +14,8 @@ Git = desired state (dokumentacja). Dokumentacja opisuje desired state; faktyczn
 ## 4. Contains
 Dokumenty architektoniczne, diagramy (C4, UML), opisy komponentów, modele.
 
+- `observability-factory-vision.md` — wizja OBSERVABILITY/TELEMETRY FACTORY (przyszły etap po MONITOR PLANE).
+
 ## 5. Does Not Contain
 Nie zawiera stanu runtime, sekretów, danych biznesowych.
 
