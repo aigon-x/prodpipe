@@ -43,6 +43,7 @@ families:
   RECOVERY:    "Odzysk i governance (Recovery & Governance)"
   GTM:         "Go-To-Market (rynek jako przedłużenie architektury)"
   AI:          "Sztuczna inteligencja (AI Plane — ML/DL/LLM lifecycle)"
+  OFFENSIVE-SECURITY: "Offensive Security Plane (Red/Blue/Purple Team)"
 
 # ── Pipeline'y ──────────────────────────────────────────────────────────────
 # Każdy pipeline: id, family, script, class, status, depends, contract.
@@ -551,6 +552,69 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-068]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-070
+    family: OFFENSIVE-SECURITY
+    script: offsec/recon.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-071
+    family: OFFENSIVE-SECURITY
+    script: offsec/scan.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-070]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-072
+    family: OFFENSIVE-SECURITY
+    script: offsec/exploit.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-071]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-073
+    family: OFFENSIVE-SECURITY
+    script: offsec/persist.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-072]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-074
+    family: OFFENSIVE-SECURITY
+    script: offsec/exfil.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-073]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-075
+    family: OFFENSIVE-SECURITY
+    script: offsec/detect.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-074]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-076
+    family: OFFENSIVE-SECURITY
+    script: offsec/respond.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-075]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-077
+    family: OFFENSIVE-SECURITY
+    script: offsec/remediate.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-076]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+  - id: P-078
+    family: OFFENSIVE-SECURITY
+    script: offsec/learn.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-077]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
 
 # ── Klasy wykonania → domyślna lista pipeline'ów ────────────────────────────
 # Każda klasa uruchamia pipeline'y, które mają w niej działać (status IMPLEMENTED).
@@ -558,6 +622,6 @@ pipelines:
 classes:
   FAST: [P-016, P-021, P-024, P-025]
   STANDARD: [P-001, P-002, P-003, P-004, P-005, P-006, P-007, P-009, P-010, P-011, P-013, P-017, P-018, P-022, P-026, P-028, P-029, P-030, P-052, P-053, P-054, P-055, P-061, P-062, P-063, P-065]
-  DEEP: [P-008, P-012, P-014, P-015, P-019, P-023, P-027, P-038, P-051, P-064]
+  DEEP: [P-008, P-012, P-014, P-015, P-019, P-023, P-027, P-038, P-051, P-064, P-070, P-071, P-072, P-073, P-074, P-075, P-076, P-077, P-078]
   RELEASE: [P-020, P-031, P-032, P-033, P-034, P-035, P-036, P-037, P-056, P-057, P-066]
   CONTINUOUS: [P-039, P-040, P-041, P-042, P-043, P-044, P-045, P-046, P-047, P-048, P-049, P-050, P-058, P-059, P-060, P-067, P-068, P-069]
