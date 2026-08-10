@@ -149,12 +149,13 @@ fi
 # ── INTEG-005: każdy moduł verify pisze evidence (runtime completeness) ──
 # Każdy gate IMPLEMENTED (nie PROPOSED) musi mieć plik evidence.
 # Wyjątek bootstrap: evidence.sh generuje evidence PO uruchomieniu każdego
-# gate'a, a dwa gate'y są uruchamiane PO tym skrypcie (GATE-038) lub NA KOŃCU
-# (GATE-001, meta-gate). W momencie wykonania tego skryptu ich evidence jeszcze
-# nie istnieje — to uzasadniona samo-referencja (bootstrap), nie brak evidence.
+# gate'a, a meta-gate'y są uruchamiane NA KOŃCU (po wygenerowaniu evidence
+# dla wszystkich innych). W momencie wykonania tego skryptu ich evidence
+# jeszcze nie istnieje — to uzasadniona samo-referencja (bootstrap), nie brak
+# evidence.
 #   - GATE-038: ten gate — jego evidence generuje evidence.sh PO tym przebiegu.
-#   - GATE-001: meta-gate — evidence.sh uruchamia go NA KOŃCU, po wszystkich
-#     innych gate'ach, bo sprawdza kompletność evidence całego zestawu.
+#   - GATE-001: meta-gate — evidence.sh uruchamia go NA KOŃCU.
+#   - GATE-020: meta-gate (EVIDENCE) — evidence.sh uruchamia go NA KOŃCU.
 if [ -f "$REGISTRY" ] && [ -d "$EVIDENCE_DIR" ]; then
   # shellcheck source=registry.sh
   . "$REGISTRY"
@@ -165,9 +166,9 @@ if [ -f "$REGISTRY" ] && [ -d "$EVIDENCE_DIR" ]; then
     if [ "$status" = "PROPOSED" ]; then
       continue
     fi
-    # Bootstrap: gate'y, których evidence generuje evidence.sh PO bieżącym
-    # przebiegu (self + meta-gate uruchamiany na końcu).
-    if [ "$gate_id" = "GATE-038" ] || [ "$gate_id" = "GATE-001" ]; then
+    # Bootstrap: meta-gate'y, których evidence generuje evidence.sh PO bieżącym
+    # przebiegu (self + meta-gate'y uruchamiane na końcu).
+    if [ "$gate_id" = "GATE-038" ] || [ "$gate_id" = "GATE-001" ] || [ "$gate_id" = "GATE-020" ]; then
       continue
     fi
     if [ ! -f "$EVIDENCE_DIR/$gate_id.evidence" ]; then

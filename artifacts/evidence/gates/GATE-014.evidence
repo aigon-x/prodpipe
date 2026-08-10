@@ -4,6 +4,6 @@ name=Testy istnieją, nie są puste, nie są false green
 command=tools/verify/gates/domains/testing.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
-output==== GATE-014 TESTING === [PASS] TESTING-001 testy istnieją        13 plików testowych. [PASS] TESTING-002 testy niepuste        Brak pustych testów. [PASS] TESTING-003 brak false green        Brak wzorców false green w testach. [PASS] TESTING-004 testy mają set -u        Wszystkie testy mają set -u.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-014 TESTING === [PASS] TESTING-001 testy istnieją        16 plików testowych. [PASS] TESTING-002 testy niepuste        Brak pustych testów. [PASS] TESTING-003 brak false green        Brak wzorców false green w testach. [PASS] TESTING-004 testy mają set -u        Wszystkie testy mają set -u.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

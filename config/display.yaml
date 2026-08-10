@@ -1,0 +1,30 @@
+# ============================================================================
+# config/display.yaml — Visual Pipeline Display — konfiguracja
+# ============================================================================
+# Konfiguracja narzędzia tools/automation/display/display-pipeline.sh.
+# Definiuje: motyw, nacisk (gęstość), kolejność rodzin i klas.
+#
+# Ten plik jest czytany przez tools/automation/display/lib/display.sh
+# (d_load_config). Brak pliku = fallback do wbudowanych wartości —
+# display to narzędzie wizualne, nie gate, więc brak pliku NIE jest FAIL.
+#
+# Zasady:
+#   * Wartości NIE są hardkodowane w skryptach — skrypty czytają stąd.
+#   * Komentarze po polsku, klucze po angielsku.
+# ============================================================================
+
+# ── Motyw ──────────────────────────────────────────────────────────────────
+# dark — ciemny motyw terminala/HTML (domyślny).
+theme: "dark"
+
+# ── Nacisk (gęstość renderowania) ──────────────────────────────────────────
+# dense — gęsty, techniczny widok (domyślny).
+# compact — jeszcze gęstszy (mniej separatorów).
+emphasis: "dense"
+
+# ── Kolejność rodzin w renderowaniu ────────────────────────────────────────
+# Kolejność, w jakiej rodziny są wypisywane w widoku families.
+family_order: "PRODUCT DESIGN SECURITY CODE BUILD DEPLOYMENT RUNTIME RECOVERY GTM AI OFFENSIVE-SECURITY HUMAN-SIMULATION SIMULATION"
+
+# ── Kolejność klas w renderowaniu ──────────────────────────────────────────
+class_order: "FAST STANDARD DEEP RELEASE CONTINUOUS"

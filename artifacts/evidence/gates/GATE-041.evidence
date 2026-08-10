@@ -1,0 +1,9 @@
+gate_id=GATE-041
+domain=HUMAN-SIMULATION
+name=HUMAN SIMULATION PLANE — test to nie skrypt, to użytkownik
+command=tools/verify/gates/domains/human.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-041 HUMAN-SIMULATION === [PASS] HUM-REG-01 pipeline'y P-079..P-089 zarejestrowane        Wszystkie 11 pipeline'ów HUMAN-SIMULATION w pipelines.sh. [PASS] HUM-REG-02 skrypty tools/automation/human/ istnieją        Wszystkie 11 skryptów obecnych. [PASS] HUM-REG-03 skrypty mają set -u        Wszystkie skrypty human/ mają set -u. [PASS] HUM-REG-03 skrypty kończą się p_module_exit        Wszystkie skrypty human/ mają p_module_exit (FAIL-CLOSED). [PASS] HUM-REG-04 brak false green w 

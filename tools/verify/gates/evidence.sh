@@ -53,10 +53,16 @@ say "Generowanie evidence dla $(registry_count) gate'ów..."
 
 GENERATED=0
 FAILED=0
-# GATE-001 (gate-integrity) jest uruchamiany NA KOŃCU, po wygenerowaniu
-# evidence dla wszystkich innych gate'ów — meta-gate sprawdza czy każdy
-# gate ma evidence, więc musi widzieć kompletny zestaw.
-for gate_id in $(registry_gate_ids | grep -v '^GATE-001$'); do
+# META_GATES: gate'y sprawdzające KOMPLETNOŚĆ evidence (każdy gate ma
+# evidence). Muszą być uruchamiane NA KOŃCU, po wygenerowaniu evidence
+# dla wszystkich innych gate'ów — inaczej widzą niekompletny zestaw i
+# fałszywie FAILUJĄ (kolejność numeryczna uruchamiałaby je przed
+# wygenerowaniem evidence dla późniejszych gate'ów).
+#   GATE-001 (gate-integrity)  — meta-gate: registry==implemented==wired==executed
+#   GATE-020 (evidence)        — EVIDENCE-002: każdy gate ma evidence
+#   GATE-038 (wiring)          — INTEG-005: runtime completeness (evidence)
+META_GATES="GATE-001 GATE-020 GATE-038"
+for gate_id in $(registry_gate_ids | grep -vE "^($(printf '%s' "$META_GATES" | tr ' ' '|'))$"); do
   cmd="$(registry_field "$gate_id" 8)"
   domain="$(registry_field "$gate_id" 2)"
   name="$(registry_field "$gate_id" 3)"
@@ -108,31 +114,40 @@ for gate_id in $(registry_gate_ids | grep -v '^GATE-001$'); do
   say "  $gate_id -> $status (exit $rc)"
 done
 
-# ── GATE-001 (meta-gate) na końcu ───────────────────────────
-gate_id="GATE-001"
-cmd="$(registry_field "$gate_id" 8)"
-domain="$(registry_field "$gate_id" 2)"
-name="$(registry_field "$gate_id" 3)"
-if [ -n "$cmd" ] && [ -f "$cmd" ]; then
-  output="$(bash "$cmd" 2>&1)"
-  rc=$?
-  case "$rc" in
-    0) status="PASS" ;;
-    1) status="FAIL" ;;
-    2) status="ERROR" ;;
-    3) status="NOT_APPLICABLE" ;;
-    *) status="ERROR" ;;
-  esac
-  output_short="$(printf '%s' "$output" | tr '\n' ' ' | cut -c1-500)"
-  printf 'gate_id=%s\ndomain=%s\nname=%s\ncommand=%s\nexit_code=%s\nstatus=%s\ntimestamp=%s\nhead=%s\noutput=%s\n' \
-    "$gate_id" "$domain" "$name" "$cmd" "$rc" "$status" "$NOW" "$HEAD_SHORT" "$output_short" \
-    > "$EVIDENCE_DIR/$gate_id.evidence"
-  GENERATED=$((GENERATED+1))
-  if [ "$rc" -ne 0 ]; then
-    FAILED=$((FAILED+1))
+# ── Meta-gate'y na końcu ────────────────────────────────────
+# GATE-001 (gate-integrity), GATE-020 (evidence), GATE-038 (wiring)
+# sprawdzają KOMPLETNOŚĆ evidence — muszą widzieć kompletny zestaw,
+# więc są uruchamiane po wygenerowaniu evidence dla wszystkich innych.
+for gate_id in $META_GATES; do
+  cmd="$(registry_field "$gate_id" 8)"
+  domain="$(registry_field "$gate_id" 2)"
+  name="$(registry_field "$gate_id" 3)"
+  status="$(registry_field "$gate_id" 22)"
+  if [ "$status" = "PROPOSED" ]; then
+    info "evidence $gate_id" "PROPOSED — pominięty (brak implementacji)."
+    continue
   fi
-  say "  $gate_id -> $status (exit $rc)"
-fi
+  if [ -n "$cmd" ] && [ -f "$cmd" ]; then
+    output="$(bash "$cmd" 2>&1)"
+    rc=$?
+    case "$rc" in
+      0) status="PASS" ;;
+      1) status="FAIL" ;;
+      2) status="ERROR" ;;
+      3) status="NOT_APPLICABLE" ;;
+      *) status="ERROR" ;;
+    esac
+    output_short="$(printf '%s' "$output" | tr '\n' ' ' | cut -c1-500)"
+    printf 'gate_id=%s\ndomain=%s\nname=%s\ncommand=%s\nexit_code=%s\nstatus=%s\ntimestamp=%s\nhead=%s\noutput=%s\n' \
+      "$gate_id" "$domain" "$name" "$cmd" "$rc" "$status" "$NOW" "$HEAD_SHORT" "$output_short" \
+      > "$EVIDENCE_DIR/$gate_id.evidence"
+    GENERATED=$((GENERATED+1))
+    if [ "$rc" -ne 0 ]; then
+      FAILED=$((FAILED+1))
+    fi
+    say "  $gate_id -> $status (exit $rc)"
+  fi
+done
 
 say ""
 say "Wygenerowano $GENERATED evidence, $FAILED z niezerowym exit code."

@@ -4,6 +4,6 @@ name=Każdy element ma źródło konfiguracji
 command=tools/verify/gates/domains/configuration.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
-output==== GATE-004 CONFIGURATION === [PASS] CONFIGURATION-001 config istnieje        Katalog config obecny. [WARN] CONFIGURATION-002 brak hardcoded        4 plików z hardcoded adresami: ./.qwen/worktrees/obs-baseline/tools/verify/debt/scanner.sh ./.qwen/worktrees/obs-baseline/tools/verify/tests/test-deployment.sh ./.qwen/worktrees/sec-baseline/tools/verify/debt/scanner.sh ./.qwen/worktrees/sec-baseline/tools/verify/tests/test-deployment.sh [PASS] CONFIGURATION-003 config niepusty        41 plików w 
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-004 CONFIGURATION === [PASS] CONFIGURATION-001 config istnieje        Katalog config obecny. [WARN] CONFIGURATION-002 brak hardcoded        24 plików z hardcoded adresami: ./.qwen/worktrees/agent-526e2e2/tools/verify/debt/scanner.sh ./.qwen/worktrees/agent-526e2e2/tools/verify/tests/test-deployment.sh ./.qwen/worktrees/agent-00b1fb5/tools/verify/debt/scanner.sh ./.qwen/worktrees/agent-00b1fb5/tools/verify/tests/test-deployment.sh ./.qwen/worktrees/agent-8a345e2/tools/verify/debt/scanne

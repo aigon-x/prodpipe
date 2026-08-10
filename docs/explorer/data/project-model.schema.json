@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Prod-ready Canonical Project Model",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "generator", "git", "components", "pipelines", "gates", "evidence", "documents", "tests", "schemas", "configuration", "findings", "coverage"],
+  "properties": {
+    "schema_version": { "type": "integer" },
+    "generated_at": { "type": "string" },
+    "generator": { "type": "string" },
+    "git": { "type": "object" },
+    "components": { "type": "array" },
+    "pipelines": { "type": "array" },
+    "gates": { "type": "array" },
+    "evidence": { "type": "array" },
+    "documents": { "type": "array" },
+    "tests": { "type": "array" },
+    "schemas": { "type": "array" },
+    "configuration": { "type": "array" },
+    "findings": { "type": "array" },
+    "coverage": { "type": "array" }
+  }
+}

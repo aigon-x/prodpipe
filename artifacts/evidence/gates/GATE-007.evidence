@@ -4,6 +4,6 @@ name=Architektura zgodna z deklaracją
 command=tools/verify/gates/domains/architecture.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
+timestamp=2026-08-10T15:21:47Z
+head=253820b
 output==== GATE-007 ARCHITECTURE === [PASS] ARCHITECTURE-001 deklaracja architektury        Plik ARCHITECTURE.md obecny. [WARN] ARCHITECTURE-002 brak orphaned modułów        63 orphaned modułów: sec-auth-check.sh sec-retention-check.sh sec-web-check.sh sec-credential-registry.sh sec-secrets-scan.sh sec-rotation-check.sh drills.sh obs-slo-check.sh obs-synthetics-check.sh fitness.sh qi.sh spectral.sh aesthetics.sh obs-health-endpoints.sh i18n.sh verify.sh config.sh reproducibility.sh dependencies.sh 

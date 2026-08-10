@@ -4,6 +4,6 @@ name=Backup/restore działa
 command=tools/verify/gates/domains/recovery.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
+timestamp=2026-08-10T15:21:47Z
+head=253820b
 output==== GATE-013 RECOVERY === [PASS] RECOVERY-001 state.sh istnieje        state.sh obecny. [PASS] RECOVERY-002 state.sh ma backup        state.sh obsługuje backup. [PASS] RECOVERY-003 state.sh ma restore        state.sh obsługuje restore. [PASS] RECOVERY-004 state.sh set -euo pipefail        state.sh ma set -euo pipefail.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-08-10T15:16:08Z",
+  "git_head": "253820b7a0f718892a2c295219f4143395b761e1",
+  "git_branch": "main",
+  "git_dirty": 52,
+  "counts": {
+    "pipelines": 98,
+    "gates": 43,
+    "evidence": 30,
+    "documents": 65,
+    "tests": 48,
+    "findings": 74
+  }
+}

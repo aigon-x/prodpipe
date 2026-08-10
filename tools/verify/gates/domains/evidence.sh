@@ -32,9 +32,13 @@ if [ -f "./tools/verify/gates/registry.sh" ]; then
   MISSING_EVIDENCE=0
   MISSING_DETAIL=""
   for gate_id in $(registry_gate_ids); do
-    # Pomijamy GATE-020 (sam siebie) i GATE-001 (meta-gate) — ich evidence
-    # jest generowane przez evidence.sh PO uruchomieniu tego gate'u.
-    if [ "$gate_id" = "GATE-020" ] || [ "$gate_id" = "GATE-001" ]; then
+    # Bootstrap: pomijamy meta-gate'y (GATE-020 sam siebie, GATE-001
+    # gate-integrity, GATE-038 wiring) — ich evidence jest generowane przez
+    # evidence.sh PO uruchomieniu tego gate'u (self-referential bootstrap).
+    # GATE-038 sprawdza też kompletność evidence (INTEG-005), więc musi być
+    # uruchamiany na końcu — w momencie wykonania tego skryptu jego evidence
+    # jeszcze nie istnieje.
+    if [ "$gate_id" = "GATE-020" ] || [ "$gate_id" = "GATE-001" ] || [ "$gate_id" = "GATE-038" ]; then
       continue
     fi
     # PROPOSED gate'y nie mają implementacji, więc nie mają evidence —

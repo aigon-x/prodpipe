@@ -476,9 +476,59 @@ GATE_REGISTRY=(
     'wszystkie LIFECYCLE-001..009 checki PASS (konstytucja, state machine, fazy F00-F17, gatey G0-G17, model artefaktow, traceability, tabele StateStore, registry)' \
     'brak konstytucji LIFECYCLE.md, niekompletny state machine, brak faz/gateow, brak tabel lifecycle w StateStore, brak wpisu w registry' \
     '0' 'release' 'true' 'exit_code' 'docs/00-foundation/LIFECYCLE.md' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_lifecycle.sh' 'IMPLEMENTED' )"
-)
 
-# ── Funkcje zapytań registry ─────────────────────────────────
+  # ── HUMAN-SIMULATION (GATE-041) — HUMAN SIMULATION PLANE ───
+  # Test to nie skrypt, to użytkownik. Weryfikuje że repo ma kompletny
+  # Human Simulation Plane: 11 etapów (SETUP→NAVIGATE→WAIT→SCREENSHOT→
+  # INTERACT→ASSERT→RECORD→REPORT→REPLAY→TERMINAL→VM), każdy z artefaktami
+  # w human/ lub tests/human/, oraz że pipeline'y P-079..P-089 są zarejestrowane
+  # i wykonywalne. Checks HUM-S-01..08, HUM-N-01..08, HUM-W-01..08, HUM-SC-01..08,
+  # HUM-I-01..15, HUM-A-01..15, HUM-R-01..08, HUM-RE-01..08, HUM-RP-01..08,
+  # HUM-T-01..08, HUM-V-01..06. Brak danych = NOT_APPLICABLE (nie FAIL).
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-041' 'HUMAN-SIMULATION' 'HUMAN SIMULATION PLANE — test to nie skrypt, to użytkownik' \
+    'Human Simulation Plane gate: weryfikuje ze repo ma kompletny, wykonywalny plan symulacji czlowieka. Sprawdza 11 etapow (SETUP, NAVIGATE, WAIT, SCREENSHOT, INTERACT, ASSERT, RECORD, REPORT, REPLAY, TERMINAL, VM), artefakty w human/ i tests/human/, oraz rejestracje pipelineow P-079..P-089. Checks HUM-S-01..08, HUM-N-01..08, HUM-W-01..08, HUM-SC-01..08, HUM-I-01..15, HUM-A-01..15, HUM-R-01..08, HUM-RE-01..08, HUM-RP-01..08, HUM-T-01..08, HUM-V-01..06. Brak danych = NOT_APPLICABLE (nie FAIL).' \
+    'platform' 'high' 'PRE_PUSH' 'tools/verify/gates/domains/human.sh' \
+    'human/, tests/human/, tools/automation/human/, config/canonical/pipelines.yaml' \
+    'artifacts/evidence/gates/GATE-041.evidence' \
+    'pipeliney P-079..P-089 zarejestrowane i wykonywalne, artefakty human/ lub tests/human/ obecne dla co najmniej jednego etapu' \
+    'brak rejestracji P-079..P-089 lub brak skryptow tools/automation/human/' \
+    '0' 'pre-push' 'true' 'exit_code' 'tools/automation/human/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_human.sh' 'IMPLEMENTED' )"
+
+  # ── SIMULATION (GATE-042) — SIMULATION PLANE ────────────────
+  # Symulacje katastrof — 'śmierć foundera' to test, nie tragedia.
+  # Weryfikuje że repo ma kompletny Simulation Plane: 9 etapów (SCENARIO→
+  # PREPARE→EXECUTE→OBSERVE→MEASURE→EVALUATE→REMEDIATE→DOCUMENT→REPEAT),
+  # każdy z artefaktami w simulation/ lub tests/simulation/, oraz że
+  # pipeline'y P-090..P-098 są zarejestrowane i wykonywalne. Checks
+  # SIM-P-01..15, SIM-T-01..22, SIM-S-01..12, SIM-B-01..12, SIM-E-01..12,
+  # SIM-O-01..12. Brak danych = NOT_APPLICABLE (nie FAIL).
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-042' 'SIMULATION' 'SIMULATION PLANE — symulacje katastrof, smierc foundera to test nie tragedia' \
+    'Simulation Plane gate: weryfikuje ze repo ma kompletny, wykonywalny plan symulacji katastrof. Sprawdza 9 etapow (SCENARIO, PREPARE, EXECUTE, OBSERVE, MEASURE, EVALUATE, REMEDIATE, DOCUMENT, REPEAT), artefakty w simulation/ i tests/simulation/, oraz rejestracje pipelineow P-090..P-098. Checks SIM-P-01..15, SIM-T-01..22, SIM-S-01..12, SIM-B-01..12, SIM-E-01..12, SIM-O-01..12. Brak danych = NOT_APPLICABLE (nie FAIL).' \
+    'platform' 'high' 'PRE_PUSH' 'tools/verify/gates/domains/simulation.sh' \
+    'simulation/, tests/simulation/, tools/automation/simulation/, config/canonical/pipelines.yaml' \
+    'artifacts/evidence/gates/GATE-042.evidence' \
+    'pipeliney P-090..P-098 zarejestrowane i wykonywalne, artefakty simulation/ lub tests/simulation/ obecne dla co najmniej jednego etapu' \
+    'brak rejestracji P-090..P-098 lub brak skryptow tools/automation/simulation/' \
+    '0' 'pre-push' 'true' 'exit_code' 'tools/automation/simulation/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_simulation.sh' 'IMPLEMENTED' )"
+
+  # ── OBSERVABILITY (GATE-043) — OBSERVABILITY & KNOWLEDGE EXPLORER ──
+  # Weryfikuje że repo ma kompletny Observability & Knowledge Explorer:
+  # narzędzie tools/explore/explore.sh (kanoniczny model projektu), biblioteki
+  # lib/, testy tests/, oraz że `explore.sh all` generuje wszystkie widoki
+  # (Markdown, Mermaid, HTML, JSON, indexes) z JEDNEGO kanonicznego modelu.
+  # Checks OBS-001..015. Brak danych = NOT_APPLICABLE (nie FAIL).
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-043' 'OBSERVABILITY' 'OBSERVABILITY & KNOWLEDGE EXPLORER — lokalne centrum dowodzenia projektu' \
+    'Observability gate: weryfikuje ze repo ma kompletny Observability & Knowledge Explorer oparty na JEDNYM kanonicznym modelu projektu. Sprawdza narzedzie tools/explore/explore.sh, biblioteki lib/ (discovery, model, git, docs, graphs, html, validate, security), testy tests/, oraz ze explore.sh all generuje wszystkie widoki (Markdown, Mermaid, HTML, JSON, indexes) z kanonicznego modelu. Checks OBS-001..015. Brak danych = NOT_APPLICABLE (nie FAIL).' \
+    'platform' 'high' 'PRE_PUSH' 'tools/verify/gates/domains/observability.sh' \
+    'tools/explore/, docs/generated/, docs/explorer/, docs/graphs/, config/canonical/observability.yaml' \
+    'artifacts/evidence/gates/GATE-043.evidence' \
+    'narzedzie tools/explore/explore.sh obecne, biblioteki lib/ i testy tests/ obecne, explore.sh all generuje wszystkie widoki z kanonicznego modelu' \
+    'brak tools/explore/explore.sh lub brak bibliotek lib/ lub explore.sh all nie generuje widokow' \
+    '0' 'pre-push' 'true' 'exit_code' 'tools/explore/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_observability.sh' 'IMPLEMENTED' )"
+)
 # Zwraca liczbę gate'ów w registry.
 registry_count() {
   echo "${#GATE_REGISTRY[@]}"

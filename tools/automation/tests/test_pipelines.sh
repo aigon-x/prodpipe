@@ -125,14 +125,15 @@ else
     t_fail "pipeline_contract P-040 = $PHASE_COUNT faz (oczekiwano 8)"
 fi
 
-# --- T9: pipeline_implemented zwraca 5 pipeline'ów ---------------------------
+# --- T9: pipeline_implemented zwraca wszystkie 98 pipeline'ów ----------------
 echo ""
 echo "--- T9: pipeline_implemented ---"
 GOT_IMPL="$(pipeline_implemented)"
 # pipeline_implemented zwraca trailing space (printf '%s '), więc porównujemy
 # po usunięciu białych znaków.
 GOT_IMPL_TRIMMED="$(echo "$GOT_IMPL" | xargs)"
-EXPECTED_IMPL="P-003 P-014 P-040 P-043 P-051"
+# Wszystkie 98 pipeline'ów (P-001..P-098) jest IMPLEMENTED.
+EXPECTED_IMPL="$(seq -f 'P-%03g' 1 98 | tr '\n' ' ' | xargs)"
 if [ "$GOT_IMPL_TRIMMED" = "$EXPECTED_IMPL" ]; then
     t_pass "pipeline_implemented = $GOT_IMPL_TRIMMED"
 else

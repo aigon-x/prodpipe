@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Operating System — Visual Display</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --fg: #c9d1d9;
+    --fg-dim: #8b949e;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --cyan: #39c5cf;
+    --magenta: #bc8cff;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: var(--bg); color: var(--fg);
+    font-family: var(--mono);
+    font-size: 13px; line-height: 1.5;
+  }
+  h1 { font-size: 20px; color: var(--cyan); margin: 0 0 4px; }
+  h2 { font-size: 15px; color: var(--accent); margin: 28px 0 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .sub { color: var(--fg-dim); margin-bottom: 16px; }
+  .meta { color: var(--fg-dim); font-size: 12px; margin-bottom: 20px; }
+  .meta b { color: var(--fg); }
+  .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .controls input, .controls select {
+    background: var(--bg2); color: var(--fg); border: 1px solid var(--border);
+    padding: 6px 10px; font-family: var(--mono); font-size: 12px; border-radius: 4px;
+  }
+  .controls input { min-width: 220px; }
+  .controls label { color: var(--fg-dim); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; }
+  th, td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--fg-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover td { background: var(--bg3); }
+  .mono { font-family: var(--mono); }
+  .dim { color: var(--fg-dim); }
+  .fam { padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  .fam-product { color: var(--cyan); }
+  .fam-design { color: var(--accent); }
+  .fam-security { color: var(--red); }
+  .fam-code { color: var(--green); }
+  .fam-build { color: var(--yellow); }
+  .fam-deployment { color: var(--magenta); }
+  .fam-runtime { color: var(--cyan); }
+  .fam-recovery { color: #e6edf3; }
+  .fam-gtm { color: var(--yellow); }
+  .fam-ai { color: var(--magenta); }
+  .fam-offensive_security { color: var(--red); }
+  .fam-human_simulation { color: var(--accent); }
+  .fam-simulation { color: var(--green); }
+  .cls { padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  .cls-fast { color: var(--green); }
+  .cls-standard { color: var(--cyan); }
+  .cls-deep { color: var(--yellow); }
+  .cls-release { color: var(--magenta); }
+  .cls-continuous { color: var(--accent); }
+  .st { padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  .st-implemented { color: var(--green); }
+  .st-proposed { color: var(--yellow); }
+  .ev { padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+  .ev-pass { color: var(--green); }
+  .ev-fail { color: var(--red); }
+  .ev-na { color: var(--yellow); }
+  .mermaid { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 8px 0 24px; overflow-x: auto; }
+  .legend { color: var(--fg-dim); font-size: 12px; margin: 4px 0 16px; }
+  .legend span { margin-right: 16px; }
+  .count { color: var(--fg-dim); }
+  .count b { color: var(--fg); }
+  .footer { color: var(--fg-dim); font-size: 11px; margin-top: 32px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<h1>PIPELINE OPERATING SYSTEM — VISUAL DISPLAY</h1>
+<div class="sub">Metadata-driven pipeline catalog (P-001..P-098) — 8-phase Pipeline Contract</div>
+<div class="meta">
+  Total pipelines: <b>98</b> &nbsp;|&nbsp;
+  Source of truth: <b>config/canonical/pipelines.yaml</b> &nbsp;|&nbsp;
+  Generated: <b>tools/automation/core/pipelines.sh</b> &nbsp;|&nbsp;
+  NO FALSE GREEN: brak danych = <b>NOT_APPLICABLE</b>
+</div>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Szukaj (ID, rodzina, klasa, skrypt)…">
+  <select id="filter-family">
+    <option value="">Wszystkie rodziny</option>
+    <option value="PRODUCT">PRODUCT</option>
+    <option value="DESIGN">DESIGN</option>
+    <option value="SECURITY">SECURITY</option>
+    <option value="CODE">CODE</option>
+    <option value="BUILD">BUILD</option>
+    <option value="DEPLOYMENT">DEPLOYMENT</option>
+    <option value="RUNTIME">RUNTIME</option>
+    <option value="RECOVERY">RECOVERY</option>
+    <option value="GTM">GTM</option>
+    <option value="AI">AI</option>
+    <option value="OFFENSIVE-SECURITY">OFFENSIVE-SECURITY</option>
+    <option value="HUMAN-SIMULATION">HUMAN-SIMULATION</option>
+    <option value="SIMULATION">SIMULATION</option>
+  </select>
+  <select id="filter-class">
+    <option value="">Wszystkie klasy</option>
+    <option value="FAST">FAST</option>
+    <option value="STANDARD">STANDARD</option>
+    <option value="DEEP">DEEP</option>
+    <option value="RELEASE">RELEASE</option>
+    <option value="CONTINUOUS">CONTINUOUS</option>
+  </select>
+  <select id="filter-evidence">
+    <option value="">Wszystkie evidence</option>
+    <option value="PASS">PASS</option>
+    <option value="FAIL">FAIL</option>
+    <option value="NOT_APPLICABLE">NOT_APPLICABLE</option>
+  </select>
+</div>
+
+<h2>Pipeline Contract (8 faz)</h2>
+<div class="legend">
+  <span>DISCOVER</span>→<span>CONTRACT</span>→<span>EXECUTE</span>→<span>TEST</span>→<span>EVIDENCE</span>→<span>VERIFY</span>→<span>REGISTER</span>→<span>REPORT</span>
+</div>
+
+<h2>Pipeline Families (13)</h2>
+<div class="legend">
+  <span>PRODUCT <b>7</b></span>
+  <span>DESIGN <b>7</b></span>
+  <span>SECURITY <b>6</b></span>
+  <span>CODE <b>8</b></span>
+  <span>BUILD <b>5</b></span>
+  <span>DEPLOYMENT <b>5</b></span>
+  <span>RUNTIME <b>12</b></span>
+  <span>RECOVERY <b>1</b></span>
+  <span>GTM <b>9</b></span>
+  <span>AI <b>9</b></span>
+  <span>OFFENSIVE-SECURITY <b>9</b></span>
+  <span>HUMAN-SIMULATION <b>11</b></span>
+  <span>SIMULATION <b>9</b></span>
+</div>
+
+<h2>Pipeline Stages (P-001..P-098)</h2>
+<table id="pipeline-table">
+  <thead>
+    <tr>
+      <th>ID</th><th>Family</th><th>Class</th><th>Status</th><th>Script</th><th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-001</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/discovery.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-002</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/requirements.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-003</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/traceability.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="FAST" data-status="IMPLEMENTED">
+      <td class="mono">P-004</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-fast">FAST</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/prioritization.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-005</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/roadmap.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-006</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/backlog.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="PRODUCT" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-007</td>
+      <td><span class="fam fam-product">PRODUCT</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">product/acceptance.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-008</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/architecture.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-009</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/design-doc.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-010</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/contracts.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-011</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/interface.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-012</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/data-model.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-013</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/tech-debt.sh</td>
+      <td><span class="ev ev-fail">FAIL</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DESIGN" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-014</td>
+      <td><span class="fam fam-design">DESIGN</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">design/change-impact.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-015</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/threat-model.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="FAST" data-status="IMPLEMENTED">
+      <td class="mono">P-016</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-fast">FAST</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/secrets.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-017</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/dependency-scan.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-018</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/static-analysis.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-019</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/penetration.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SECURITY" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-020</td>
+      <td><span class="fam fam-security">SECURITY</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">security/compliance.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="FAST" data-status="IMPLEMENTED">
+      <td class="mono">P-021</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-fast">FAST</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/unit-tests.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-022</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/integration-tests.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-023</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/e2e-tests.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="FAST" data-status="IMPLEMENTED">
+      <td class="mono">P-024</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-fast">FAST</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/lint.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="FAST" data-status="IMPLEMENTED">
+      <td class="mono">P-025</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-fast">FAST</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/format.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-026</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/coverage.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-027</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/performance.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="CODE" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-028</td>
+      <td><span class="fam fam-code">CODE</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">code/review.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="BUILD" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-029</td>
+      <td><span class="fam fam-build">BUILD</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">build/build.sh</td>
+      <td><span class="ev ev-fail">FAIL</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="BUILD" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-030</td>
+      <td><span class="fam fam-build">BUILD</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">build/artifact.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="BUILD" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-031</td>
+      <td><span class="fam fam-build">BUILD</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">build/sbom.sh</td>
+      <td><span class="ev ev-fail">FAIL</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="BUILD" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-032</td>
+      <td><span class="fam fam-build">BUILD</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">build/reproducibility.sh</td>
+      <td><span class="ev ev-fail">FAIL</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="BUILD" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-033</td>
+      <td><span class="fam fam-build">BUILD</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">build/release.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DEPLOYMENT" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-034</td>
+      <td><span class="fam fam-deployment">DEPLOYMENT</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">deployment/deploy.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DEPLOYMENT" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-035</td>
+      <td><span class="fam fam-deployment">DEPLOYMENT</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">deployment/rollback.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DEPLOYMENT" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-036</td>
+      <td><span class="fam fam-deployment">DEPLOYMENT</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">deployment/canary.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DEPLOYMENT" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-037</td>
+      <td><span class="fam fam-deployment">DEPLOYMENT</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">deployment/blue-green.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="DEPLOYMENT" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-038</td>
+      <td><span class="fam fam-deployment">DEPLOYMENT</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">deployment/infrastructure.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-039</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/pipeline-governance.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-040</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/gap-discovery.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-041</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/temporal-assurance.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-042</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/knowledge-consistency.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-043</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/self-certification.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-044</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/continuous-certification.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-045</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/change-risk.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-046</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/selective-verification.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-047</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/unknown-management.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-048</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/source-of-truth.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-049</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/generated-artifact.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RUNTIME" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-050</td>
+      <td><span class="fam fam-runtime">RUNTIME</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">runtime/documentation.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="RECOVERY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-051</td>
+      <td><span class="fam fam-recovery">RECOVERY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">recovery/max-decomposition.sh</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-052</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/discover.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-053</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/validate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-054</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/design.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-055</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/build.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-056</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/prep.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-057</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/launch.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-058</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/adopt.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-059</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/scale.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="GTM" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-060</td>
+      <td><span class="fam fam-gtm">GTM</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">gtm/learn.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-061</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/data-prep.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-062</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/train.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-063</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/eval.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-064</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/validate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-065</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/package.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="RELEASE" data-status="IMPLEMENTED">
+      <td class="mono">P-066</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-release">RELEASE</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/deploy.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-067</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/observe.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-068</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/retrain.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="AI" data-class="CONTINUOUS" data-status="IMPLEMENTED">
+      <td class="mono">P-069</td>
+      <td><span class="fam fam-ai">AI</span></td>
+      <td><span class="cls cls-continuous">CONTINUOUS</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">ai/retire.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-070</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/recon.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-071</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/scan.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-072</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/exploit.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-073</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/persist.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-074</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/exfil.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-075</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/detect.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-076</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/respond.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-077</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/remediate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="OFFENSIVE-SECURITY" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-078</td>
+      <td><span class="fam fam-offensive_security">OFFENSIVE-SECURITY</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">offsec/learn.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-079</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/setup.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-080</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/navigate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-081</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/wait.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-082</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/screenshot.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-083</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/interact.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-084</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/assert.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-085</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/record.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-086</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/report.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-087</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/replay.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-088</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/terminal.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="HUMAN-SIMULATION" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-089</td>
+      <td><span class="fam fam-human_simulation">HUMAN-SIMULATION</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">human/vm.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-090</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/scenario.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-091</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/prepare.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-092</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/execute.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-093</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/observe.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-094</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/measure.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-095</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/evaluate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-096</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/remediate.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="STANDARD" data-status="IMPLEMENTED">
+      <td class="mono">P-097</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-standard">STANDARD</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/document.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="pipeline-row" data-family="SIMULATION" data-class="DEEP" data-status="IMPLEMENTED">
+      <td class="mono">P-098</td>
+      <td><span class="fam fam-simulation">SIMULATION</span></td>
+      <td><span class="cls cls-deep">DEEP</span></td>
+      <td><span class="st st-implemented">IMPLEMENTED</span></td>
+      <td class="mono dim">simulation/repeat.sh</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Pipeline Dependencies (Mermaid graph)</h2>
+<div class="mermaid">
+flowchart LR
+  P-001["P-001"]
+  P-001 --> P-002
+  P-002 --> P-003
+  P-002 --> P-004
+  P-004 --> P-005
+  P-005 --> P-006
+  P-003 --> P-007
+  P-002 --> P-008
+  P-008 --> P-009
+  P-009 --> P-010
+  P-010 --> P-011
+  P-010 --> P-012
+  P-008 --> P-013
+  P-003 --> P-014
+  P-008 --> P-015
+  P-016["P-016"]
+  P-016 --> P-017
+  P-017 --> P-018
+  P-018 --> P-019
+  P-019 --> P-020
+  P-010 --> P-021
+  P-021 --> P-022
+  P-022 --> P-023
+  P-024["P-024"]
+  P-024 --> P-025
+  P-021 --> P-026
+  P-022 --> P-027
+  P-025 --> P-028
+  P-028 --> P-029
+  P-029 --> P-030
+  P-030 --> P-031
+  P-030 --> P-032
+  P-031 --> P-033
+  P-032 --> P-033
+  P-033 --> P-034
+  P-034 --> P-035
+  P-034 --> P-036
+  P-034 --> P-037
+  P-034 --> P-038
+  P-039["P-039"]
+  P-039 --> P-040
+  P-040 --> P-041
+  P-040 --> P-042
+  P-040 --> P-043
+  P-043 --> P-044
+  P-014 --> P-045
+  P-045 --> P-046
+  P-040 --> P-047
+  P-040 --> P-048
+  P-040 --> P-049
+  P-040 --> P-050
+  P-003 --> P-051
+  P-052["P-052"]
+  P-052 --> P-053
+  P-053 --> P-054
+  P-054 --> P-055
+  P-055 --> P-056
+  P-056 --> P-057
+  P-057 --> P-058
+  P-058 --> P-059
+  P-059 --> P-060
+  P-061["P-061"]
+  P-061 --> P-062
+  P-062 --> P-063
+  P-063 --> P-064
+  P-064 --> P-065
+  P-065 --> P-066
+  P-066 --> P-067
+  P-067 --> P-068
+  P-068 --> P-069
+  P-070["P-070"]
+  P-070 --> P-071
+  P-071 --> P-072
+  P-072 --> P-073
+  P-073 --> P-074
+  P-074 --> P-075
+  P-075 --> P-076
+  P-076 --> P-077
+  P-077 --> P-078
+  P-079["P-079"]
+  P-079 --> P-080
+  P-080 --> P-081
+  P-081 --> P-082
+  P-082 --> P-083
+  P-083 --> P-084
+  P-084 --> P-085
+  P-085 --> P-086
+  P-086 --> P-087
+  P-087 --> P-088
+  P-088 --> P-089
+  P-090["P-090"]
+  P-090 --> P-091
+  P-091 --> P-092
+  P-092 --> P-093
+  P-093 --> P-094
+  P-094 --> P-095
+  P-095 --> P-096
+  P-096 --> P-097
+  P-097 --> P-098
+</div>
+
+<h2>Gate Coverage (GATE-001..GATE-042)</h2>
+<table id="gate-table">
+  <thead>
+    <tr><th>Gate</th><th>Domain</th><th>Evidence</th></tr>
+  </thead>
+  <tbody>
+    <tr class="gate-row" data-domain="GATE-INTEGRITY">
+      <td class="mono">GATE-001</td>
+      <td class="mono dim">GATE-INTEGRITY</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="SOURCE-OF-TRUTH">
+      <td class="mono">GATE-002</td>
+      <td class="mono dim">SOURCE-OF-TRUTH</td>
+      <td><span class="ev ev-fail">FAIL</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CANONICALITY">
+      <td class="mono">GATE-003</td>
+      <td class="mono dim">CANONICALITY</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CONFIGURATION">
+      <td class="mono">GATE-004</td>
+      <td class="mono dim">CONFIGURATION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="SECURITY">
+      <td class="mono">GATE-005</td>
+      <td class="mono dim">SECURITY</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="STRUCTURE">
+      <td class="mono">GATE-006</td>
+      <td class="mono dim">STRUCTURE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="ARCHITECTURE">
+      <td class="mono">GATE-007</td>
+      <td class="mono dim">ARCHITECTURE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="DEPENDENCIES">
+      <td class="mono">GATE-008</td>
+      <td class="mono dim">DEPENDENCIES</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="REPRODUCIBILITY">
+      <td class="mono">GATE-009</td>
+      <td class="mono dim">REPRODUCIBILITY</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="DEPLOYMENT">
+      <td class="mono">GATE-010</td>
+      <td class="mono dim">DEPLOYMENT</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CONTRACTS">
+      <td class="mono">GATE-011</td>
+      <td class="mono dim">CONTRACTS</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="MIGRATION">
+      <td class="mono">GATE-012</td>
+      <td class="mono dim">MIGRATION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="RECOVERY">
+      <td class="mono">GATE-013</td>
+      <td class="mono dim">RECOVERY</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="TESTING">
+      <td class="mono">GATE-014</td>
+      <td class="mono dim">TESTING</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="PERFORMANCE">
+      <td class="mono">GATE-015</td>
+      <td class="mono dim">PERFORMANCE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="DOCUMENTATION">
+      <td class="mono">GATE-016</td>
+      <td class="mono dim">DOCUMENTATION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CI">
+      <td class="mono">GATE-017</td>
+      <td class="mono dim">CI</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="GIT-HOOKS">
+      <td class="mono">GATE-018</td>
+      <td class="mono dim">GIT-HOOKS</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="STATE">
+      <td class="mono">GATE-019</td>
+      <td class="mono dim">STATE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="EVIDENCE">
+      <td class="mono">GATE-020</td>
+      <td class="mono dim">EVIDENCE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="SYSTEM-TWIN">
+      <td class="mono">GATE-021</td>
+      <td class="mono dim">SYSTEM-TWIN</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="INVARIANT-ENGINE">
+      <td class="mono">GATE-022</td>
+      <td class="mono dim">INVARIANT-ENGINE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="ACTION-PROOF">
+      <td class="mono">GATE-023</td>
+      <td class="mono dim">ACTION-PROOF</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="POSTCONDITION">
+      <td class="mono">GATE-024</td>
+      <td class="mono dim">POSTCONDITION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="EFFECTIVE-CONFIG">
+      <td class="mono">GATE-025</td>
+      <td class="mono dim">EFFECTIVE-CONFIG</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="BEHAVIORAL-DRIFT">
+      <td class="mono">GATE-026</td>
+      <td class="mono dim">BEHAVIORAL-DRIFT</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="PREDICTIVE-RESOURCE">
+      <td class="mono">GATE-027</td>
+      <td class="mono dim">PREDICTIVE-RESOURCE</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="PREDICTIVE-COST">
+      <td class="mono">GATE-028</td>
+      <td class="mono dim">PREDICTIVE-COST</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CONTEXT-HEALTH">
+      <td class="mono">GATE-029</td>
+      <td class="mono dim">CONTEXT-HEALTH</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="MEMORY-INTEGRITY">
+      <td class="mono">GATE-030</td>
+      <td class="mono dim">MEMORY-INTEGRITY</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="DEPENDENCY-GRAPH">
+      <td class="mono">GATE-031</td>
+      <td class="mono dim">DEPENDENCY-GRAPH</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="PRE-MORTEM">
+      <td class="mono">GATE-032</td>
+      <td class="mono dim">PRE-MORTEM</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="COUNTERFACTUAL">
+      <td class="mono">GATE-033</td>
+      <td class="mono dim">COUNTERFACTUAL</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="CHANGE-RISK">
+      <td class="mono">GATE-034</td>
+      <td class="mono dim">CHANGE-RISK</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="COMPLEXITY-GOVERNOR">
+      <td class="mono">GATE-035</td>
+      <td class="mono dim">COMPLEXITY-GOVERNOR</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="AGENT-TRUST">
+      <td class="mono">GATE-036</td>
+      <td class="mono dim">AGENT-TRUST</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="AUTONOMY-LEVEL">
+      <td class="mono">GATE-037</td>
+      <td class="mono dim">AUTONOMY-LEVEL</td>
+      <td><span class="ev ev-na">NOT_APPLICABLE</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="WIRING">
+      <td class="mono">GATE-038</td>
+      <td class="mono dim">WIRING</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="RESILIENCE">
+      <td class="mono">GATE-039</td>
+      <td class="mono dim">RESILIENCE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="LIFECYCLE">
+      <td class="mono">GATE-040</td>
+      <td class="mono dim">LIFECYCLE</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="HUMAN-SIMULATION">
+      <td class="mono">GATE-041</td>
+      <td class="mono dim">HUMAN-SIMULATION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+    <tr class="gate-row" data-domain="SIMULATION">
+      <td class="mono">GATE-042</td>
+      <td class="mono dim">SIMULATION</td>
+      <td><span class="ev ev-pass">PASS</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  Generated by tools/automation/display/display-html.sh — static, dark, technical, dense.
+  No backend, no CDN. Source of truth: config/canonical/pipelines.yaml.
+</div>
+
+<script>
+// ── Filtrowanie tabeli pipeline'ów ─────────────────────────
+(function () {
+  var search = document.getElementById('search');
+  var fFamily = document.getElementById('filter-family');
+  var fClass = document.getElementById('filter-class');
+  var fEv = document.getElementById('filter-evidence');
+  var rows = document.querySelectorAll('#pipeline-table .pipeline-row');
+
+  function apply() {
+    var q = (search.value || '').toLowerCase();
+    var fam = fFamily.value;
+    var cls = fClass.value;
+    var ev = fEv.value;
+    rows.forEach(function (r) {
+      var text = r.textContent.toLowerCase();
+      var rFam = r.getAttribute('data-family');
+      var rCls = r.getAttribute('data-class');
+      var rEv = r.querySelector('.ev').textContent;
+      var show = true;
+      if (q && text.indexOf(q) === -1) show = false;
+      if (fam && rFam !== fam) show = false;
+      if (cls && rCls !== cls) show = false;
+      if (ev && rEv !== ev) show = false;
+      r.classList.toggle('hidden', !show);
+    });
+  }
+  search.addEventListener('input', apply);
+  fFamily.addEventListener('change', apply);
+  fClass.addEventListener('change', apply);
+  fEv.addEventListener('change', apply);
+})();
+</script>
+</body>
+</html>

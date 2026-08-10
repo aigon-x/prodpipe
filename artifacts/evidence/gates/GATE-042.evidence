@@ -1,0 +1,9 @@
+gate_id=GATE-042
+domain=SIMULATION
+name=SIMULATION PLANE — symulacje katastrof, smierc foundera to test nie tragedia
+command=tools/verify/gates/domains/simulation.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-042 SIMULATION === [PASS] SIM-REG-01 pipeline'y P-090..P-098 zarejestrowane        Wszystkie 9 pipeline'ów SIMULATION w pipelines.sh. [PASS] SIM-REG-02 skrypty tools/automation/simulation/ istnieją        Wszystkie 9 skryptów obecnych. [PASS] SIM-REG-03 skrypty mają set -u        Wszystkie skrypty simulation/ mają set -u. [PASS] SIM-REG-03 skrypty kończą się p_module_exit        Wszystkie skrypty simulation/ mają p_module_exit (FAIL-CLOSED). [PASS] SIM-REG-04 brak false green w

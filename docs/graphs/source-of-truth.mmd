@@ -1,0 +1,9 @@
+% Wygenerowano z kanonicznego modelu projektu (project-model.json).
+% Deterministic — nie edytuj ręcznie.
+graph TD
+  REPO["REPOSITORY"] -->|"discovery"| DISCOVERY["DISCOVERY ENGINE"]
+  DISCOVERY -->|"normalize"| MODEL["CANONICAL MODEL\nproject-model.json"]
+  MODEL -->|"generate"| DOCS["Markdown indexes"]
+  MODEL -->|"generate"| GRAPHS["Mermaid graphs"]
+  MODEL -->|"generate"| HTML["HTML Explorer"]
+  MODEL -->|"generate"| JSON["summary.json"]

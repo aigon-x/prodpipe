@@ -1,0 +1,11 @@
+% Wygenerowano z kanonicznego modelu projektu (project-model.json).
+% Deterministic — nie edytuj ręcznie.
+graph TD
+  REPO["REPOSITORY"] -->|"discovery"| DISCOVERY["DISCOVERY ENGINE"]
+  DISCOVERY -->|"normalize"| MODEL["CANONICAL MODEL"]
+  MODEL -->|"generate"| DOCS["Markdown"]
+  MODEL -->|"generate"| GRAPHS["Mermaid"]
+  MODEL -->|"generate"| HTML["HTML Explorer"]
+  MODEL -->|"generate"| JSON["summary.json"]
+  MODEL -->|"validate"| VALIDATE["VALIDATION"]
+  VALIDATE -->|"self-gate"| GATE["OBS-001..015"]

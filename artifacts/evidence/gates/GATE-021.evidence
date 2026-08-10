@@ -4,6 +4,6 @@ name=System Twin / Canonical State Graph
 command=tools/verify/gates/domains/system-twin.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
-output==== GATE-021 SYSTEM-TWIN === [PASS] SYSTEM-TWIN-001 migracja system_twin        Migracja 0004_system_twin.sql obecna. [PASS] SYSTEM-TWIN-002 tabela system_twin_node        Tabela system_twin_node zdefiniowana. [PASS] SYSTEM-TWIN-003 tabela system_twin_edge        Tabela system_twin_edge zdefiniowana. [PASS] SYSTEM-TWIN-004 schema_version spójna        STATE_SCHEMA_VERSION=17 == ostatnia migracja 0017. [INFO] SYSTEM-TWIN-005 graf spójny z rzeczywistością        Brak nodów w grafie (System Tw
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-021 SYSTEM-TWIN === [PASS] SYSTEM-TWIN-001 migracja system_twin        Migracja 0004_system_twin.sql obecna. [PASS] SYSTEM-TWIN-002 tabela system_twin_node        Tabela system_twin_node zdefiniowana. [PASS] SYSTEM-TWIN-003 tabela system_twin_edge        Tabela system_twin_edge zdefiniowana. [PASS] SYSTEM-TWIN-004 schema_version spójna        STATE_SCHEMA_VERSION=18 == ostatnia migracja 0018. [INFO] SYSTEM-TWIN-005 graf spójny z rzeczywistością        Brak nodów w grafie (System Tw

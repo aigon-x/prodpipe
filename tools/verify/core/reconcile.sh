@@ -177,7 +177,17 @@ recon_record_debt() {
   fi
   local did
   did="debt-$(date +%s)-$RANDOM"
-  if sqlite3 "$db" "INSERT INTO debt (debt_id, domain, description, kind, status, owner, repayment_deadline, source_type, source_ref, observed_at) VALUES ('$did', '$domain', '$description', '$kind', '$status', '$owner', '$deadline', 'verify', '$source_ref', datetime('now'));" 2>/dev/null; then
+  # Escapowanie pojedynczych cudzysłowów — grep hits (description) zawierają
+  # apostrofy (np. `scanner.sh` — `LEGACY_PORTS`), które łamały literał SQL.
+  local e_domain e_description e_kind e_status e_owner e_deadline e_source_ref
+  e_domain="${domain//\'/\'\'}"
+  e_description="${description//\'/\'\'}"
+  e_kind="${kind//\'/\'\'}"
+  e_status="${status//\'/\'\'}"
+  e_owner="${owner//\'/\'\'}"
+  e_deadline="${deadline//\'/\'\'}"
+  e_source_ref="${source_ref//\'/\'\'}"
+  if sqlite3 "$db" "INSERT INTO debt (debt_id, domain, description, kind, status, owner, repayment_deadline, source_type, source_ref, observed_at) VALUES ('$did', '$e_domain', '$e_description', '$e_kind', '$e_status', '$e_owner', '$e_deadline', 'verify', '$e_source_ref', datetime('now'));" 2>/dev/null; then
     return 0
   else
     warn "recon_record_debt" "INSERT do debt NIE powiódł się ($domain: $description)"

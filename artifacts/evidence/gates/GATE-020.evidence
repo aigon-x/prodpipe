@@ -2,8 +2,8 @@ gate_id=GATE-020
 domain=EVIDENCE
 name=Każdy gate ma evidence
 command=tools/verify/gates/domains/evidence.sh
-exit_code=1
-status=FAIL
-timestamp=2026-08-10T13:06:44Z
-head=f3d49e2
-output==== GATE-020 EVIDENCE === [PASS] EVIDENCE-001 katalog evidence istnieje        Katalog evidence obecny. [FAIL] EVIDENCE-002 każdy gate ma evidence        8 gate'ów bez evidence: GATE-021 GATE-022 GATE-023 GATE-024 GATE-025 GATE-038 GATE-039 GATE-040 [PASS] EVIDENCE-003 evidence ma exit code        Wszystkie evidence mają exit code. [PASS] EVIDENCE-004 evidence ma timestamp        Wszystkie evidence mają timestamp.  === RESULT === Checks: 4  PASS: 3  FAIL: 1  WARN: 0  INFO: 0 CERTIFICATION: F
+exit_code=0
+status=PASS
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-020 EVIDENCE === [PASS] EVIDENCE-001 katalog evidence istnieje        Katalog evidence obecny. [PASS] EVIDENCE-002 każdy gate ma evidence        Wszystkie gate'y mają pliki evidence. [PASS] EVIDENCE-003 evidence ma exit code        Wszystkie evidence mają exit code. [PASS] EVIDENCE-004 evidence ma timestamp        Wszystkie evidence mają timestamp.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

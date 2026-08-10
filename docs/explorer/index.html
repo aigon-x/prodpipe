@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prod-ready — Observability & Knowledge Explorer</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1a1a1a; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: .5rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: .4rem .6rem; text-align: left; }
+    th { background: #f0f0f0; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .metric { font-size: 2rem; font-weight: bold; }
+    code { background: #f5f5f5; padding: .1rem .3rem; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Prod-ready — Observability &amp; Knowledge Explorer</h1>
+  <p>Wygenerowano z kanonicznego modelu projektu. Jedno źródło prawdy: <code>docs/generated/project-model.json</code>.</p>
+  <div class="card"><h2>Stan</h2>
+    <table>
+      <tr><th>HEAD</th><td><code>253820b7a0f718892a2c295219f4143395b761e1</code></td></tr>
+      <tr><th>Branch</th><td><code>main</code></td></tr>
+      <tr><th>Dirty</th><td>52 plików</td></tr>
+    </table>
+  </div>
+  <div class="card"><h2>Metryki</h2>
+    <table>
+      <tr><th>Pipeliney</th><td class="metric">98</td></tr>
+      <tr><th>Gatey</th><td class="metric">43</td></tr>
+      <tr><th>Evidence</th><td class="metric">30</td></tr>
+      <tr><th>Dokumenty</th><td class="metric">65</td></tr>
+      <tr><th>Testy</th><td class="metric">48</td></tr>
+      <tr><th>Findings</th><td class="metric">74</td></tr>
+    </table>
+  </div>
+  <div class="card"><h2>Pipeliney</h2>
+    <table>
+      <tr><th>ID</th><th>Rodzina</th><th>Skrypt</th><th>Status</th></tr>
+      <tr><td><code>P-001</code></td><td>PRODUCT</td><td><code>product/discovery.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-002</code></td><td>PRODUCT</td><td><code>product/requirements.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-003</code></td><td>PRODUCT</td><td><code>product/traceability.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-004</code></td><td>PRODUCT</td><td><code>product/prioritization.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-005</code></td><td>PRODUCT</td><td><code>product/roadmap.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-006</code></td><td>PRODUCT</td><td><code>product/backlog.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-007</code></td><td>PRODUCT</td><td><code>product/acceptance.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-008</code></td><td>DESIGN</td><td><code>design/architecture.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-009</code></td><td>DESIGN</td><td><code>design/design-doc.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-010</code></td><td>DESIGN</td><td><code>design/contracts.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-011</code></td><td>DESIGN</td><td><code>design/interface.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-012</code></td><td>DESIGN</td><td><code>design/data-model.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-013</code></td><td>DESIGN</td><td><code>design/tech-debt.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-014</code></td><td>DESIGN</td><td><code>design/change-impact.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-015</code></td><td>SECURITY</td><td><code>security/threat-model.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-016</code></td><td>SECURITY</td><td><code>security/secrets.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-017</code></td><td>SECURITY</td><td><code>security/dependency-scan.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-018</code></td><td>SECURITY</td><td><code>security/static-analysis.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-019</code></td><td>SECURITY</td><td><code>security/penetration.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-020</code></td><td>SECURITY</td><td><code>security/compliance.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-021</code></td><td>CODE</td><td><code>code/unit-tests.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-022</code></td><td>CODE</td><td><code>code/integration-tests.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-023</code></td><td>CODE</td><td><code>code/e2e-tests.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-024</code></td><td>CODE</td><td><code>code/lint.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-025</code></td><td>CODE</td><td><code>code/format.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-026</code></td><td>CODE</td><td><code>code/coverage.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-027</code></td><td>CODE</td><td><code>code/performance.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-028</code></td><td>CODE</td><td><code>code/review.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-029</code></td><td>BUILD</td><td><code>build/build.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-030</code></td><td>BUILD</td><td><code>build/artifact.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-031</code></td><td>BUILD</td><td><code>build/sbom.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-032</code></td><td>BUILD</td><td><code>build/reproducibility.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-033</code></td><td>BUILD</td><td><code>build/release.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-034</code></td><td>DEPLOYMENT</td><td><code>deployment/deploy.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-035</code></td><td>DEPLOYMENT</td><td><code>deployment/rollback.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-036</code></td><td>DEPLOYMENT</td><td><code>deployment/canary.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-037</code></td><td>DEPLOYMENT</td><td><code>deployment/blue-green.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-038</code></td><td>DEPLOYMENT</td><td><code>deployment/infrastructure.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-039</code></td><td>RUNTIME</td><td><code>runtime/pipeline-governance.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-040</code></td><td>RUNTIME</td><td><code>runtime/gap-discovery.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-041</code></td><td>RUNTIME</td><td><code>runtime/temporal-assurance.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-042</code></td><td>RUNTIME</td><td><code>runtime/knowledge-consistency.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-043</code></td><td>RUNTIME</td><td><code>runtime/self-certification.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-044</code></td><td>RUNTIME</td><td><code>runtime/continuous-certification.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-045</code></td><td>RUNTIME</td><td><code>runtime/change-risk.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-046</code></td><td>RUNTIME</td><td><code>runtime/selective-verification.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-047</code></td><td>RUNTIME</td><td><code>runtime/unknown-management.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-048</code></td><td>RUNTIME</td><td><code>runtime/source-of-truth.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-049</code></td><td>RUNTIME</td><td><code>runtime/generated-artifact.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-050</code></td><td>RUNTIME</td><td><code>runtime/documentation.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-051</code></td><td>RECOVERY</td><td><code>recovery/max-decomposition.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-052</code></td><td>GTM</td><td><code>gtm/discover.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-053</code></td><td>GTM</td><td><code>gtm/validate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-054</code></td><td>GTM</td><td><code>gtm/design.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-055</code></td><td>GTM</td><td><code>gtm/build.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-056</code></td><td>GTM</td><td><code>gtm/prep.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-057</code></td><td>GTM</td><td><code>gtm/launch.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-058</code></td><td>GTM</td><td><code>gtm/adopt.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-059</code></td><td>GTM</td><td><code>gtm/scale.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-060</code></td><td>GTM</td><td><code>gtm/learn.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-061</code></td><td>AI</td><td><code>ai/data-prep.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-062</code></td><td>AI</td><td><code>ai/train.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-063</code></td><td>AI</td><td><code>ai/eval.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-064</code></td><td>AI</td><td><code>ai/validate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-065</code></td><td>AI</td><td><code>ai/package.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-066</code></td><td>AI</td><td><code>ai/deploy.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-067</code></td><td>AI</td><td><code>ai/observe.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-068</code></td><td>AI</td><td><code>ai/retrain.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-069</code></td><td>AI</td><td><code>ai/retire.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-070</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/recon.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-071</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/scan.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-072</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/exploit.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-073</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/persist.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-074</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/exfil.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-075</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/detect.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-076</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/respond.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-077</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/remediate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-078</code></td><td>OFFENSIVE-SECURITY</td><td><code>offsec/learn.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-079</code></td><td>HUMAN-SIMULATION</td><td><code>human/setup.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-080</code></td><td>HUMAN-SIMULATION</td><td><code>human/navigate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-081</code></td><td>HUMAN-SIMULATION</td><td><code>human/wait.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-082</code></td><td>HUMAN-SIMULATION</td><td><code>human/screenshot.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-083</code></td><td>HUMAN-SIMULATION</td><td><code>human/interact.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-084</code></td><td>HUMAN-SIMULATION</td><td><code>human/assert.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-085</code></td><td>HUMAN-SIMULATION</td><td><code>human/record.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-086</code></td><td>HUMAN-SIMULATION</td><td><code>human/report.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-087</code></td><td>HUMAN-SIMULATION</td><td><code>human/replay.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-088</code></td><td>HUMAN-SIMULATION</td><td><code>human/terminal.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-089</code></td><td>HUMAN-SIMULATION</td><td><code>human/vm.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-090</code></td><td>SIMULATION</td><td><code>simulation/scenario.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-091</code></td><td>SIMULATION</td><td><code>simulation/prepare.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-092</code></td><td>SIMULATION</td><td><code>simulation/execute.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-093</code></td><td>SIMULATION</td><td><code>simulation/observe.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-094</code></td><td>SIMULATION</td><td><code>simulation/measure.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-095</code></td><td>SIMULATION</td><td><code>simulation/evaluate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-096</code></td><td>SIMULATION</td><td><code>simulation/remediate.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-097</code></td><td>SIMULATION</td><td><code>simulation/document.sh</code></td><td>IMPLEMENTED</td></tr>
+      <tr><td><code>P-098</code></td><td>SIMULATION</td><td><code>simulation/repeat.sh</code></td><td>IMPLEMENTED</td></tr>
+    </table>
+  </div>
+  <div class="card"><h2>Gatey</h2>
+    <table>
+      <tr><th>Gate</th><th>Evidence</th></tr>
+      <tr><td><code>GATE-001</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-002</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-003</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-004</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-005</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-006</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-007</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-008</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-009</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-010</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-011</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-012</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-013</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-014</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-015</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-016</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-017</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-018</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-019</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-020</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-021</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-022</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-023</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-024</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-025</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-026</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-027</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-028</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-029</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-030</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-031</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-032</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-033</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-034</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-035</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-036</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-037</code></td><td>BRAK</td></tr>
+      <tr><td><code>GATE-038</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-039</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-040</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-041</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-042</code></td><td>TAK</td></tr>
+      <tr><td><code>GATE-043</code></td><td>BRAK</td></tr>
+    </table>
+  </div>
+  <div class="card"><h2>Findings</h2>
+    <ul>
+      <li><strong>directory</strong> <code>00-foundation</code></li>
+      <li><strong>directory</strong> <code>agents</code></li>
+      <li><strong>directory</strong> <code>apps</code></li>
+      <li><strong>directory</strong> <code>architecture</code></li>
+      <li><strong>directory</strong> <code>ARCHITECTURE.md</code></li>
+      <li><strong>directory</strong> <code>archive</code></li>
+      <li><strong>directory</strong> <code>artifacts</code></li>
+      <li><strong>directory</strong> <code>audit</code></li>
+      <li><strong>directory</strong> <code>business</code></li>
+      <li><strong>directory</strong> <code>CHANGELOG.md</code></li>
+      <li><strong>directory</strong> <code>CODEOWNERS</code></li>
+      <li><strong>directory</strong> <code>config</code></li>
+      <li><strong>directory</strong> <code>contracts</code></li>
+      <li><strong>directory</strong> <code>CONTRIBUTING.md</code></li>
+      <li><strong>directory</strong> <code>data</code></li>
+      <li><strong>directory</strong> <code>decisions</code></li>
+      <li><strong>directory</strong> <code>deployment</code></li>
+      <li><strong>directory</strong> <code>DEPLOYMENT.md</code></li>
+      <li><strong>directory</strong> <code>development</code></li>
+      <li><strong>directory</strong> <code>docs</code></li>
+      <li><strong>directory</strong> <code>filesystem</code></li>
+      <li><strong>directory</strong> <code>generated</code></li>
+      <li><strong>directory</strong> <code>git</code></li>
+      <li><strong>directory</strong> <code>.gitattributes</code></li>
+      <li><strong>directory</strong> <code>.git-hooks</code></li>
+      <li><strong>directory</strong> <code>.github</code></li>
+      <li><strong>directory</strong> <code>.gitignore</code></li>
+      <li><strong>directory</strong> <code>.gitleaks.toml</code></li>
+      <li><strong>directory</strong> <code>.gitmessage</code></li>
+      <li><strong>directory</strong> <code>governance</code></li>
+      <li><strong>directory</strong> <code>kontekst.md</code></li>
+      <li><strong>directory</strong> <code>lib</code></li>
+      <li><strong>directory</strong> <code>LICENSE</code></li>
+      <li><strong>directory</strong> <code>mesh</code></li>
+      <li><strong>directory</strong> <code>MIGRATION.md</code></li>
+      <li><strong>directory</strong> <code>models</code></li>
+      <li><strong>directory</strong> <code>observability</code></li>
+      <li><strong>directory</strong> <code>operations</code></li>
+      <li><strong>directory</strong> <code>OWNERSHIP.md</code></li>
+      <li><strong>directory</strong> <code>README.md</code></li>
+      <li><strong>directory</strong> <code>RECOVERY.md</code></li>
+      <li><strong>directory</strong> <code>reference</code></li>
+      <li><strong>directory</strong> <code>resilience</code></li>
+      <li><strong>directory</strong> <code>secrets</code></li>
+      <li><strong>directory</strong> <code>security</code></li>
+      <li><strong>directory</strong> <code>SECURITY.md</code></li>
+      <li><strong>directory</strong> <code>shared</code></li>
+      <li><strong>directory</strong> <code>.skeleton.yaml</code></li>
+      <li><strong>directory</strong> <code>SOURCE-OF-TRUTH.md</code></li>
+      <li><strong>directory</strong> <code>STATE-FOUNDATION-B-REPORT.md</code></li>
+      <li><strong>directory</strong> <code>system</code></li>
+      <li><strong>directory</strong> <code>tests</code></li>
+      <li><strong>directory</strong> <code>.tools</code></li>
+      <li><strong>directory</strong> <code>tools</code></li>
+      <li><strong>directory</strong> <code>user</code></li>
+      <li><strong>directory</strong> <code>VERSION</code></li>
+      <li><strong>ghost</strong> <code>GATE-026</code></li>
+      <li><strong>ghost</strong> <code>GATE-027</code></li>
+      <li><strong>ghost</strong> <code>GATE-028</code></li>
+      <li><strong>ghost</strong> <code>GATE-029</code></li>
+      <li><strong>ghost</strong> <code>GATE-030</code></li>
+      <li><strong>ghost</strong> <code>GATE-031</code></li>
+      <li><strong>ghost</strong> <code>GATE-032</code></li>
+      <li><strong>ghost</strong> <code>GATE-033</code></li>
+      <li><strong>ghost</strong> <code>GATE-034</code></li>
+      <li><strong>ghost</strong> <code>GATE-035</code></li>
+      <li><strong>ghost</strong> <code>GATE-036</code></li>
+      <li><strong>ghost</strong> <code>GATE-037</code></li>
+      <li><strong>ghost</strong> <code>GATE-043</code></li>
+      <li><strong>mock</strong> <code>tools/automation/core/gen-pipelines.sh</code></li>
+      <li><strong>mock</strong> <code>tools/automation/core/lib.sh</code></li>
+      <li><strong>mock</strong> <code>tools/automation/core/pipelines.sh</code></li>
+      <li><strong>mock</strong> <code>tools/automation/tests/run_tests.sh</code></li>
+      <li><strong>mock</strong> <code>tools/automation/tests/test_pipelines.sh</code></li>
+    </ul>
+  </div>
+  <div class="card"><h2>Dane</h2>
+    <ul>
+      <li><a href="data/project-model.json">project-model.json</a></li>
+      <li><a href="data/summary.json">summary.json</a></li>
+      <li><a href="data/project-model.schema.json">project-model.schema.json</a></li>
+    </ul>
+  </div>
+  <p><em>Wygenerowano automatycznie — nie edytuj ręcznie.</em></p>
+</body>
+</html>

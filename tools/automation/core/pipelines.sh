@@ -103,8 +103,139 @@ PIPELINES=(
   "P-076|OFFENSIVE-SECURITY|offsec/respond.sh|DEEP|IMPLEMENTED|P-075|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
   "P-077|OFFENSIVE-SECURITY|offsec/remediate.sh|DEEP|IMPLEMENTED|P-076|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
   "P-078|OFFENSIVE-SECURITY|offsec/learn.sh|DEEP|IMPLEMENTED|P-077|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-079|HUMAN-SIMULATION|human/setup.sh|STANDARD|IMPLEMENTED||DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-080|HUMAN-SIMULATION|human/navigate.sh|STANDARD|IMPLEMENTED|P-079|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-081|HUMAN-SIMULATION|human/wait.sh|STANDARD|IMPLEMENTED|P-080|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-082|HUMAN-SIMULATION|human/screenshot.sh|STANDARD|IMPLEMENTED|P-081|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-083|HUMAN-SIMULATION|human/interact.sh|STANDARD|IMPLEMENTED|P-082|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-084|HUMAN-SIMULATION|human/assert.sh|STANDARD|IMPLEMENTED|P-083|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-085|HUMAN-SIMULATION|human/record.sh|STANDARD|IMPLEMENTED|P-084|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-086|HUMAN-SIMULATION|human/report.sh|STANDARD|IMPLEMENTED|P-085|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-087|HUMAN-SIMULATION|human/replay.sh|DEEP|IMPLEMENTED|P-086|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-088|HUMAN-SIMULATION|human/terminal.sh|DEEP|IMPLEMENTED|P-087|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-089|HUMAN-SIMULATION|human/vm.sh|DEEP|IMPLEMENTED|P-088|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-090|SIMULATION|simulation/scenario.sh|STANDARD|IMPLEMENTED||DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-091|SIMULATION|simulation/prepare.sh|STANDARD|IMPLEMENTED|P-090|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-092|SIMULATION|simulation/execute.sh|STANDARD|IMPLEMENTED|P-091|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-093|SIMULATION|simulation/observe.sh|STANDARD|IMPLEMENTED|P-092|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-094|SIMULATION|simulation/measure.sh|STANDARD|IMPLEMENTED|P-093|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-095|SIMULATION|simulation/evaluate.sh|STANDARD|IMPLEMENTED|P-094|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-096|SIMULATION|simulation/remediate.sh|STANDARD|IMPLEMENTED|P-095|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-097|SIMULATION|simulation/document.sh|STANDARD|IMPLEMENTED|P-096|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
+  "P-098|SIMULATION|simulation/repeat.sh|DEEP|IMPLEMENTED|P-097|DISCOVER,CONTRACT,EXECUTE,TEST,EVIDENCE,VERIFY,REGISTER,REPORT"
 )
 
+# ── Metadane MON-* (Monitor Plane) ──────────────────────────
+# Format: <id>|<schedule>|<schedule_spec>|<control>|<monitor>|<notify>|<timeout>|<retries>|<priority>
+#   schedule      — cron | interval | event | conditional | manual | reminder | escalation
+#   schedule_spec — specyfikacja (cron expr / sekundy / nazwa eventu / warunek)
+#   control       — dozwolone akcje kontrolne (przecinkami)
+#   monitor       — elementy monitorowania (przecinkami)
+#   notify        — kanały powiadomień (przecinkami)
+#   timeout       — limit czasu wykonania (sekundy)
+#   retries       — maksymalna liczba ponowień
+#   priority      — LOW | NORMAL | HIGH | CRITICAL
+
+PIPELINE_MON=(
+  "P-001|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-002|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-003|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-004|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-005|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-006|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-007|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-008|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-009|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-010|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-011|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-012|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-013|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-014|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-015|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-016|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-017|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-018|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-019|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-020|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-021|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-022|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-023|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-024|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-025|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-026|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-027|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-028|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-029|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-030|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-031|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-032|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-033|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-034|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-035|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-036|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-037|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-038|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-039|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-040|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-041|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-042|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-043|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-044|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-045|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-046|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-047|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-048|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-049|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-050|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-051|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-052|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-053|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-054|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-055|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-056|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-057|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-058|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-059|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-060|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-061|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-062|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-063|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-064|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-065|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-066|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-067|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-068|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-069|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-070|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-071|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-072|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-073|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-074|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-075|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-076|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-077|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-078|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-079|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-080|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-081|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-082|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-083|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-084|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-085|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-086|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-087|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-088|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-089|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-090|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-091|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-092|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-093|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-094|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-095|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-096|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-097|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+  "P-098|manual||pause,resume,cancel,retry,skip,restart|status,progress,logs,metrics,dashboard,timeline|dashboard|300|3|NORMAL"
+)
 # ── Klasa → pipeline'y ──────────────────────────────────────
 # Każda klasa uruchamia listę pipeline'ów z domyślną klasą.
 pipeline_class_modules() {
@@ -114,10 +245,10 @@ pipeline_class_modules() {
       echo "P-016 P-021 P-024 P-025"
       ;;
     STANDARD)
-      echo "P-001 P-002 P-003 P-004 P-005 P-006 P-007 P-009 P-010 P-011 P-013 P-017 P-018 P-022 P-026 P-028 P-029 P-030 P-052 P-053 P-054 P-055 P-061 P-062 P-063 P-065"
+      echo "P-001 P-002 P-003 P-004 P-005 P-006 P-007 P-009 P-010 P-011 P-013 P-017 P-018 P-022 P-026 P-028 P-029 P-030 P-052 P-053 P-054 P-055 P-061 P-062 P-063 P-065 P-079 P-080 P-081 P-082 P-083 P-084 P-085 P-086 P-090 P-091 P-092 P-093 P-094 P-095 P-096 P-097"
       ;;
     DEEP)
-      echo "P-008 P-012 P-014 P-015 P-019 P-023 P-027 P-038 P-051 P-064 P-070 P-071 P-072 P-073 P-074 P-075 P-076 P-077 P-078"
+      echo "P-008 P-012 P-014 P-015 P-019 P-023 P-027 P-038 P-051 P-064 P-070 P-071 P-072 P-073 P-074 P-075 P-076 P-077 P-078 P-087 P-088 P-089 P-098"
       ;;
     RELEASE)
       echo "P-020 P-031 P-032 P-033 P-034 P-035 P-036 P-037 P-056 P-057 P-066"
@@ -281,3 +412,49 @@ pipeline_proposed() {
   done
   echo ""
 }
+
+# ── Metadane MON-* (Monitor Plane) ──────────────────────────
+# pipeline_mon_field <id> <field> — zwraca wartość pola MON-* dla pipeline'a.
+#   field: schedule | schedule_spec | control | monitor | notify | timeout | retries | priority
+# Pole 1 = id, pole 2 = schedule, ..., pole 9 = priority.
+pipeline_mon_field() {
+  local id="$1"
+  local field="$2"
+  local idx
+  case "$field" in
+    schedule)      idx=2 ;;
+    schedule_spec) idx=3 ;;
+    control)       idx=4 ;;
+    monitor)       idx=5 ;;
+    notify)        idx=6 ;;
+    timeout)       idx=7 ;;
+    retries)       idx=8 ;;
+    priority)      idx=9 ;;
+    *) echo ""; return ;;
+  esac
+  for entry in "${PIPELINE_MON[@]}"; do
+    local eid="${entry%%|*}"
+    if [ "$eid" = "$id" ]; then
+      local rest="${entry#*|}"
+      local i
+      # rest = field2|field3|...|field9. Stripping (idx-2) more fields
+      # leaves field `idx` at the front.
+      for ((i=2; i<idx; i++)); do
+        rest="${rest#*|}"
+      done
+      echo "${rest%%|*}"
+      return
+    fi
+  done
+  echo ""
+}
+
+# ── Wygodne akcesory MON-* ─────────────────────────────────
+pipeline_schedule()      { pipeline_mon_field "$1" schedule; }
+pipeline_schedule_spec() { pipeline_mon_field "$1" schedule_spec; }
+pipeline_control()       { pipeline_mon_field "$1" control; }
+pipeline_monitor()       { pipeline_mon_field "$1" monitor; }
+pipeline_notify()        { pipeline_mon_field "$1" notify; }
+pipeline_timeout()       { pipeline_mon_field "$1" timeout; }
+pipeline_retries()       { pipeline_mon_field "$1" retries; }
+pipeline_priority()      { pipeline_mon_field "$1" priority; }

@@ -107,16 +107,20 @@ if [ -f "$REGISTRY" ]; then
 fi
 
 # ── GATE-INTEGRITY-005: registry == executed (każdy gate ma evidence) ─
-# Uwaga: GATE-001 (ten meta-gate) jest pomijany — jego evidence jest
-# generowane przez evidence.sh PO uruchomieniu tego gate'u (self-referential).
+# Uwaga: meta-gate'y (GATE-001 ten skrypt, GATE-020 evidence, GATE-038 wiring)
+# są pomijane — ich evidence jest generowane przez evidence.sh PO uruchomieniu
+# tego gate'u (self-referential bootstrap). GATE-001 jest uruchamiany PIERWSZY
+# w pętli META_GATES evidence.sh, więc GATE-020 i GATE-038 nie mają jeszcze
+# evidence w momencie jego wykonania.
 if [ -f "$REGISTRY" ] && [ -d "$EVIDENCE_DIR" ]; then
   # shellcheck source=registry.sh
   . "$REGISTRY"
   NOT_EXECUTED=0
   NOT_EXECUTED_DETAIL=""
   for gate_id in $(registry_gate_ids); do
-    # Pomijamy sam siebie (GATE-001) — evidence generowane po uruchomieniu.
-    if [ "$gate_id" = "GATE-001" ]; then
+    # Bootstrap: pomijamy meta-gate'y (GATE-001 sam siebie, GATE-020 evidence,
+    # GATE-038 wiring) — ich evidence generowane po uruchomieniu tego gate'u.
+    if [ "$gate_id" = "GATE-001" ] || [ "$gate_id" = "GATE-020" ] || [ "$gate_id" = "GATE-038" ]; then
       continue
     fi
     # PROPOSED gate'y nie mają implementacji, więc nie mają evidence —

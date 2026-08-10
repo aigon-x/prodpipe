@@ -25,7 +25,10 @@ cd "$ROOT"
 say "=== SECURITY — CREDENTIALS ==="
 
 # Wykluczamy katalogi, które mogą zawierać wzorce jako stringi (testy, docs).
-EXCLUDE="--exclude-dir=.git --exclude-dir=.git-hooks --exclude-dir=.github --exclude-dir=archive"
+# .qwen/ = artefakty robocze agenta (worktree, nieśledzone) — nie wchodzą do repo.
+# .gitleaks.toml = allowlist wzorców testowych (AKIA..., sk-...) — oczywiście fałszywe.
+# test_security.sh = fixture testowy (zawiera wzorce sk-... jako dane testowe).
+EXCLUDE="--exclude-dir=.git --exclude-dir=.git-hooks --exclude-dir=.github --exclude-dir=archive --exclude-dir=.qwen --exclude=.gitleaks.toml --exclude=test_security.sh"
 
 # SEC-201 No AWS credentials
 if grep -rInE 'AKIA[0-9A-Z]{16}' $EXCLUDE . 2>/dev/null | grep -q .; then

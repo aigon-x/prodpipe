@@ -51,10 +51,15 @@ SECTIONS=(
 #   tools/security/                → security/secrets.sh
 #   .tools/                        → narzędzia pomocnicze
 #   config/generated/              → generated artifacts (tylko .gitkeep)
+#   artifacts/                     → generated evidence/reports (artefakty, nie źródło)
+#   docs/generated/                → wygenerowane dokumenty (config-zero, reconciliation)
+#   tools/automation/build         → artefakty build pipeline'ów (generated)
+#   tools/config/                  → guard/compiler (config-guard.sh, config-compiler.sh) —
+#                                     ENFORCEMENT, nie źródło wymagające README z 12 sekcjami
 # Wzorzec to regex alternatyw (grep -vE), nie lista ze spacjami.
 # Każdy katalog dopasowujemy z opcjonalnym końcowym "/" (bo dirname zwraca
 # katalog bez "/", np. ".git-hooks", a ścieżka pliku ma "/", np. ".git-hooks/x").
-STR_EXCLUDE='^(\.git-hooks/?|\.github/?|system/control-plane/state/?|tools/verify/?|tools/security/?|\.tools/?|config/generated/)'
+STR_EXCLUDE='^(\.git-hooks/?|\.github/?|system/control-plane/state/?|tools/verify/?|tools/security/?|\.tools/?|config/generated/|artifacts/|docs/generated/|tools/automation/build/?|tools/config/?)'
 
 # STR-001 Every directory has README.md
 # Root README.md jest wyłączony (platform overview).

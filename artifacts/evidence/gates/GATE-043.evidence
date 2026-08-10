@@ -1,0 +1,9 @@
+gate_id=GATE-043
+domain=OBSERVABILITY
+name=OBSERVABILITY & KNOWLEDGE EXPLORER — lokalne centrum dowodzenia projektu
+command=tools/verify/gates/domains/observability.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T15:21:47Z
+head=253820b
+output==== GATE-043 OBSERVABILITY === [PASS] OBS-001 narzędzie tools/explore/explore.sh istnieje        Explorer CLI obecny. [PASS] OBS-002 biblioteki lib/ istnieją        Wszystkie 8 bibliotek obecne. [PASS] OBS-003 testy tests/ istnieją        Wszystkie 5 testów obecne. [PASS] OBS-004 explore.sh ma set -u        set -u obecny. [PASS] OBS-005 biblioteki lib/ mają set -u        Wszystkie biblioteki mają set -u. [PASS] OBS-006 explore.sh ma komendę all        Komenda all obecna (scan+build+docs+g

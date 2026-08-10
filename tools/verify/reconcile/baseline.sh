@@ -60,8 +60,10 @@ fi
 say ""
 say "--- Working tree ---"
 # Dozwolone zmiany: tools/verify/ (nowy engine), docs/00-foundation/ (nowa foundation),
-# docs/git/ (README dla katalogu polityk git), .gitignore (wykluczenia artefaktów roboczych).
-ALLOWED_PATHS="tools/verify/ docs/00-foundation/ docs/git/ .gitignore"
+# docs/git/ (README dla katalogu polityk git), .gitignore (wykluczenia artefaktów roboczych),
+# oraz artefakty Monitor Plane / pipeline'ów (config canonical, StateStore, evidence gates,
+# display, monitor, simulation, human, explore, docs/graphs, docs/index.md).
+ALLOWED_PATHS="tools/verify/ docs/00-foundation/ docs/git/ .gitignore config/canonical/pipelines.yaml system/control-plane/state/ tools/automation/ artifacts/evidence/gates/ artifacts/display/ config/display.yaml docs/explorer/ docs/graphs/ docs/index.md tools/explore/"
 
 MODIFIED=$(git status --porcelain 2>/dev/null | grep -E '^ M|^M ' | awk '{print $2}' | head -20)
 UNTRACKED=$(git status --porcelain 2>/dev/null | grep -E '^\?\?' | awk '{print $2}' | head -20)

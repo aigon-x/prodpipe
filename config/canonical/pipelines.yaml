@@ -44,10 +44,189 @@ families:
   GTM:         "Go-To-Market (rynek jako przedłużenie architektury)"
   AI:          "Sztuczna inteligencja (AI Plane — ML/DL/LLM lifecycle)"
   OFFENSIVE-SECURITY: "Offensive Security Plane (Red/Blue/Purple Team)"
+  HUMAN-SIMULATION: "Human Simulation Plane (test to nie skrypt, to użytkownik)"
+  SIMULATION: "Simulation Plane (symulacje katastrof — 'śmierć foundera' to test, nie tragedia)"
+
+# ── MONITOR PLANE ───────────────────────────────────────────────────────────
+# Pipeline to NIE skrypt, który się uruchamia — to PROCES, który ma stan,
+# lifecycle, i może być kontrolowany. Monitor Plane definiuje:
+#   * 9 etapów lifecycle (REGISTER → ARCHIVE)
+#   * typy harmonogramowania (schedule)
+#   * akcje kontrolne (control)
+#   * elementy monitorowania (monitor)
+#   * kanały powiadomień (notify)
+#   * metrykę zdrowia MON_health
+#   * gate'y MON-* (MON-R-01..06, MON-S-01..08, MON-Q-01..08, MON-ST-01..08,
+#     MON-M-01..08, MON-C-01..08, MON-CO-01..08, MON-N-01..08, MON-A-01..08)
+#
+# Każdy pipeline w sekcji `pipelines:` może mieć pola MON-*:
+#   schedule       — typ harmonogramowania (cron|interval|event|conditional|manual|reminder|escalation)
+#   schedule_spec  — specyfikacja (cron expr / sekundy / nazwa eventu / warunek)
+#   control        — dozwolone akcje kontrolne (pause|resume|cancel|retry|skip|restart)
+#   monitor        — elementy monitorowania (status|progress|logs|metrics|dashboard|timeline)
+#   notify         — kanały powiadomień (email|slack|dashboard|webhook)
+#   timeout        — limit czasu wykonania (sekundy)
+#   retries        — maksymalna liczba ponowień
+#   priority       — LOW | NORMAL | HIGH | CRITICAL
+#
+# Domyślne wartości (gdy pole pominięte):
+#   schedule: manual, schedule_spec: "", control: [pause,resume,cancel,retry,skip,restart],
+#   monitor: [status,progress,logs,metrics,dashboard,timeline], notify: [dashboard],
+#   timeout: 300, retries: 3, priority: NORMAL
+# ────────────────────────────────────────────────────────────────────────────
+monitor_plane:
+  schema_version: 1
+  # ── 9 etapów lifecycle ────────────────────────────────────────────────────
+  stages:
+    REGISTER:  "Rejestracja pipeline'a w Monitor Plane (stan PENDING)"
+    SCHEDULE:  "Harmonogramowanie (cron/interval/event/conditional/manual/reminder/escalation)"
+    QUEUE:     "Kolejkowanie (oczekiwanie na zasoby/zależności)"
+    START:     "Start wykonania (stan RUNNING)"
+    MONITOR:   "Monitorowanie (status/progress/logs/metrics/dashboard/timeline)"
+    CONTROL:   "Kontrola (pause/resume/cancel/retry/skip/restart)"
+    COMPLETE:  "Zakończenie (stan COMPLETED/FAILED)"
+    NOTIFY:    "Powiadomienie (email/slack/dashboard/webhook)"
+    ARCHIVE:   "Archiwizacja (evidence + historia)"
+  # ── Stany maszyny stanów ─────────────────────────────────────────────────
+  states:
+    PENDING:   "zarejestrowany, czeka na harmonogram"
+    SCHEDULED: "zaplanowany, czeka na kolejkę"
+    QUEUED:    "w kolejce, czeka na start"
+    RUNNING:   "wykonywany"
+    PAUSED:    "wstrzymany (control: pause)"
+    COMPLETED: "zakończony sukcesem"
+    FAILED:    "zakończony porażką"
+    CANCELLED: "anulowany (control: cancel)"
+    SKIPPED:   "pominięty (control: skip)"
+    ARCHIVED:  "zarchiwizowany"
+  # ── Typy harmonogramowania ───────────────────────────────────────────────
+  schedule_types:
+    cron:       "wyrażenie cron (np. '0 3 * * *')"
+    interval:   "co N sekund/minut"
+    event:      "wyzwalany eventem (np. git push, file change)"
+    conditional: "gdy warunek spełniony (np. zależność PASS)"
+    manual:     "tylko ręcznie"
+    reminder:   "przypomnienie o wykonaniu"
+    escalation: "eskalacja po porażce/limicie czasu"
+  # ── Akcje kontrolne ──────────────────────────────────────────────────────
+  control_actions:
+    pause:   "wstrzymaj wykonanie (RUNNING → PAUSED)"
+    resume:  "wznów wykonanie (PAUSED → RUNNING)"
+    cancel:  "anuluj (RUNNING/PAUSED → CANCELLED)"
+    retry:   "ponów (FAILED → QUEUED)"
+    skip:    "pomiń (PENDING/SCHEDULED → SKIPPED)"
+    restart: "restartuj (COMPLETED/FAILED → QUEUED)"
+  # ── Elementy monitorowania ───────────────────────────────────────────────
+  monitor_elements:
+    status:    "bieżący stan pipeline'a"
+    progress:  "postęp wykonania (%)"
+    logs:      "logi wykonania"
+    metrics:   "metryki (czas, pamięć, sukces)"
+    dashboard: "widok zbiorczy"
+    timeline:  "oś czasu lifecycle"
+  # ── Kanały powiadomień ───────────────────────────────────────────────────
+  notify_channels:
+    email:     "e-mail"
+    slack:     "Slack webhook"
+    dashboard: "dashboard (wbudowany)"
+    webhook:   "zewnętrzny webhook"
+  # ── Metryka zdrowia ──────────────────────────────────────────────────────
+  # MON_health = pipeline_success_rate × pipeline_coverage × control_rate × notification_rate
+  # Każdy czynnik w [0,1]. MON_health w [0,1]. 1.0 = pełne zdrowie.
+  health_metric:
+    formula: "MON_health = pipeline_success_rate × pipeline_coverage × control_rate × notification_rate"
+    pipeline_success_rate: "udane wykonania / wszystkie wykonania"
+    pipeline_coverage:     "pipeline'y z evidence / wszystkie pipeline'y"
+    control_rate:          "skuteczne akcje kontrolne / wszystkie akcje kontrolne"
+    notification_rate:     "wysłane powiadomienia / wymagane powiadomienia"
+  # ── Gate'y MON-* ─────────────────────────────────────────────────────────
+  # 9 grup × 8 gate'ów (MON-R ma 6). Łącznie 70 gate'ów.
+  gates:
+    MON-R:  # REGISTER (6)
+      MON-R-01: "pipeline zarejestrowany w Monitor Plane"
+      MON-R-02: "stan początkowy PENDING"
+      MON-R-03: "unikalny identyfikator pipeline'a"
+      MON-R-04: "metadane MON-* kompletne (schedule/control/monitor/notify)"
+      MON-R-05: "timeout i retries dodatnie"
+      MON-R-06: "priority w {LOW,NORMAL,HIGH,CRITICAL}"
+    MON-S:  # SCHEDULE (8)
+      MON-S-01: "typ harmonogramowania poprawny"
+      MON-S-02: "specyfikacja harmonogramu poprawna (cron/interval/event/conditional)"
+      MON-S-03: "harmonogram nie koliduje z zależnościami"
+      MON-S-04: "pipeline zaplanowany (stan SCHEDULED)"
+      MON-S-05: "okno czasowe respektowane"
+      MON-S-06: "eskalacja skonfigurowana dla harmonogramu"
+      MON-S-07: "reminder skonfigurowany (jeśli typ=reminder)"
+      MON-S-08: "harmonogram zapisany w StateStore"
+    MON-Q:  # QUEUE (8)
+      MON-Q-01: "pipeline w kolejce (stan QUEUED)"
+      MON-Q-02: "zależności spełnione przed startem"
+      MON-Q-03: "kolejka FIFO respektowana"
+      MON-Q-04: "limit współbieżności respektowany"
+      MON-Q-05: "priorytet respektowany w kolejce"
+      MON-Q-06: "timeout kolejki nie przekroczony"
+      MON-Q-07: "kolejka zapisana w StateStore"
+      MON-Q-08: "brak deadlocku zależności"
+    MON-ST: # START (8)
+      MON-ST-01: "pipeline wystartował (stan RUNNING)"
+      MON-ST-02: "skrypt istnieje i jest wykonywalny"
+      MON-ST-03: "środowisko przygotowane"
+      MON-ST-04: "timestamp startu zapisany"
+      MON-ST-05: "PID procesu zapisany"
+      MON-ST-06: "timeout uruchomiony"
+      MON-ST-07: "logi otwarte"
+      MON-ST-08: "start zapisany w StateStore"
+    MON-M:  # MONITOR (8)
+      MON-M-01: "status monitorowany"
+      MON-M-02: "postęp raportowany"
+      MON-M-03: "logi zbierane"
+      MON-M-04: "metryki zbierane"
+      MON-M-05: "dashboard aktualizowany"
+      MON-M-06: "timeline aktualizowany"
+      MON-M-07: "monitoring zapisany w StateStore"
+      MON-M-08: "brak fałszywego zielonego (NO FALSE GREEN)"
+    MON-C:  # CONTROL (8)
+      MON-C-01: "akcje kontrolne dozwolone (z metadanych)"
+      MON-C-02: "pause działa (RUNNING → PAUSED)"
+      MON-C-03: "resume działa (PAUSED → RUNNING)"
+      MON-C-04: "cancel działa (→ CANCELLED)"
+      MON-C-05: "retry działa (FAILED → QUEUED)"
+      MON-C-06: "skip działa (→ SKIPPED)"
+      MON-C-07: "restart działa (→ QUEUED)"
+      MON-C-08: "kontrola zapisana w StateStore"
+    MON-CO: # COMPLETE (8)
+      MON-CO-01: "pipeline zakończony (COMPLETED/FAILED)"
+      MON-CO-02: "exit code przechwycony"
+      MON-CO-03: "status końcowy poprawny"
+      MON-CO-04: "timestamp końca zapisany"
+      MON-CO-05: "czas trwania policzony"
+      MON-CO-06: "wynik zapisany w StateStore"
+      MON-CO-07: "zależności downstream powiadomione"
+      MON-CO-08: "brak fałszywego zielonego (FAIL-CLOSED)"
+    MON-N:  # NOTIFY (8)
+      MON-N-01: "kanały powiadomień skonfigurowane"
+      MON-N-02: "powiadomienie o sukcesie wysłane"
+      MON-N-03: "powiadomienie o porażce wysłane"
+      MON-N-04: "powiadomienie o eskalacji wysłane"
+      MON-N-05: "powiadomienie o reminderze wysłane"
+      MON-N-06: "powiadomienie zapisane w StateStore"
+      MON-N-07: "brak duplikatów powiadomień"
+      MON-N-08: "notification_rate policzony"
+    MON-A:  # ARCHIVE (8)
+      MON-A-01: "pipeline zarchiwizowany (stan ARCHIVED)"
+      MON-A-02: "evidence zapisane"
+      MON-A-03: "logi zarchiwizowane"
+      MON-A-04: "metryki zarchiwizowane"
+      MON-A-05: "historia lifecycle zapisana"
+      MON-A-06: "archiwum zapisane w StateStore"
+      MON-A-07: "brak wycieku zasobów"
+      MON-A-08: "MON_health zaktualizowany"
 
 # ── Pipeline'y ──────────────────────────────────────────────────────────────
 # Każdy pipeline: id, family, script, class, status, depends, contract.
 # contract to 8-fazowy Pipeline Contract (DISCOVER..REPORT).
+# Opcjonalnie pola MON-* (schedule, schedule_spec, control, monitor, notify,
+# timeout, retries, priority) — patrz sekcja monitor_plane powyżej.
 pipelines:
   # ── PRODUCT / DISCOVERY ──────────────────────────────────────────────────
   - id: P-001
@@ -57,6 +236,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-002
     family: PRODUCT
     script: product/requirements.sh
@@ -64,6 +252,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-001]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-003
     family: PRODUCT
     script: product/traceability.sh
@@ -71,6 +268,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-002]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-004
     family: PRODUCT
     script: product/prioritization.sh
@@ -78,6 +284,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-002]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-005
     family: PRODUCT
     script: product/roadmap.sh
@@ -85,6 +300,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-004]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-006
     family: PRODUCT
     script: product/backlog.sh
@@ -92,6 +316,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-005]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-007
     family: PRODUCT
     script: product/acceptance.sh
@@ -99,6 +332,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-003]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── DESIGN / ARCHITECTURE ────────────────────────────────────────────────
   - id: P-008
@@ -108,6 +350,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-002]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-009
     family: DESIGN
     script: design/design-doc.sh
@@ -115,6 +366,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-008]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-010
     family: DESIGN
     script: design/contracts.sh
@@ -122,6 +382,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-009]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-011
     family: DESIGN
     script: design/interface.sh
@@ -129,6 +398,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-010]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-012
     family: DESIGN
     script: design/data-model.sh
@@ -136,6 +414,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-010]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-013
     family: DESIGN
     script: design/tech-debt.sh
@@ -143,6 +430,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-008]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-014
     family: DESIGN
     script: design/change-impact.sh
@@ -150,6 +446,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-003]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── SECURITY ─────────────────────────────────────────────────────────────
   - id: P-015
@@ -159,6 +464,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-008]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-016
     family: SECURITY
     script: security/secrets.sh
@@ -166,6 +480,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-017
     family: SECURITY
     script: security/dependency-scan.sh
@@ -173,6 +496,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-016]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-018
     family: SECURITY
     script: security/static-analysis.sh
@@ -180,6 +512,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-017]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-019
     family: SECURITY
     script: security/penetration.sh
@@ -187,6 +528,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-018]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-020
     family: SECURITY
     script: security/compliance.sh
@@ -194,6 +544,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-019]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── CODE / QUALITY ───────────────────────────────────────────────────────
   - id: P-021
@@ -203,6 +562,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-010]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-022
     family: CODE
     script: code/integration-tests.sh
@@ -210,6 +578,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-021]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-023
     family: CODE
     script: code/e2e-tests.sh
@@ -217,6 +594,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-022]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-024
     family: CODE
     script: code/lint.sh
@@ -224,6 +610,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-025
     family: CODE
     script: code/format.sh
@@ -231,6 +626,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-024]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-026
     family: CODE
     script: code/coverage.sh
@@ -238,6 +642,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-021]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-027
     family: CODE
     script: code/performance.sh
@@ -245,6 +658,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-022]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-028
     family: CODE
     script: code/review.sh
@@ -252,6 +674,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-025]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── BUILD / RELEASE ──────────────────────────────────────────────────────
   - id: P-029
@@ -261,6 +692,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-028]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-030
     family: BUILD
     script: build/artifact.sh
@@ -268,6 +708,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-029]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-031
     family: BUILD
     script: build/sbom.sh
@@ -275,6 +724,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-030]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-032
     family: BUILD
     script: build/reproducibility.sh
@@ -282,6 +740,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-030]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-033
     family: BUILD
     script: build/release.sh
@@ -289,6 +756,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-031, P-032]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── DEPLOYMENT ───────────────────────────────────────────────────────────
   - id: P-034
@@ -298,6 +774,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-033]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-035
     family: DEPLOYMENT
     script: deployment/rollback.sh
@@ -305,6 +790,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-034]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-036
     family: DEPLOYMENT
     script: deployment/canary.sh
@@ -312,6 +806,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-034]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-037
     family: DEPLOYMENT
     script: deployment/blue-green.sh
@@ -319,6 +822,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-034]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-038
     family: DEPLOYMENT
     script: deployment/infrastructure.sh
@@ -326,6 +838,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-034]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── RUNTIME / OPERATIONS ─────────────────────────────────────────────────
   - id: P-039
@@ -335,6 +856,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-040
     family: RUNTIME
     script: runtime/gap-discovery.sh
@@ -342,6 +872,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-039]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-041
     family: RUNTIME
     script: runtime/temporal-assurance.sh
@@ -349,6 +888,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-042
     family: RUNTIME
     script: runtime/knowledge-consistency.sh
@@ -356,6 +904,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-043
     family: RUNTIME
     script: runtime/self-certification.sh
@@ -363,6 +920,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-044
     family: RUNTIME
     script: runtime/continuous-certification.sh
@@ -370,6 +936,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-043]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-045
     family: RUNTIME
     script: runtime/change-risk.sh
@@ -377,6 +952,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-014]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-046
     family: RUNTIME
     script: runtime/selective-verification.sh
@@ -384,6 +968,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-045]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-047
     family: RUNTIME
     script: runtime/unknown-management.sh
@@ -391,6 +984,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-048
     family: RUNTIME
     script: runtime/source-of-truth.sh
@@ -398,6 +1000,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-049
     family: RUNTIME
     script: runtime/generated-artifact.sh
@@ -405,6 +1016,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-050
     family: RUNTIME
     script: runtime/documentation.sh
@@ -412,6 +1032,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-040]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
 
   # ── RECOVERY / GOVERNANCE ────────────────────────────────────────────────
   - id: P-051
@@ -422,6 +1051,15 @@ pipelines:
     depends: [P-003]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
 
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+
   # ── GTM / GO-TO-MARKET ───────────────────────────────────────────────────
   - id: P-052
     family: GTM
@@ -430,6 +1068,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-053
     family: GTM
     script: gtm/validate.sh
@@ -437,6 +1084,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-052]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-054
     family: GTM
     script: gtm/design.sh
@@ -444,6 +1100,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-053]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-055
     family: GTM
     script: gtm/build.sh
@@ -451,6 +1116,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-054]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-056
     family: GTM
     script: gtm/prep.sh
@@ -458,6 +1132,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-055]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-057
     family: GTM
     script: gtm/launch.sh
@@ -465,6 +1148,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-056]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-058
     family: GTM
     script: gtm/adopt.sh
@@ -472,6 +1164,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-057]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-059
     family: GTM
     script: gtm/scale.sh
@@ -479,6 +1180,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-058]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-060
     family: GTM
     script: gtm/learn.sh
@@ -486,6 +1196,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-059]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   # ── AI PLANE (ML/DL/LLM lifecycle) ───────────────────────────────────────
   # W AI błąd = bug w danych, kodzie LUB modelu (3 źródła, nie 1).
   # Model = artefakt, trening = pipeline, predykcja = deployment.
@@ -496,6 +1215,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-062
     family: AI
     script: ai/train.sh
@@ -503,6 +1231,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-061]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-063
     family: AI
     script: ai/eval.sh
@@ -510,6 +1247,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-062]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-064
     family: AI
     script: ai/validate.sh
@@ -517,6 +1263,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-063]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-065
     family: AI
     script: ai/package.sh
@@ -524,6 +1279,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-064]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-066
     family: AI
     script: ai/deploy.sh
@@ -531,6 +1295,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-065]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-067
     family: AI
     script: ai/observe.sh
@@ -538,6 +1311,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-066]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-068
     family: AI
     script: ai/retrain.sh
@@ -545,6 +1327,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-067]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-069
     family: AI
     script: ai/retire.sh
@@ -552,6 +1343,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-068]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-070
     family: OFFENSIVE-SECURITY
     script: offsec/recon.sh
@@ -559,6 +1359,15 @@ pipelines:
     status: IMPLEMENTED
     depends: []
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-071
     family: OFFENSIVE-SECURITY
     script: offsec/scan.sh
@@ -566,6 +1375,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-070]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-072
     family: OFFENSIVE-SECURITY
     script: offsec/exploit.sh
@@ -573,6 +1391,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-071]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-073
     family: OFFENSIVE-SECURITY
     script: offsec/persist.sh
@@ -580,6 +1407,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-072]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-074
     family: OFFENSIVE-SECURITY
     script: offsec/exfil.sh
@@ -587,6 +1423,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-073]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-075
     family: OFFENSIVE-SECURITY
     script: offsec/detect.sh
@@ -594,6 +1439,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-074]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-076
     family: OFFENSIVE-SECURITY
     script: offsec/respond.sh
@@ -601,6 +1455,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-075]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-077
     family: OFFENSIVE-SECURITY
     script: offsec/remediate.sh
@@ -608,6 +1471,15 @@ pipelines:
     status: IMPLEMENTED
     depends: [P-076]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
   - id: P-078
     family: OFFENSIVE-SECURITY
     script: offsec/learn.sh
@@ -616,12 +1488,348 @@ pipelines:
     depends: [P-077]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
 
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-079
+    family: HUMAN-SIMULATION
+    script: human/setup.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-080
+    family: HUMAN-SIMULATION
+    script: human/navigate.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-079]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-081
+    family: HUMAN-SIMULATION
+    script: human/wait.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-080]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-082
+    family: HUMAN-SIMULATION
+    script: human/screenshot.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-081]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-083
+    family: HUMAN-SIMULATION
+    script: human/interact.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-082]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-084
+    family: HUMAN-SIMULATION
+    script: human/assert.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-083]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-085
+    family: HUMAN-SIMULATION
+    script: human/record.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-084]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-086
+    family: HUMAN-SIMULATION
+    script: human/report.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-085]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-087
+    family: HUMAN-SIMULATION
+    script: human/replay.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-086]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-088
+    family: HUMAN-SIMULATION
+    script: human/terminal.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-087]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-089
+    family: HUMAN-SIMULATION
+    script: human/vm.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-088]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  # ── SIMULATION PLANE (P-090..P-098) ──────────────────────────────────────
+  # Symulacje katastrof — 'śmierć foundera' to test, nie tragedia.
+  # 9 etapów: SCENARIO → PREPARE → EXECUTE → OBSERVE → MEASURE → EVALUATE →
+  #           REMEDIATE → DOCUMENT → REPEAT
+  # 10 typów katastrof: founder death, data loss, security breach,
+  #   infrastructure failure, vendor outage, key person loss, regulatory action,
+  #   reputational crisis, supply chain failure, total platform loss.
+  - id: P-090
+    family: SIMULATION
+    script: simulation/scenario.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: []
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-091
+    family: SIMULATION
+    script: simulation/prepare.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-090]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-092
+    family: SIMULATION
+    script: simulation/execute.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-091]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-093
+    family: SIMULATION
+    script: simulation/observe.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-092]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-094
+    family: SIMULATION
+    script: simulation/measure.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-093]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-095
+    family: SIMULATION
+    script: simulation/evaluate.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-094]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-096
+    family: SIMULATION
+    script: simulation/remediate.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-095]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-097
+    family: SIMULATION
+    script: simulation/document.sh
+    class: STANDARD
+    status: IMPLEMENTED
+    depends: [P-096]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+  - id: P-098
+    family: SIMULATION
+    script: simulation/repeat.sh
+    class: DEEP
+    status: IMPLEMENTED
+    depends: [P-097]
+    contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
+
+    schedule: manual
+    schedule_spec: ""
+    control: [pause, resume, cancel, retry, skip, restart]
+    monitor: [status, progress, logs, metrics, dashboard, timeline]
+    notify: [dashboard]
+    timeout: 300
+    retries: 3
+    priority: NORMAL
+
 # ── Klasy wykonania → domyślna lista pipeline'ów ────────────────────────────
 # Każda klasa uruchamia pipeline'y, które mają w niej działać (status IMPLEMENTED).
 # UWAGA: każda klasa MUSI mieć dokładnie JEDNĄ definicję (last-wins, jak w gates.yaml).
 classes:
   FAST: [P-016, P-021, P-024, P-025]
-  STANDARD: [P-001, P-002, P-003, P-004, P-005, P-006, P-007, P-009, P-010, P-011, P-013, P-017, P-018, P-022, P-026, P-028, P-029, P-030, P-052, P-053, P-054, P-055, P-061, P-062, P-063, P-065]
-  DEEP: [P-008, P-012, P-014, P-015, P-019, P-023, P-027, P-038, P-051, P-064, P-070, P-071, P-072, P-073, P-074, P-075, P-076, P-077, P-078]
+  STANDARD: [P-001, P-002, P-003, P-004, P-005, P-006, P-007, P-009, P-010, P-011, P-013, P-017, P-018, P-022, P-026, P-028, P-029, P-030, P-052, P-053, P-054, P-055, P-061, P-062, P-063, P-065, P-079, P-080, P-081, P-082, P-083, P-084, P-085, P-086, P-090, P-091, P-092, P-093, P-094, P-095, P-096, P-097]
+  DEEP: [P-008, P-012, P-014, P-015, P-019, P-023, P-027, P-038, P-051, P-064, P-070, P-071, P-072, P-073, P-074, P-075, P-076, P-077, P-078, P-087, P-088, P-089, P-098]
   RELEASE: [P-020, P-031, P-032, P-033, P-034, P-035, P-036, P-037, P-056, P-057, P-066]
   CONTINUOUS: [P-039, P-040, P-041, P-042, P-043, P-044, P-045, P-046, P-047, P-048, P-049, P-050, P-058, P-059, P-060, P-067, P-068, P-069]

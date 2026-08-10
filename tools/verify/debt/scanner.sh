@@ -50,7 +50,14 @@ say "=== HISTORICAL DEBT SCANNER (L4 HISTORY) ==="
 # .qwen/ = artefakty robocze agenta (worktree, nieśledzone) — nie wchodzą do repo.
 # UWAGA: to musi być poprawny regex alternatyw (grep -vE), nie lista ze spacjami —
 # wzorzec ze spacjami był NO-OP i nie wykluczał niczego (ukryty bug).
-EXCLUDE='(\./\.git/|\./archive/|\./tools/verify/|\./\.qwen/)'
+# artifacts/reports/ = raporty analityczne, które DOKUMENTUJĄ legacy (opisują dług,
+# nie zawierają go) — np. ghost-resolution-matrix.md, duplication.md.
+# docs/generated/ = wygenerowane dokumenty (config-zero, itd.) — DOKUMENTUJĄ legacy
+# (inwentaryzują legacy porty/nazwy/ENV/crate'y), nie zawierają go jako aktywnego długu.
+# tools/config/ = guard/compiler (config-guard.sh, config-compiler.sh) — ENFORCEMENT:
+# config-guard.sh celowo referencuje legacy nazwy, żeby je BLOKOWAĆ (to rozwiązanie
+# długu, nie dług). Nie może być flagowany jako DRIFT.
+EXCLUDE='(\./\.git/|\./archive/|\./tools/verify/|\./\.qwen/|\./artifacts/reports/|\./docs/generated/|\./tools/config/)'
 
 # ── Katalogi, w których legacy jest DOZWOLONE (ALLOWED_LEGACY)
 # archive/ = świadomie archiwizowane; tools/verify = nowy engine.
@@ -462,7 +469,9 @@ else
 fi
 
 # Generated (target/, node_modules/, dist/, build/, .cache/)
-GENERATED=$(find . -type d \( -name 'target' -o -name 'node_modules' -o -name 'dist' -o -name 'build' -o -name '.cache' \) -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
+# tools/automation/build/ = katalog build (generated) — świadomie dozwolony
+# (artefakty build pipeline'ów), nie jest długiem.
+GENERATED=$(find . -type d \( -name 'target' -o -name 'node_modules' -o -name 'dist' -o -name 'build' -o -name '.cache' \) -not -path './.git/*' -not -path './.qwen/*' -not -path './tools/automation/build' -not -path './tools/automation/build/*' 2>/dev/null | head -10)
 if [ -n "$GENERATED" ]; then
   recon_status "DRIFT" "DEBT-013c Generated" "Znaleziono katalogi generated: $GENERATED"
   recon_record_debt "history" "Katalogi generated: $GENERATED" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
@@ -483,8 +492,9 @@ say "--- L4 HISTORY: Status UNKNOWN ---"
 #   docs/00-foundation/    → kanoniczne dokumenty foundation
 UNKNOWN_FILES=$(repo_files \
   | grep -vE '^(\.git-hooks/|system/control-plane/|tools/verify/|archive/|docs/00-foundation/)' \
-  | grep -vE '\.(md|sh|yml|yaml|toml|json|txt|sql)$' \
+  | grep -vE '\.(md|sh|yml|yaml|toml|json|txt|sql|evidence|cron)$' \
   | grep -vE '(^|/)(README\.md|\.gitkeep|\.gitignore|\.gitattributes|\.gitmessage|CODEOWNERS|LICENSE|VERSION|CHANGELOG\.md)$' \
+  | grep -vE '^tools/test$' \
   | head -10)
 if [ -n "$UNKNOWN_FILES" ]; then
   recon_status "UNKNOWN" "DEBT-014 Status UNKNOWN" "Pliki bez klasyfikacji: $UNKNOWN_FILES"
