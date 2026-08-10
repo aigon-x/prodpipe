@@ -1,0 +1,57 @@
+# ============================================================================
+# auth.yaml — Authorization Definition (SEC-AUTH-01..03)
+# ============================================================================
+# Definicja mechanizmów autoryzacji, ról, uprawnień i SoD (separation of
+# duties). ŹRÓDŁO PRAWDY dla modułu tools/verify/security/sec-auth-check.sh.
+#
+# SEC-AUTH-01: definicja autoryzacji MUSI istnieć (ten plik).
+# SEC-AUTH-02: role i uprawnienia MUSZĄ być zdefiniowane.
+# SEC-AUTH-03: SoD MUSI być zdefiniowane — autor ≠ approver ≠ deployer.
+#
+# ZASADA TEMPLATE: role i uprawnienia to placeholdery polityki, nie dane
+# operacyjne. Prawdziwe mapowania żyją w IdP / policy engine.
+# ============================================================================
+
+schema_version: 1
+
+# ── Mechanizm autoryzacji ───────────────────────────────────────────────────
+# SEC-AUTH-01: definicja autoryzacji.
+authorization:
+  mechanism: "RBAC (role-based access control) + policy engine"
+  policy_engine: "OPA/Rego (referencja, nie wdrożenie)"
+  enforcement: "centralny policy decision point (PDP)"
+
+# ── Role i uprawnienia ──────────────────────────────────────────────────────
+# SEC-AUTH-02: role i uprawnienia zdefiniowane.
+roles:
+  - name: reader
+    permissions: [read]
+    description: "Odczyt zasobów — bez modyfikacji."
+  - name: developer
+    permissions: [read, write, create_branch, open_pr]
+    description: "Rozwój kodu — może tworzyć PR, nie może deployować."
+  - name: reviewer
+    permissions: [read, approve_pr]
+    description: "Przegląd i zatwierdzanie PR — nie może pisać ani deployować."
+  - name: deployer
+    permissions: [read, deploy]
+    description: "Wdrażanie do środowisk — nie może zatwierdzać zmian."
+  - name: admin
+    permissions: [read, write, approve_pr, deploy, manage_roles]
+    description: "Administracja platformą — pełne uprawnienia."
+
+# ── Separation of Duties (SoD) ──────────────────────────────────────────────
+# SEC-AUTH-03: SoD zdefiniowane — autor ≠ approver ≠ deployer.
+# Każda para ról, które NIE mogą być łączone w jednej osobie.
+separation_of_duties:
+  enabled: true
+  rules:
+    - name: author-vs-approver
+      description: "Autor zmiany nie może być jej approverem."
+      disjoint_roles: [developer, reviewer]
+    - name: approver-vs-deployer
+      description: "Approver zmiany nie może być jej deployerem."
+      disjoint_roles: [reviewer, deployer]
+    - name: author-vs-deployer
+      description: "Autor zmiany nie może być jej deployerem."
+      disjoint_roles: [developer, deployer]

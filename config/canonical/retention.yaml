@@ -1,0 +1,38 @@
+# ============================================================================
+# retention.yaml — Retention Policy (SEC-RET-01..02)
+# ============================================================================
+# Polityka retencji sekretów i logów. ŹRÓDŁO PRAWDY dla modułu
+# tools/verify/security/sec-retention-check.sh.
+#
+# SEC-RET-01: polityka retencji MUSI istnieć (ten plik).
+# SEC-RET-02: retencja MUSI być zgodna z wymogami (np. logi >= 90 dni).
+#
+# ZASADA TEMPLATE: wartości to placeholdery polityki, nie dane operacyjne.
+# ============================================================================
+
+schema_version: 1
+
+# ── Polityka retencji ───────────────────────────────────────────────────────
+# Każda kategoria: name, retention_days, required_min_days, scope.
+# required_min_days — twarde minimum wymagane przez politykę (SEC-RET-02).
+retention_policy:
+  - name: application_logs
+    retention_days: 90
+    required_min_days: 90
+    scope: "logi aplikacyjne — minimum 90 dni"
+  - name: security_audit_logs
+    retention_days: 365
+    required_min_days: 365
+    scope: "logi audytu bezpieczeństwa — minimum 365 dni"
+  - name: access_logs
+    retention_days: 180
+    required_min_days: 90
+    scope: "logi dostępu — minimum 90 dni"
+  - name: secret_rotation_history
+    retention_days: 730
+    required_min_days: 365
+    scope: "historia rotacji sekretów — minimum 365 dni"
+  - name: backup_credentials
+    retention_days: 30
+    required_min_days: 30
+    scope: "kopie zapasowe poświadczeń — minimum 30 dni"

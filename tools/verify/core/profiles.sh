@@ -102,6 +102,26 @@ VERIFY_MODULES=(
   "obs-synthetics:full:BLOCKING"
   "obs-synthetics:release:BLOCKING"
   "obs-synthetics:genesis:BLOCKING"
+  "security-credential-registry:full:BLOCKING"
+  "security-credential-registry:security:BLOCKING"
+  "security-credential-registry:release:BLOCKING"
+  "security-credential-registry:genesis:BLOCKING"
+  "security-rotation:full:BLOCKING"
+  "security-rotation:security:BLOCKING"
+  "security-rotation:release:BLOCKING"
+  "security-rotation:genesis:BLOCKING"
+  "security-retention:full:BLOCKING"
+  "security-retention:security:BLOCKING"
+  "security-retention:release:BLOCKING"
+  "security-retention:genesis:BLOCKING"
+  "security-auth:full:BLOCKING"
+  "security-auth:security:BLOCKING"
+  "security-auth:release:BLOCKING"
+  "security-auth:genesis:BLOCKING"
+  "security-web:full:BLOCKING"
+  "security-web:security:BLOCKING"
+  "security-web:release:BLOCKING"
+  "security-web:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -113,10 +133,10 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     security)
-      echo "git security security-drills"
+      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     architecture)
       echo "architecture contracts semantics taxonomy efficiency"
@@ -125,13 +145,13 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     *)
       echo "git security structure"
@@ -188,6 +208,11 @@ module_script() {
     obs-deadman)           echo "obs-deadman-check.sh" ;;
     obs-dashboards)        echo "obs-dashboards-check.sh" ;;
     obs-synthetics)        echo "obs-synthetics-check.sh" ;;
+    security-credential-registry) echo "security/sec-credential-registry.sh" ;;
+    security-rotation)     echo "security/sec-rotation-check.sh" ;;
+    security-retention)    echo "security/sec-retention-check.sh" ;;
+    security-auth)         echo "security/sec-auth-check.sh" ;;
+    security-web)          echo "security/sec-web-check.sh" ;;
     *)              echo "" ;;
   esac
 }

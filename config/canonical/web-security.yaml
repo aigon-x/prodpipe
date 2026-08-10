@@ -1,0 +1,47 @@
+# ============================================================================
+# web-security.yaml — Web Security Policy (SEC-WEB-01..02)
+# ============================================================================
+# Polityka bezpieczeństwa web: nagłówki bezpieczeństwa i wymóg TLS.
+# ŹRÓDŁO PRAWDY dla modułu tools/verify/security/sec-web-check.sh.
+#
+# SEC-WEB-01: nagłówki bezpieczeństwa MUSZĄ być zdefiniowane.
+# SEC-WEB-02: TLS MUSI być wymagany.
+#
+# ZASADA TEMPLATE: wartości to placeholdery polityki, nie konfiguracja
+# konkretnego serwera. Prawdziwe nagłówki ustawia reverse proxy / CDN.
+# ============================================================================
+
+schema_version: 1
+
+# ── Nagłówki bezpieczeństwa ─────────────────────────────────────────────────
+# SEC-WEB-01: nagłówki bezpieczeństwa zdefiniowane.
+security_headers:
+  enabled: true
+  headers:
+    - name: Strict-Transport-Security
+      value: "max-age=31536000; includeSubDomains"
+      required: true
+    - name: X-Content-Type-Options
+      value: "nosniff"
+      required: true
+    - name: X-Frame-Options
+      value: "DENY"
+      required: true
+    - name: Content-Security-Policy
+      value: "default-src 'self'"
+      required: true
+    - name: Referrer-Policy
+      value: "no-referrer"
+      required: true
+    - name: Permissions-Policy
+      value: "geolocation=(), microphone=(), camera=()"
+      required: true
+
+# ── TLS ─────────────────────────────────────────────────────────────────────
+# SEC-WEB-02: TLS wymagany.
+tls:
+  required: true
+  min_version: "TLSv1.2"
+  enforce_hsts: true
+  redirect_http_to_https: true
+  description: "Cały ruch web MUSI używać TLS >= 1.2; HTTP przekierowywany na HTTPS."
