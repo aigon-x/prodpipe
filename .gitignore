@@ -126,6 +126,9 @@ governance/generated/*
 # ── Docs generated ───────────────────────────────────────────
 docs/generated/*
 !docs/generated/.gitkeep
+# OPERATION CONFIG ZERO — certyfikowane deliverable (tracked, nie generated)
+!docs/generated/config-zero/
+!docs/generated/config-zero/**
 
 # ── Test artifacts ───────────────────────────────────────────
 tests/**/output/
