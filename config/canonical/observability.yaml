@@ -1,0 +1,97 @@
+# ============================================================================
+# observability.yaml — AIGON Production Platform — OBS-BASELINE
+# ============================================================================
+# Manifest metryk. Definiuje metryki, które projekt MUSI eksponować (OBS-03)
+# oraz ich definicje (OBS-06): typ, jednostka, opis, kardynalność.
+#
+# OBS-BASELINE: szablon rodzi obserwowalne projekty. Ten plik jest źródłem
+# prawdy dla metryk — obs-metrics-check.sh weryfikuje, że:
+#   * OBS-03  metryki mają spójne nazewnictwo (konwencja: <ns>_<name>_<unit>)
+#             i kontrolowaną kardynalność (etykiety o niskiej kardynalności)
+#   * OBS-06  każda metryka ma definicję (type, unit, description)
+#
+# ZASADA TEMPLATE: świeży projekt (zero kodu domenowego) ma metryki RED
+# (Rate/Errors/Duration) jako placeholder — NIE są to realne endpointy.
+# Scaffold substytuuje nazwy serwisu przy tworzeniu nowego projektu.
+#
+# Konwencja nazw (OBS-03): <namespace>_<metric>_<unit>
+#   * namespace: nazwa serwisu (np. api, worker, db)
+#   * metric:    rzeczownik (np. requests, errors, latency)
+#   * unit:      jednostka (total, errors, seconds, bytes)
+# ============================================================================
+
+schema_version: 1
+
+# ── Metryki RED (Rate / Errors / Duration) — obowiązkowe dla każdego serwisu ─
+# OBS-03: każda metryka ma name + type + unit + description + cardinality.
+# OBS-06: definicja jest kompletna (bez unit/type = FAIL).
+metrics:
+  # ── Rate (OBS-03) ────────────────────────────────────────────────────────
+  - name: "template_requests_total"
+    type: "counter"
+    unit: "total"
+    description: "Liczba żądań przetworzonych przez serwis."
+    cardinality: "low"          # etykiety: method, status, endpoint (kontrolowane)
+    labels: ["method", "status", "endpoint"]
+
+  # ── Errors (OBS-03) ──────────────────────────────────────────────────────
+  - name: "template_errors_total"
+    type: "counter"
+    unit: "errors"
+    description: "Liczba błędów (5xx, wyjątki) w serwisie."
+    cardinality: "low"
+    labels: ["method", "status", "endpoint"]
+
+  # ── Duration (OBS-03) ────────────────────────────────────────────────────
+  - name: "template_request_duration_seconds"
+    type: "histogram"
+    unit: "seconds"
+    description: "Czas trwania żądania (histogram)."
+    cardinality: "low"
+    labels: ["method", "endpoint"]
+
+  # ── SLO (OBS-14) ─────────────────────────────────────────────────────────
+  - name: "template_slo_budget_ratio"
+    type: "gauge"
+    unit: "ratio"
+    description: "Pozostały budżet błędu SLO (0..1)."
+    cardinality: "low"
+    labels: ["slo"]
+
+# ── Kardynalność (OBS-03) ──────────────────────────────────────────────────
+# Metryki o wysokiej kardynalności (np. user_id, request_id jako etykieta)
+# są zabronione — niszczą wydajność i koszt. Ten blok definiuje dozwolone
+# etykiety o niskiej kardynalności.
+cardinality:
+  max_labels: 5                 # maksymalna liczba etykiet na metrykę
+  forbidden_labels:             # etykiety o wysokiej kardynalności = FAIL
+    - "user_id"
+    - "request_id"
+    - "trace_id"
+    - "session_id"
+    - "email"
+
+# ── Konwencja nazw (OBS-03) ────────────────────────────────────────────────
+# Każda metryka MUSI pasować do wzorca: <ns>_<name>_<unit>.
+# ns = namespace (service_id z .skeleton.yaml), name = rzeczownik,
+# unit = jednostka. Metryka bez unit w nazwie = FAIL.
+naming:
+  pattern: "^[a-z0-9_]+_[a-z0-9_]+_(total|errors|seconds|bytes|ratio|count)$"
+  description: "Konwencja: <namespace>_<metric>_<unit>"
+
+# ── Health endpoints (OBS-10) ──────────────────────────────────────────────
+# Projekt web:true MUSI deklarować /healthz (liveness) i /readyz (readiness).
+# obs-health-endpoints.sh sprawdza, że te endpointy są zadeklarowane.
+# ZASADA TEMPLATE: świeży projekt ma web:false → moduł robi skip.
+health:
+  liveness: "/healthz"     # czy proces żyje
+  readiness: "/readyz"     # czy gotowy na ruch
+
+# ── Deadman switch (OBS-13) ────────────────────────────────────────────────
+# Deadman = heartbeat, który alarmuje, gdy serwis PRZESTAJE wysyłać sygnał
+# życia. Obowiązkowy dla krytycznych serwisów (tier 1-2). obs-deadman-check.sh
+# sprawdza kompletność: heartbeat_interval + alert_ref.
+# ZASADA TEMPLATE: świeży projekt ma tier:3 → deadman nieobowiązkowy.
+deadman:
+  heartbeat_interval: "60s"          # jak często serwis wysyła heartbeat
+  alert_ref: "template_deadman_missing"   # alert wyzwalany przy braku heartbeat

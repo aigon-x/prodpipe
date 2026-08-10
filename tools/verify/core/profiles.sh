@@ -74,6 +74,30 @@ VERIFY_MODULES=(
   "i18n:full:BLOCKING"
   "i18n:release:BLOCKING"
   "i18n:genesis:BLOCKING"
+  "obs-logging:full:BLOCKING"
+  "obs-logging:release:BLOCKING"
+  "obs-logging:genesis:BLOCKING"
+  "obs-metrics:full:BLOCKING"
+  "obs-metrics:release:BLOCKING"
+  "obs-metrics:genesis:BLOCKING"
+  "obs-alerts:full:BLOCKING"
+  "obs-alerts:release:BLOCKING"
+  "obs-alerts:genesis:BLOCKING"
+  "obs-slo:full:BLOCKING"
+  "obs-slo:release:BLOCKING"
+  "obs-slo:genesis:BLOCKING"
+  "obs-health:full:BLOCKING"
+  "obs-health:release:BLOCKING"
+  "obs-health:genesis:BLOCKING"
+  "obs-deadman:full:BLOCKING"
+  "obs-deadman:release:BLOCKING"
+  "obs-deadman:genesis:BLOCKING"
+  "obs-dashboards:full:BLOCKING"
+  "obs-dashboards:release:BLOCKING"
+  "obs-dashboards:genesis:BLOCKING"
+  "obs-synthetics:full:BLOCKING"
+  "obs-synthetics:release:BLOCKING"
+  "obs-synthetics:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -85,7 +109,7 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
       ;;
     security)
       echo "git security security-drills"
@@ -97,13 +121,13 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n obs-logging obs-metrics obs-alerts obs-slo obs-health obs-deadman obs-dashboards obs-synthetics"
       ;;
     *)
       echo "git security structure"
@@ -151,6 +175,14 @@ module_script() {
     security-drills)       echo "security/drills.sh" ;;
     taxonomy)              echo "architecture/taxonomy.sh" ;;
     i18n)                  echo "i18n/i18n.sh" ;;
+    obs-logging)           echo "obs-logging-check.sh" ;;
+    obs-metrics)           echo "obs-metrics-check.sh" ;;
+    obs-alerts)            echo "obs-alerts-check.sh" ;;
+    obs-slo)               echo "obs-slo-check.sh" ;;
+    obs-health)            echo "obs-health-endpoints.sh" ;;
+    obs-deadman)           echo "obs-deadman-check.sh" ;;
+    obs-dashboards)        echo "obs-dashboards-check.sh" ;;
+    obs-synthetics)        echo "obs-synthetics-check.sh" ;;
     *)              echo "" ;;
   esac
 }

@@ -1,0 +1,46 @@
+# ============================================================================
+# slo.yaml — AIGON Production Platform — OBS-BASELINE
+# ============================================================================
+# Definicje SLO (Service Level Objectives). Każde SLO MUSI mieć:
+#
+#   * service    — identyfikator serwisu (service_id z .skeleton.yaml)
+#   * sli        — nazwa wskaźnika (np. availability, latency_p99)
+#   * target     — cel (0..1, np. 0.99 = 99% dostępności)
+#   * window     — okno pomiarowe (np. 30d, 7d)
+#   * alert_ref  — referencja do alertu powiązanego z tym SLO — WYMAGANE (OBS-14)
+#
+# OBS-BASELINE: szablon rodzi obserwowalne projekty. Ten plik jest źródłem
+# prawdy dla SLO — obs-slo-check.sh weryfikuje, że:
+#   * OBS-14  każdy SLO ma alert_ref (SLO bez alertu = FAIL)
+#   * OBS-14  target jest w dozwolonym zakresie (0 < target <= 1)
+#   * OBS-14  tier z .skeleton.yaml determinuje minimalny target:
+#             tier 1 → target >= 0.99, tier 2 → >= 0.95, tier 3 → >= 0.90
+#
+# ZASADA TEMPLATE: świeży projekt (zero kodu domenowego) ma tier: 3, więc
+# minimalny target to 0.90. Placeholdery SLO NIE są realnymi zobowiązaniami.
+# Scaffold substytuuje nazwy serwisu przy tworzeniu nowego projektu.
+# ============================================================================
+
+schema_version: 1
+
+# ── Lista SLO ──────────────────────────────────────────────────────────────
+# Każde SLO MUSI mieć: service, sli, target, window, alert_ref.
+# target: 0..1 (0.99 = 99%). window: okno pomiarowe.
+slo:
+  - service: "template"
+    sli: "availability"
+    target: 0.99
+    window: "30d"
+    alert_ref: "template_slo_budget_exhausted"   # OBS-14: WYMAGANE
+
+  - service: "template"
+    sli: "latency_p99"
+    target: 0.95
+    window: "7d"
+    alert_ref: "template_latency_p99_high"
+
+  - service: "template"
+    sli: "error_rate"
+    target: 0.95
+    window: "30d"
+    alert_ref: "template_high_error_rate"

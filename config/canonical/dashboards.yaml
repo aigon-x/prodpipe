@@ -1,0 +1,22 @@
+# ============================================================================
+# dashboards.yaml — AIGON Production Platform — OBS-BASELINE
+# ============================================================================
+# Rejestr dashboardów. Każdy krytyczny serwis (tier 1-2) MUSI mieć dashboard.
+# obs-dashboards-check.sh weryfikuje, że dashboardy istnieją dla krytycznych
+# serwisów.
+#
+# OBS-BASELINE: szablon rodzi obserwowalne projekty. Ten plik jest źródłem
+# prawdy dla dashboardów.
+#
+# ZASADA TEMPLATE: świeży projekt (zero kodu domenowego) ma tier: 3, więc
+# dashboardy nie są obowiązkowe. Placeholdery NIE są realnymi dashboardami.
+# ============================================================================
+
+schema_version: 1
+
+# ── Lista dashboardów ──────────────────────────────────────────────────────
+# Każdy dashboard: service (service_id), name, path (ścieżka do pliku).
+dashboards:
+  - service: "template"
+    name: "template-overview"
+    path: "dashboards/template-overview.json"

@@ -1,0 +1,29 @@
+# ============================================================================
+# synthetics.yaml — AIGON Production Platform — OBS-BASELINE
+# ============================================================================
+# Rejestr syntetyków (synthetic monitoring). Projekt web:true MUSI mieć
+# syntetyki — sztuczne żądania, które sprawdzają, że endpointy działają
+# z zewnątrz (nie tylko wewnętrzne healthz/readyz).
+#
+# OBS-BASELINE: szablon rodzi obserwowalne projekty. Ten plik jest źródłem
+# prawdy dla syntetyków — obs-synthetics-check.sh weryfikuje, że projekt
+# web:true ma zadeklarowane syntetyki.
+#
+# ZASADA TEMPLATE: świeży projekt (zero kodu domenowego) ma web: false, więc
+# syntetyki nie są obowiązkowe. Placeholdery NIE są realnymi syntetykami.
+# ============================================================================
+
+schema_version: 1
+
+# ── Lista syntetyków ───────────────────────────────────────────────────────
+# Każdy syntetyk: name, endpoint, method, expected_status.
+synthetics:
+  - name: "template_healthz"
+    endpoint: "/healthz"
+    method: "GET"
+    expected_status: 200
+
+  - name: "template_readyz"
+    endpoint: "/readyz"
+    method: "GET"
+    expected_status: 200
