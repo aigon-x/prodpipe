@@ -254,6 +254,196 @@ GATE_REGISTRY=(
     'każdy gate ma plik evidence z exit code i timestamp' \
     'gate bez evidence' \
     '0' 'release' 'true' 'exit_code' 'artifacts/evidence/gates/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_evidence.sh' 'IMPLEMENTED' )"
+
+  # ── SELF-PROVING RUNTIME / SYSTEM TWIN (P0) ────────────────
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-021' 'SYSTEM-TWIN' 'System Twin / Canonical State Graph' \
+    'Weryfikuje że żywy wykonywalny graf stanu (system/control-plane/state/) jest spójny z rzeczywistością: każdy node w grafie ma żywy odpowiednik, każdy edge ma realną zależność. MODEL OUTPUT IS A CLAIM, NOT A FACT.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/gates/domains/system-twin.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-021.evidence' \
+    'graf stanu spójny z rzeczywistością (nodes/edges/invariants/dependencies)' \
+    'graf stanu rozjazd z rzeczywistością (node bez odpowiednika, edge bez zależności)' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_system_twin.sh' 'IMPLEMENTED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-022' 'INVARIANT-ENGINE' 'Invariant Engine' \
+    'Wykonywalny silnik 500+ invariants z 12 control planes. Stale sprawdza invariants, nie tylko przy verify. Każdy invariant ma dowód wykonania.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/gates/domains/invariant-engine.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-022.evidence' \
+    'wszystkie invariants PASS lub udokumentowane UNKNOWN' \
+    'invariant FAIL bez dowodu' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_invariant_engine.sh' 'IMPLEMENTED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-023' 'ACTION-PROOF' 'Action Proof Engine' \
+    'Każde działanie deklaruje POSTCONDITION (oczekiwany stan po akcji). Silnik weryfikuje postcondition po wykonaniu. Jeśli postcondition nie spełnione - akcja NIE UDAŁA SIĘ mimo deklaracji.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/gates/domains/action-proof.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-023.evidence' \
+    'każda akcja ma zadeklarowany postcondition i dowód jego weryfikacji' \
+    'akcja bez postcondition lub postcondition niespełniony' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_action_proof.sh' 'IMPLEMENTED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-024' 'POSTCONDITION' 'Postcondition Verification' \
+    'Weryfikuje że każda zarejestrowana akcja ma spełniony postcondition. MODEL OUTPUT IS A CLAIM, NOT A FACT - deklaracja nie jest dowodem.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/gates/domains/postcondition.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-024.evidence' \
+    'wszystkie postconditions spełnione lub udokumentowane' \
+    'postcondition niespełniony' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_postcondition.sh' 'IMPLEMENTED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-025' 'EFFECTIVE-CONFIG' 'Effective Configuration vs Declared State' \
+    'Wykrywa rozjazd między EFFECTIVE STATE (co faktycznie działa) a DECLARED STATE (co jest w configu). Drift między deklaracją a rzeczywistością.' \
+    'platform' 'critical' 'RELEASE' 'tools/verify/gates/domains/effective-config.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-025.evidence' \
+    'effective state zgodny z declared state' \
+    'drift między effective a declared state' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_effective_config.sh' 'IMPLEMENTED' )"
+
+  # ── SELF-PROVING RUNTIME / SYSTEM TWIN (P1 - PROPOSED) ─────
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-026' 'BEHAVIORAL-DRIFT' 'Behavioral Drift Engine' \
+    'Wykrywa czy system zachowuje się jak wczoraj. Baseline zachowań (metryki, timingi, wzorce) vs dzisiaj. Wymaga historycznych danych - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/behavioral-drift.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-026.evidence' \
+    'zachowanie zgodne z baseline' \
+    'behavioral drift wykryty' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_behavioral_drift.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-027' 'PREDICTIVE-RESOURCE' 'Predictive Resource Engine' \
+    'Przewidywanie zużycia zasobów na podstawie trendów. Wymaga historycznych danych - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/predictive-resource.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-027.evidence' \
+    'prognoza zasobów w granicach' \
+    'prognoza przekracza próg' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_predictive_resource.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-028' 'PREDICTIVE-COST' 'Predictive Cost Engine' \
+    'Przewidywanie kosztów na podstawie trendów. Wymaga historycznych danych - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/predictive-cost.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-028.evidence' \
+    'prognoza kosztów w granicach' \
+    'prognoza kosztów przekracza próg' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_predictive_cost.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-029' 'CONTEXT-HEALTH' 'Context Health Score' \
+    'Context Health Score - czy kontekst agenta jest zdrowy, nie przekroczony, nie zdegradowany. Wymaga danych kontekstu - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/context-health.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-029.evidence' \
+    'context health w granicach' \
+    'context health zdegradowany' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_context_health.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-030' 'MEMORY-INTEGRITY' 'Memory Integrity Engine' \
+    'Czy pamięć nie jest uszkodzona/niekompletna. Memory Decay - starzenie się pamięci. Wymaga danych pamięci - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/memory-integrity.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-030.evidence' \
+    'pamięć integralna' \
+    'pamięć uszkodzona/niekompletna' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_memory_integrity.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-031' 'DEPENDENCY-GRAPH' 'Dependency + Compatibility Graph' \
+    'Wykonywalny graf zależności z weryfikacją wersji. Rozszerzenie DEPENDENCY control plane - PROPOSED.' \
+    'platform' 'high' 'RELEASE' 'tools/verify/gates/domains/dependency-graph.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-031.evidence' \
+    'graf zależności spójny, wersje kompatybilne' \
+    'konflikt wersji w grafie zależności' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_dependency_graph.sh' 'PROPOSED' )"
+
+  # ── SELF-PROVING RUNTIME / SYSTEM TWIN (P2 - PROPOSED) ─────
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-032' 'PRE-MORTEM' 'Pre-Mortem Engine' \
+    'Przed każdą istotną zmianą: jak ta zmiana może zabić system? Generuje scenariusze awarii i sprawdza czy istnieją gatey je łapiące - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/pre-mortem.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-032.evidence' \
+    'scenariusze awarii pokryte gateami' \
+    'scenariusz awarii bez pokrycia' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_pre_mortem.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-033' 'COUNTERFACTUAL' 'Counterfactual Engine' \
+    'Co by było gdybyśmy nie zrobili X? Symulacja alternatywnej historii - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/counterfactual.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-033.evidence' \
+    'counterfactual analiza wykonana' \
+    'counterfactual analiza niekompletna' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_counterfactual.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-034' 'CHANGE-RISK' 'Change Risk Score' \
+    'Każda zmiana dostaje ryzyko (0-100) na podstawie dotkniętych komponentów, zależności, historii - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/change-risk.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-034.evidence' \
+    'change risk w granicach' \
+    'change risk przekracza próg' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_change_risk.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-035' 'COMPLEXITY-GOVERNOR' 'Complexity Governor' \
+    'Mierzy złożoność (cyklomatyczną, zależnościową, kontekstową) i BLOKUJE zmiany przekraczające próg - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/complexity-governor.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-035.evidence' \
+    'złożoność w granicach' \
+    'złożoność przekracza próg' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_complexity_governor.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-036' 'AGENT-TRUST' 'Agent Trust Score' \
+    'Trust Score per agent (0-100) na podstawie historii (ile razy postcondition się spełniło) - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/agent-trust.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-036.evidence' \
+    'trust score w granicach' \
+    'trust score poniżej progu' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_agent_trust.sh' 'PROPOSED' )"
+
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-037' 'AUTONOMY-LEVEL' 'Adaptive Autonomy Level' \
+    'Adaptive Autonomy LEVEL 0-5: im wyższy trust, tym więcej autonomii. Zależny od AGENT-TRUST - PROPOSED.' \
+    'platform' 'medium' 'RELEASE' 'tools/verify/gates/domains/autonomy-level.sh' \
+    'system/control-plane/state/' \
+    'artifacts/evidence/gates/GATE-037.evidence' \
+    'autonomy level zgodny z trust score' \
+    'autonomy level niezgodny z trust score' \
+    '0' 'release' 'true' 'state' 'system/control-plane/state/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_autonomy_level.sh' 'PROPOSED' )"
+
+  # ── G-INTEG (WIRING GATE) — pierwszy blokujący gate w pipeline ──
+  # Weryfikuje sam szkielet: dwukierunkową macierz połączeń między warstwami.
+  # Zasada nadrzędna: każdy check musi być DWUKIERUNKOWY.
+  #   declared→exists (FALSE GATE)  ORAZ  exists→declared (ORPHAN)
+  #   defined→consumed (martwa)     ORAZ  consumed→defined (dangling)
+  # Uruchamiany w LOCAL_FAST (najwcześniejszy profil) — weryfikuje szkielet
+  # zanim cokolwiek innego. blocking=true — jakikolwiek rozjazd = FAIL.
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-038' 'WIRING' 'G-INTEG — dwukierunkowa macierz połączeń' \
+    'Wiring gate: weryfikuje integralność połączeń między warstwami (profiles/scripts/evidence/schema/env/docs/CI/tests/registry/migrations/entry-points). Kazdy check jest DWUKIERUNKOWY: declared->exists ORAZ exists->declared, defined->consumed ORAZ consumed->defined. Wykrywa FALSE GATE, ORPHAN, martwe zmienne, dangling references, unconnected checks. Pierwszy blokujacy gate w pipeline.' \
+    'platform' 'critical' 'LOCAL_FAST' 'tools/verify/gates/domains/wiring.sh' \
+    'tools/verify/, system/control-plane/state/, config/, .github/workflows/, .git-hooks/, docs/' \
+    'artifacts/evidence/gates/GATE-038.evidence' \
+    'wszystkie INTEG-001..012 dwukierunkowe checki PASS (brak false gate, orphan, martwa zmienna, dangling ref)' \
+    'jakikolwiek rozjazd w macierzy polaczen (false gate, orphan, martwa zmienna, dangling ref, unconnected check)' \
+    '0' 'pre-commit' 'true' 'exit_code' 'tools/verify/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_wiring.sh' 'IMPLEMENTED' )"
 )
 
 # ── Funkcje zapytań registry ─────────────────────────────────

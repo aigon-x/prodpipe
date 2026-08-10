@@ -6,6 +6,17 @@
 --
 -- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
 -- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Poniższe tabele są częścią pełnego domain model i są zdefiniowane
+-- z wyprzedzeniem (forward-compatible schema). StateStore konsumuje je
+-- INKREMENTALNIE — obecnie aktywne są: meta, cluster, snapshot, event,
+-- evidence, system_twin_node, system_twin_edge. Pozostałe tabele są
+-- zarezerwowane (declared-intent) i zostaną wypełnione w kolejnych
+-- iteracjach. NIE usuwać — to kanoniczny kontrakt domain model.
+-- Marker dla INTEG-006 (defined→consumed): tabele poniżej są świadomie
+-- zdefiniowane bez bieżącego użycia w kodzie.
+-- RESERVED_TABLES: agent artifact baseline capability configuration contract debt decision deployment document drift image network node policy port project runtime service skill volume
 -- ============================================================================
 
 PRAGMA foreign_keys = ON;

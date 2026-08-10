@@ -4,6 +4,6 @@ name=Architektura zgodna z deklaracją
 command=tools/verify/gates/domains/architecture.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T01:39:39Z
-head=338ac56
+timestamp=2026-08-10T02:24:35Z
+head=552fed2
 output==== GATE-007 ARCHITECTURE === [PASS] ARCHITECTURE-001 deklaracja architektury        Plik ARCHITECTURE.md obecny. [WARN] ARCHITECTURE-002 brak orphaned modułów        3 orphaned modułów: credentials.sh branches.sh tags.sh [WARN] ARCHITECTURE-003 brak shadow system        Znaleziono shadow system (.git-hooks/validate-sot).  === RESULT === Checks: 3  PASS: 1  FAIL: 0  WARN: 2  INFO: 0 CERTIFICATION: PASS

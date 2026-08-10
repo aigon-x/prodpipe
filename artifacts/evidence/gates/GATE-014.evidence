@@ -2,8 +2,8 @@ gate_id=GATE-014
 domain=TESTING
 name=Testy istnieją, nie są puste, nie są false green
 command=tools/verify/gates/domains/testing.sh
-exit_code=0
-status=PASS
-timestamp=2026-08-10T01:39:39Z
-head=338ac56
-output==== GATE-014 TESTING === [PASS] TESTING-001 testy istnieją        1 plików testowych. [PASS] TESTING-002 testy niepuste        Brak pustych testów. [PASS] TESTING-003 brak false green        Brak wzorców false green w testach. [PASS] TESTING-004 testy mają set -u        Wszystkie testy mają set -u.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS
+exit_code=1
+status=FAIL
+timestamp=2026-08-10T02:24:35Z
+head=552fed2
+output==== GATE-014 TESTING === [PASS] TESTING-001 testy istnieją        11 plików testowych. [PASS] TESTING-002 testy niepuste        Brak pustych testów. [FAIL] TESTING-003 brak false green        5 testów z false green: ./tools/verify/gates/tests/test_invariant_engine.sh ./tools/verify/gates/tests/test_gate_integrity.sh ./tools/verify/gates/tests/test_postcondition.sh ./tools/verify/gates/tests/test_action_proof.sh ./tools/verify/gates/tests/test_effective_config.sh [PASS] TESTING-004 testy maj�

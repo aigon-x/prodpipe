@@ -4,6 +4,6 @@ name=Progi wydajności
 command=tools/verify/gates/domains/performance.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T01:39:39Z
-head=338ac56
+timestamp=2026-08-10T02:24:35Z
+head=552fed2
 output==== GATE-015 PERFORMANCE === [PASS] PERFORMANCE-001 brak dużych plików        Brak plików > 10MB. [PASS] PERFORMANCE-002 brak ogromnych plików tekstowych        Brak plików tekstowych > 5MB.  === RESULT === Checks: 2  PASS: 2  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

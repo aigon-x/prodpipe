@@ -4,6 +4,6 @@ name=Każdy element ma źródło konfiguracji
 command=tools/verify/gates/domains/configuration.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T01:39:39Z
-head=338ac56
+timestamp=2026-08-10T02:24:35Z
+head=552fed2
 output==== GATE-004 CONFIGURATION === [PASS] CONFIGURATION-001 config istnieje        Katalog config obecny. [PASS] CONFIGURATION-002 brak hardcoded        Brak hardcoded adresów/portów w kodzie. [PASS] CONFIGURATION-003 config niepusty        16 plików w config.  === RESULT === Checks: 3  PASS: 3  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

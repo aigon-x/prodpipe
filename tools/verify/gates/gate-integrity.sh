@@ -30,12 +30,18 @@ fi
 
 # ── GATE-INTEGRITY-002: registry == implemented ─────────────
 # Każdy gate w registry ma odpowiadający skrypt implementacji.
+# PROPOSED gate'y są świadomie nie zaimplementowane (lifecycle:
+# PROPOSED → IMPLEMENTED) — nie są liczone jako brak implementacji.
 if [ -f "$REGISTRY" ]; then
   # shellcheck source=registry.sh
   . "$REGISTRY"
   NOT_IMPLEMENTED=0
   NOT_IMPLEMENTED_DETAIL=""
   for gate_id in $(registry_gate_ids); do
+    status="$(registry_field "$gate_id" 22)"
+    if [ "$status" = "PROPOSED" ]; then
+      continue
+    fi
     cmd="$(registry_field "$gate_id" 8)"
     if [ -z "$cmd" ] || [ ! -f "$cmd" ]; then
       NOT_IMPLEMENTED=$((NOT_IMPLEMENTED+1))
@@ -111,6 +117,12 @@ if [ -f "$REGISTRY" ] && [ -d "$EVIDENCE_DIR" ]; then
   for gate_id in $(registry_gate_ids); do
     # Pomijamy sam siebie (GATE-001) — evidence generowane po uruchomieniu.
     if [ "$gate_id" = "GATE-001" ]; then
+      continue
+    fi
+    # PROPOSED gate'y nie mają implementacji, więc nie mają evidence —
+    # to nie jest missing evidence (lifecycle: PROPOSED z definicji nie jest wykonany).
+    status="$(registry_field "$gate_id" 22)"
+    if [ "$status" = "PROPOSED" ]; then
       continue
     fi
     if [ ! -f "$EVIDENCE_DIR/$gate_id.evidence" ]; then

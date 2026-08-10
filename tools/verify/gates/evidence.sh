@@ -60,6 +60,15 @@ for gate_id in $(registry_gate_ids | grep -v '^GATE-001$'); do
   cmd="$(registry_field "$gate_id" 8)"
   domain="$(registry_field "$gate_id" 2)"
   name="$(registry_field "$gate_id" 3)"
+  status="$(registry_field "$gate_id" 22)"
+
+  # PROPOSED gate'y są zarejestrowane ale nie zaimplementowane —
+  # nie generujemy dla nich evidence (nie mają implementacji do uruchomienia).
+  # To NIE jest shadow gate: są widoczne w registry i raportach jako PROPOSED.
+  if [ "$status" = "PROPOSED" ]; then
+    info "evidence $gate_id" "PROPOSED — pominięty (brak implementacji)."
+    continue
+  fi
 
   if [ -z "$cmd" ] || [ ! -f "$cmd" ]; then
     # Brak implementacji — evidence ERROR (exit 2).
@@ -129,10 +138,13 @@ say ""
 say "Wygenerowano $GENERATED evidence, $FAILED z niezerowym exit code."
 
 # ── Podsumowanie ────────────────────────────────────────────
-if [ "$GENERATED" -eq "$(registry_count)" ]; then
-  pass "EVIDENCE-STORE wszystkie gate'y mają evidence" BLOCKING "$GENERATED/$GENERATED evidence wygenerowane."
+# Liczymy tylko IMPLEMENTED gate'y (PROPOSED nie mają implementacji,
+# więc nie mogą mieć evidence — to nie jest missing evidence).
+IMPLEMENTED_COUNT="$(registry_implemented_gates | wc -l)"
+if [ "$GENERATED" -eq "$IMPLEMENTED_COUNT" ]; then
+  pass "EVIDENCE-STORE wszystkie gate'y mają evidence" BLOCKING "$GENERATED/$IMPLEMENTED_COUNT evidence wygenerowane."
 else
-  fail "EVIDENCE-STORE wszystkie gate'y mają evidence" BLOCKING "Wygenerowano $GENERATED z $(registry_count)."
+  fail "EVIDENCE-STORE wszystkie gate'y mają evidence" BLOCKING "Wygenerowano $GENERATED z $IMPLEMENTED_COUNT."
 fi
 
 verify_module_exit

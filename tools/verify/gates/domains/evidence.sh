@@ -37,6 +37,12 @@ if [ -f "./tools/verify/gates/registry.sh" ]; then
     if [ "$gate_id" = "GATE-020" ] || [ "$gate_id" = "GATE-001" ]; then
       continue
     fi
+    # PROPOSED gate'y nie mają implementacji, więc nie mają evidence —
+    # to nie jest missing evidence (lifecycle: PROPOSED z definicji nie jest wykonany).
+    status="$(registry_field "$gate_id" 22)"
+    if [ "$status" = "PROPOSED" ]; then
+      continue
+    fi
     if [ ! -f "$EVIDENCE_DIR/$gate_id.evidence" ]; then
       MISSING_EVIDENCE=$((MISSING_EVIDENCE+1))
       MISSING_DETAIL="$MISSING_DETAIL $gate_id"

@@ -47,6 +47,18 @@ say "Egzekwowanie $(printf '%s' "$GATES" | wc -w) gate'ów dla profilu $PROFILE.
 GATE_FAIL=0
 for gate_id in $GATES; do
   cmd="$(registry_field "$gate_id" 8)"
+  status="$(registry_field "$gate_id" 22)"
+  # PROPOSED gate'y są zarejestrowane ale nie zaimplementowane —
+  # pomijamy je w egzekwowaniu (nie są jeszcze gotowe do egzekucji).
+  # To NIE jest shadow gate: są widoczne w registry i raportach jako PROPOSED.
+  if [ "$status" = "PROPOSED" ]; then
+    say ""
+    say "────────────────────────────────────────────────────────────"
+    say "GATE: $gate_id ($cmd) — PROPOSED (pominięty, nie zaimplementowany)"
+    say "────────────────────────────────────────────────────────────"
+    info "enforce $gate_id" "PROPOSED — pominięty w egzekwowaniu."
+    continue
+  fi
   if [ -z "$cmd" ] || [ ! -f "$cmd" ]; then
     fail "enforce $gate_id" BLOCKING "Brak implementacji: ${cmd:-NONE}"
     GATE_FAIL=$((GATE_FAIL+1))

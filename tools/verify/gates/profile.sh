@@ -41,7 +41,7 @@ case "$ACTION" in
     say "=== PIPELINE PROFILES ==="
     for profile in LOCAL_FAST PRE_PUSH CI RELEASE; do
       gates="$(registry_gates_for_profile "$profile")"
-      count="$(printf '%s' "$gates" | grep -c . || true)"
+      count="$(printf '%s' "$gates" | wc -l)"
       say ""
       say "── $profile ($count gate'ów) ──"
       for g in $gates; do
@@ -53,7 +53,7 @@ case "$ACTION" in
     say "=== LICZBA GATE'ÓW PER PROFIL ==="
     for profile in LOCAL_FAST PRE_PUSH CI RELEASE; do
       gates="$(registry_gates_for_profile "$profile")"
-      count="$(printf '%s' "$gates" | grep -c . || true)"
+      count="$(printf '%s' "$gates" | wc -l)"
       say "  $profile: $count"
     done
     ;;
