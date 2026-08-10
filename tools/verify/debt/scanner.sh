@@ -139,10 +139,13 @@ LEGACY_DOCS=(
 )
 
 # ── Legacy API / SoT ────────────────────────────────────────
+# UWAGA: SOURCE-OF-TRUTH.md, OWNERSHIP.md, VERSION to KANONICZNE pliki
+# platformy (źródła prawdy), NIE legacy. Nie mogą być flagowane jako dług.
+# DEBT-012 szuka więc tylko legacy API (stare ścieżki API), nie kanonicznych SoT.
 LEGACY_SOT=(
-  "SOURCE-OF-TRUTH"
-  "OWNERSHIP"
-  "VERSION"
+  "legacy-api"
+  "legacy-endpoint"
+  "old-api"
 )
 
 # ── Pomocnicza: czy ścieżka jest w dozwolonym katalogu ──────

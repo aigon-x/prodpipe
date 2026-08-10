@@ -36,10 +36,12 @@ cd "$ROOT"
 say "=== GIT INTEGRITY ==="
 
 # GIT-001 Git initialized
-if [ -d ".git" ]; then
+# Uwaga: w git worktree `.git` jest plikiem (gitdir: ...), nie katalogiem.
+# Używamy `git rev-parse --git-dir`, które działa w obu przypadkach.
+if git rev-parse --git-dir >/dev/null 2>&1; then
   pass "GIT-001 Git initialized"
 else
-  fail "GIT-001 Git initialized" BLOCKING "Brak katalogu .git — repo nie jest zainicjalizowane."
+  fail "GIT-001 Git initialized" BLOCKING "Brak repozytorium git — repo nie jest zainicjalizowane."
 fi
 
 # GIT-002 main branch exists

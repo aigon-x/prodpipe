@@ -1,0 +1,28 @@
+{
+  "type": "test-graph",
+  "description": "Struktura testów",
+  "nodes": [
+    {"id":"tests","type":"dir","path":"tests/"},
+    {"id":"tests-chaos","type":"dir","path":"tests/chaos/"},
+    {"id":"tests-contract","type":"dir","path":"tests/contract/"},
+    {"id":"tests-e2e","type":"dir","path":"tests/e2e/"},
+    {"id":"tests-fixtures","type":"dir","path":"tests/fixtures/"},
+    {"id":"tests-integration","type":"dir","path":"tests/integration/"},
+    {"id":"tests-performance","type":"dir","path":"tests/performance/"},
+    {"id":"tests-regression","type":"dir","path":"tests/regression/"},
+    {"id":"tests-security","type":"dir","path":"tests/security/"},
+    {"id":"tests-unit","type":"dir","path":"tests/unit/"},
+    {"id":"test-state","type":"test","path":"system/control-plane/state/tests/test_state.sh"}
+  ],
+  "edges": [
+    {"from":"tests","to":"tests-chaos","relation":"contains"},
+    {"from":"tests","to":"tests-contract","relation":"contains"},
+    {"from":"tests","to":"tests-e2e","relation":"contains"},
+    {"from":"tests","to":"tests-fixtures","relation":"contains"},
+    {"from":"tests","to":"tests-integration","relation":"contains"},
+    {"from":"tests","to":"tests-performance","relation":"contains"},
+    {"from":"tests","to":"tests-regression","relation":"contains"},
+    {"from":"tests","to":"tests-security","relation":"contains"},
+    {"from":"tests","to":"tests-unit","relation":"contains"}
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "type": "documentation-graph",
+  "description": "Struktura dokumentacji",
+  "nodes": [
+    {"id":"docs","type":"dir","path":"docs/"},
+    {"id":"docs-foundation","type":"dir","path":"docs/00-foundation/"},
+    {"id":"docs-arch","type":"dir","path":"docs/architecture/"},
+    {"id":"docs-decisions","type":"dir","path":"docs/decisions/"},
+    {"id":"docs-dev","type":"dir","path":"docs/development/"},
+    {"id":"docs-git","type":"dir","path":"docs/git/"},
+    {"id":"docs-ops","type":"dir","path":"docs/operations/"},
+    {"id":"docs-ref","type":"dir","path":"docs/reference/"},
+    {"id":"docs-sec","type":"dir","path":"docs/security/"},
+    {"id":"docs-user","type":"dir","path":"docs/user/"},
+    {"id":"docs-generated","type":"dir","path":"docs/generated/reconciliation/"},
+    {"id":"README","type":"file","path":"README.md"},
+    {"id":"ARCHITECTURE","type":"file","path":"ARCHITECTURE.md"},
+    {"id":"SOURCE-OF-TRUTH","type":"file","path":"SOURCE-OF-TRUTH.md"},
+    {"id":"OWNERSHIP","type":"file","path":"OWNERSHIP.md"}
+  ],
+  "edges": [
+    {"from":"docs","to":"docs-foundation","relation":"contains"},
+    {"from":"docs","to":"docs-arch","relation":"contains"},
+    {"from":"docs","to":"docs-decisions","relation":"contains"},
+    {"from":"docs","to":"docs-dev","relation":"contains"},
+    {"from":"docs","to":"docs-git","relation":"contains"},
+    {"from":"docs","to":"docs-ops","relation":"contains"},
+    {"from":"docs","to":"docs-ref","relation":"contains"},
+    {"from":"docs","to":"docs-sec","relation":"contains"},
+    {"from":"docs","to":"docs-user","relation":"contains"},
+    {"from":"docs","to":"docs-generated","relation":"contains"}
+  ]
+}

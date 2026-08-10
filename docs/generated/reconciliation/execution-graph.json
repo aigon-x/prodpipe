@@ -1,0 +1,24 @@
+{
+  "type": "execution-graph",
+  "description": "Kolejność wykonywania modułów w verify.sh reconcile",
+  "entrypoint": "tools/verify/verify.sh",
+  "subcommand": "reconcile",
+  "sequence": [
+    {"order":1,"module":"reconcile/baseline.sh","layer":"CANON"},
+    {"order":2,"module":"reconcile/reconcile.sh","layer":"CANON"},
+    {"order":3,"module":"drift/drift.sh","layer":"DRIFT"},
+    {"order":4,"module":"history/history.sh","layer":"HISTORY"},
+    {"order":5,"module":"debt/scanner.sh","layer":"DEBT"},
+    {"order":6,"module":"debt/debt.sh","layer":"DEBT"}
+  ],
+  "orphaned_modules_not_executed": [
+    "tools/verify/git/integrity.sh",
+    "tools/verify/git/branches.sh",
+    "tools/verify/git/history.sh",
+    "tools/verify/git/tags.sh",
+    "tools/verify/security/secrets.sh",
+    "tools/verify/security/credentials.sh",
+    "tools/verify/security/history.sh",
+    "tools/verify/structure/readme.sh"
+  ]
+}

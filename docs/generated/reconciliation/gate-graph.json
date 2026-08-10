@@ -1,0 +1,19 @@
+{
+  "type": "gate-graph",
+  "description": "Bramy jakości (gates) i ich stan",
+  "gates": [
+    {"id":"GIT-001..019","module":"git/integrity.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"GIT-201..203","module":"git/branches.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"GIT-101..108","module":"git/history.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"GIT-301..303","module":"git/tags.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"SEC-001..004","module":"security/secrets.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"SEC-201..208","module":"security/credentials.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"SEC-101..102","module":"security/history.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"STR-001..003","module":"structure/readme.sh","status":"ORPHANED","gate":"FALSE GATE (say \"\")"},
+    {"id":"BASE-001..006","module":"reconcile/baseline.sh","status":"CONNECTED","gate":"verify_module_exit"},
+    {"id":"DRIFT-001..009","module":"drift/drift.sh","status":"CONNECTED","gate":"verify_module_exit"},
+    {"id":"HIST-001..007","module":"history/history.sh","status":"CONNECTED","gate":"verify_module_exit"},
+    {"id":"DEBT-001..014","module":"debt/scanner.sh","status":"CONNECTED","gate":"verify_module_exit"},
+    {"id":"DEBT-101..106","module":"debt/debt.sh","status":"CONNECTED","gate":"verify_module_exit"}
+  ]
+}

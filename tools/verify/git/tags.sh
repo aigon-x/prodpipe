@@ -21,7 +21,9 @@ say "=== GIT TAG POLICY ==="
 
 # GIT-301 Tag naming policy
 # Dozwolone: baseline-*, v*, milestone-*, release-*, recovery-*
-BAD_TAGS=$(git tag -l 2>/dev/null | grep -vE '^(baseline-|v[0-9]|milestone-|release-|recovery-)' | head -5)
+# (case-insensitive prefix — kanoniczny tag BASELINE-0.1.0 jest uppercase,
+#  zgodnie z docs/git/TAGGING-POLICY.md)
+BAD_TAGS=$(git tag -l 2>/dev/null | grep -viE '^(baseline-|v[0-9]|milestone-|release-|recovery-)' | head -5)
 if [ -n "$BAD_TAGS" ]; then
   fail "GIT-301 Tag naming policy" BLOCKING "Tagi niezgodne z polityką: $BAD_TAGS"
 else

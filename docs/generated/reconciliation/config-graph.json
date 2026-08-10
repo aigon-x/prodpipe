@@ -1,0 +1,30 @@
+{
+  "type": "config-graph",
+  "description": "Konfiguracja i pliki stanu",
+  "nodes": [
+    {"id":"config","type":"dir","path":"config/"},
+    {"id":"config-canonical","type":"dir","path":"config/canonical/"},
+    {"id":"config-generated","type":"dir","path":"config/generated/"},
+    {"id":"config-local","type":"dir","path":"config/local/"},
+    {"id":"config-schemas","type":"dir","path":"config/schemas/"},
+    {"id":"config-templates","type":"dir","path":"config/templates/"},
+    {"id":"state","type":"state","path":"system/control-plane/state/"},
+    {"id":"state-db","type":"state","path":"system/control-plane/state/data/"},
+    {"id":"state-migrations","type":"state","path":"system/control-plane/state/migrations/"},
+    {"id":"state-schema","type":"state","path":"system/control-plane/state/schema.sql"},
+    {"id":"git-hooks","type":"config","path":".git-hooks/"},
+    {"id":"gitattributes","type":"config","path":".gitattributes"},
+    {"id":"gitignore","type":"config","path":".gitignore"},
+    {"id":"gitmessage","type":"config","path":".gitmessage"}
+  ],
+  "edges": [
+    {"from":"config","to":"config-canonical","relation":"contains"},
+    {"from":"config","to":"config-generated","relation":"contains"},
+    {"from":"config","to":"config-local","relation":"contains"},
+    {"from":"config","to":"config-schemas","relation":"contains"},
+    {"from":"config","to":"config-templates","relation":"contains"},
+    {"from":"state","to":"state-db","relation":"contains"},
+    {"from":"state","to":"state-migrations","relation":"contains"},
+    {"from":"state","to":"state-schema","relation":"contains"}
+  ]
+}
