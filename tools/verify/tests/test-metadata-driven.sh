@@ -50,7 +50,7 @@ echo ""
 echo "--- T2: verify_profile_modules full ---"
 # shellcheck source=core/profiles.sh
 . "$PROFILES_SH"
-EXPECTED_FULL="git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+EXPECTED_FULL="git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency"
 GOT_FULL="$(verify_profile_modules full)"
 if [ "$GOT_FULL" = "$EXPECTED_FULL" ]; then
     t_pass "verify_profile_modules full = $GOT_FULL"

@@ -10,6 +10,13 @@
 #   T4: fail-closed — brak glossary.yaml → SEM-001 FAIL
 #   T5: fail-closed — termin krytyczny z epistemic_status=UNKNOWN → SEM-005 FAIL
 #       (UNKNOWN_SEMANTICS dla terminu krytycznego)
+#   T6: fail-closed — termin UNKNOWN używany w kontekście WYKONAWCZYM
+#       (executable security/policy/control) → SEM-008 FAIL (BLOCKING)
+#   T7: termin UNKNOWN używany tylko w DOKUMENTACJI → SEM-008 WARN (nie FAIL)
+#   T8: termin UNKNOWN używany w ARTEFAKCIE HISTORYCZNYM → SEM-008 INFO
+#   T9: fail-closed — termin krytyczny UNKNOWN używany przez IMPLEMENTACJĘ
+#       → SEM-011 FAIL (BLOCKING)
+#   T10: dryf semantyczny (last_changed != introduced_at) → SEM-010 INFO
 #
 # Testy są IZOLOWANE: tworzą własne tymczasowe repo git (bo moduł używa
 # repo_files = git ls-files i verify_root = git rev-parse), więc nie dotykają
@@ -52,7 +59,7 @@ echo "--- T1: glossary z wszystkimi terminami FACT → SEM-001..005 PASS (rc=0) 
 # Prawdziwy glossary ma trust-domain: UNKNOWN → SEM-005 FAIL. Dlatego T1
 # buduje KOPIĘ z wszystkimi epistemic_status=FACT, żeby testować ścieżkę PASS.
 T1_DIR="$(mktemp -d)"
-trap 'rm -rf "$T1_DIR" "$T2_DIR" "$T3_DIR" "$T4_DIR" "$T5_DIR"' EXIT
+trap 'rm -rf "$T1_DIR" "$T2_DIR" "$T3_DIR" "$T4_DIR" "$T5_DIR" "$T6_DIR" "$T7_DIR" "$T8_DIR" "$T9_DIR" "$T10_DIR"' EXIT
 # Zbuduj glossary z wszystkimi terminami FACT (sed zamienia każdy epistemic_status na FACT).
 T1_GLOSSARY="$T1_DIR/glossary-fact.yaml"
 mkdir -p "$T1_DIR"
@@ -164,6 +171,159 @@ if [ "$T5_RC" -ne 0 ] && printf '%s' "$T5_OUT" | grep -q "SEM-005 Każdy termin 
 else
   t_fail "termin krytyczny z UNKNOWN NIE dał SEM-005 FAIL (rc=$T5_RC)"
   printf '%s\n' "$T5_OUT" | tail -25
+fi
+
+# ── T6: fail-closed — termin UNKNOWN w kontekście WYKONAWCZYM → SEM-008 FAIL ──
+echo ""
+echo "--- T6: termin UNKNOWN używany w kontekście WYKONAWCZYM → SEM-008 FAIL ---"
+# Budujemy glossary z trust-domain: UNKNOWN + plik wykonywalny (policy.sh),
+# który używa terminu trust-domain w kontekście security/policy/control.
+T6_DIR="$(mktemp -d)"
+mkdir -p "$T6_DIR/repo/config/canonical" "$T6_DIR/repo/tools/verify/security"
+( cd "$T6_DIR/repo" && git init -q )
+( cd "$T6_DIR/repo" && git config user.email "test@aigon.local" )
+( cd "$T6_DIR/repo" && git config user.name "SEM Test" )
+cp "$GLOSSARY_SRC" "$T6_DIR/repo/config/canonical/glossary.yaml"
+# Plik wykonywalny używający trust-domain w kontekście security/policy.
+cat > "$T6_DIR/repo/tools/verify/security/policy.sh" <<'EOF'
+#!/usr/bin/env bash
+# policy — kontrola dostępu oparta o trust-domain
+set -euo pipefail
+# trust-domain: granica zaufania dla autoryzacji
+check_trust_domain() {
+  local domain="$1"
+  echo "checking trust-domain: $domain"
+}
+EOF
+echo "# test" > "$T6_DIR/repo/README.md"
+( cd "$T6_DIR/repo" && git add -A )
+( cd "$T6_DIR/repo" && git commit -qm "add glossary + policy.sh" )
+
+T6_OUT="$(cd "$T6_DIR/repo" && VERIFY_STATE_DB="$T6_DIR/nonexistent.db" bash "$SEMANTICS_SH" 2>&1)"
+T6_RC=$?
+if [ "$T6_RC" -ne 0 ] && printf '%s' "$T6_OUT" | grep -q "SEM-008 UNKNOWN w kontekście wykonawczym" \
+   && printf '%s' "$T6_OUT" | grep -q "\[FAIL\]"; then
+  t_pass "termin UNKNOWN w kontekście wykonawczym → SEM-008 FAIL (rc=$T6_RC)"
+else
+  t_fail "termin UNKNOWN w kontekście wykonawczym NIE dał SEM-008 FAIL (rc=$T6_RC)"
+  printf '%s\n' "$T6_OUT" | tail -25
+fi
+
+# ── T7: termin UNKNOWN tylko w DOKUMENTACJI → SEM-008 WARN (nie FAIL) ──────
+echo ""
+echo "--- T7: termin UNKNOWN tylko w dokumentacji → SEM-008 WARN (nie FAIL) ---"
+T7_DIR="$(mktemp -d)"
+mkdir -p "$T7_DIR/repo/config/canonical" "$T7_DIR/repo/docs"
+( cd "$T7_DIR/repo" && git init -q )
+( cd "$T7_DIR/repo" && git config user.email "test@aigon.local" )
+( cd "$T7_DIR/repo" && git config user.name "SEM Test" )
+cp "$GLOSSARY_SRC" "$T7_DIR/repo/config/canonical/glossary.yaml"
+# Dokumentacja używająca trust-domain (docs/).
+cat > "$T7_DIR/repo/docs/architecture.md" <<'EOF'
+# Architektura
+trust-domain definiuje granicę zaufania w systemie.
+EOF
+echo "# test" > "$T7_DIR/repo/README.md"
+( cd "$T7_DIR/repo" && git add -A )
+( cd "$T7_DIR/repo" && git commit -qm "add glossary + docs" )
+
+T7_OUT="$(cd "$T7_DIR/repo" && VERIFY_STATE_DB="$T7_DIR/nonexistent.db" bash "$SEMANTICS_SH" 2>&1)"
+T7_RC=$?
+if printf '%s' "$T7_OUT" | grep -q "SEM-008 UNKNOWN w dokumentacji" \
+   && printf '%s' "$T7_OUT" | grep -q "\[WARN\]"; then
+  t_pass "termin UNKNOWN w dokumentacji → SEM-008 WARN (rc=$T7_RC)"
+else
+  t_fail "termin UNKNOWN w dokumentacji NIE dał SEM-008 WARN (rc=$T7_RC)"
+  printf '%s\n' "$T7_OUT" | tail -25
+fi
+
+# ── T8: termin UNKNOWN w ARTEFAKCIE HISTORYCZNYM → SEM-008 INFO ────────────
+echo ""
+echo "--- T8: termin UNKNOWN w artefakcie historycznym → SEM-008 INFO ---"
+T8_DIR="$(mktemp -d)"
+mkdir -p "$T8_DIR/repo/config/canonical" "$T8_DIR/repo/docs/decisions"
+( cd "$T8_DIR/repo" && git init -q )
+( cd "$T8_DIR/repo" && git config user.email "test@aigon.local" )
+( cd "$T8_DIR/repo" && git config user.name "SEM Test" )
+cp "$GLOSSARY_SRC" "$T8_DIR/repo/config/canonical/glossary.yaml"
+# Artefakt historyczny (docs/decisions/) używający trust-domain.
+cat > "$T8_DIR/repo/docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md" <<'EOF'
+# Decyzja architektoniczna
+trust-domain był rozważany jako granica zaufania (historyczny zapis).
+EOF
+echo "# test" > "$T8_DIR/repo/README.md"
+( cd "$T8_DIR/repo" && git add -A )
+( cd "$T8_DIR/repo" && git commit -qm "add glossary + decision" )
+
+T8_OUT="$(cd "$T8_DIR/repo" && VERIFY_STATE_DB="$T8_DIR/nonexistent.db" bash "$SEMANTICS_SH" 2>&1)"
+T8_RC=$?
+if printf '%s' "$T8_OUT" | grep -q "SEM-008 UNKNOWN w artefaktach historycznych" \
+   && printf '%s' "$T8_OUT" | grep -q "\[INFO\]"; then
+  t_pass "termin UNKNOWN w artefakcie historycznym → SEM-008 INFO (rc=$T8_RC)"
+else
+  t_fail "termin UNKNOWN w artefakcie historycznym NIE dał SEM-008 INFO (rc=$T8_RC)"
+  printf '%s\n' "$T8_OUT" | tail -25
+fi
+
+# ── T9: fail-closed — termin krytyczny UNKNOWN używany przez IMPLEMENTACJĘ → SEM-011 FAIL ──
+echo ""
+echo "--- T9: termin krytyczny UNKNOWN używany przez implementację → SEM-011 FAIL ---"
+T9_DIR="$(mktemp -d)"
+mkdir -p "$T9_DIR/repo/config/canonical" "$T9_DIR/repo/tools/verify/security"
+( cd "$T9_DIR/repo" && git init -q )
+( cd "$T9_DIR/repo" && git config user.email "test@aigon.local" )
+( cd "$T9_DIR/repo" && git config user.name "SEM Test" )
+cp "$GLOSSARY_SRC" "$T9_DIR/repo/config/canonical/glossary.yaml"
+# Implementacja (executable) używająca trust-domain w kontroli dostępu.
+cat > "$T9_DIR/repo/tools/verify/security/access.sh" <<'EOF'
+#!/usr/bin/env bash
+# access — kontrola dostępu oparta o trust-domain
+set -euo pipefail
+# trust-domain: granica zaufania dla autoryzacji (P0)
+authorize() {
+  local domain="$1"
+  echo "authorizing in trust-domain: $domain"
+}
+EOF
+echo "# test" > "$T9_DIR/repo/README.md"
+( cd "$T9_DIR/repo" && git add -A )
+( cd "$T9_DIR/repo" && git commit -qm "add glossary + access.sh" )
+
+T9_OUT="$(cd "$T9_DIR/repo" && VERIFY_STATE_DB="$T9_DIR/nonexistent.db" bash "$SEMANTICS_SH" 2>&1)"
+T9_RC=$?
+if [ "$T9_RC" -ne 0 ] && printf '%s' "$T9_OUT" | grep -q "SEM-011 CRITICAL UNKNOWN USED BY IMPLEMENTATION" \
+   && printf '%s' "$T9_OUT" | grep -q "\[FAIL\]"; then
+  t_pass "termin krytyczny UNKNOWN używany przez implementację → SEM-011 FAIL (rc=$T9_RC)"
+else
+  t_fail "termin krytyczny UNKNOWN używany przez implementację NIE dał SEM-011 FAIL (rc=$T9_RC)"
+  printf '%s\n' "$T9_OUT" | tail -25
+fi
+
+# ── T10: dryf semantyczny (last_changed != introduced_at) → SEM-010 INFO ───
+echo ""
+echo "--- T10: dryf semantyczny (last_changed != introduced_at) → SEM-010 INFO ---"
+T10_DIR="$(mktemp -d)"
+mkdir -p "$T10_DIR/repo/config/canonical"
+( cd "$T10_DIR/repo" && git init -q )
+( cd "$T10_DIR/repo" && git config user.email "test@aigon.local" )
+( cd "$T10_DIR/repo" && git config user.name "SEM Test" )
+# Glossary z dryfem: last_changed != introduced_at dla sec-d.
+T10_GLOSSARY="$T10_DIR/glossary-drift.yaml"
+mkdir -p "$T10_DIR"
+sed 's/^    last_changed: "2026-08-10"/    last_changed: "2026-08-11"/' "$GLOSSARY_SRC" > "$T10_GLOSSARY"
+cp "$T10_GLOSSARY" "$T10_DIR/repo/config/canonical/glossary.yaml"
+echo "# test" > "$T10_DIR/repo/README.md"
+( cd "$T10_DIR/repo" && git add -A )
+( cd "$T10_DIR/repo" && git commit -qm "add glossary with drift" )
+
+T10_OUT="$(cd "$T10_DIR/repo" && VERIFY_STATE_DB="$T10_DIR/nonexistent.db" bash "$SEMANTICS_SH" 2>&1)"
+T10_RC=$?
+if printf '%s' "$T10_OUT" | grep -q "SEM-010 Historyczny dryf semantyczny" \
+   && printf '%s' "$T10_OUT" | grep -q "definicja/status zmienione"; then
+  t_pass "dryf semantyczny → SEM-010 INFO (rc=$T10_RC)"
+else
+  t_fail "dryf semantyczny NIE dał SEM-010 INFO (rc=$T10_RC)"
+  printf '%s\n' "$T10_OUT" | tail -25
 fi
 
 # ── Podsumowanie ───────────────────────────────────────────────────────────

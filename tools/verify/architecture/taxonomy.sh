@@ -3,14 +3,14 @@
 # architecture/taxonomy.sh — AIGON Production Platform — Repository Certification Engine
 # Moduł: ARCHITECTURE — TAXONOMY GATE
 # Weryfikuje taksonomię doskonałości (config/canonical/taxonomy.yaml) pod kątem
-# kompletności, spójności i epistemic governance. Taksonomia definiuje 31
+# kompletności, spójności i epistemic governance. Taksonomia definiuje 32
 # wymiarów doskonałości, z których każdy ma wagę (suma wag wymiarów `always`
 # = 1.0) oraz listę checków.
 #
 # Checki:
 #   TAX-001  Taxonomy istnieje
 #   TAX-002  Taxonomy jest poprawnym YAML
-#   TAX-003  Ma 31 wymiarów
+#   TAX-003  Ma 32 wymiary
 #   TAX-004  Każdy wymiar ma id, name, definition, source, applicability, weight, checks
 #   TAX-005  Id wymiarów unikalne
 #   TAX-006  Wagi sumują się do 1.0 dla wymiarów `always`
@@ -22,6 +22,7 @@
 #   TAX-012  Sekcja qi_formula istnieje
 #   TAX-013  Sekcja priorities istnieje
 #   TAX-014  Epistemic governance — podsumowanie (INFORMATIONAL)
+#   TAX-015  Meta-gate: pokrycie check→gate (check-gate-map.yaml)
 # ─────────────────────────────────────────────────────────────
 set -u
 
@@ -89,11 +90,11 @@ fi
 DIMS="$(awk '/^dimensions:/{in_dim=1; next} /^[^ ]/{in_dim=0} in_dim && /^  - id:/{sub(/^  - id:[[:space:]]*/, ""); print}' "$TAXONOMY")"
 DIM_COUNT="$(printf '%s' "$DIMS" | wc -w)"
 
-# ── TAX-003 Ma 31 wymiarów ───────────────────────────────────
-if [ "$DIM_COUNT" -eq 31 ]; then
-  pass "TAX-003 Ma 31 wymiarów" BLOCKING "Znaleziono $DIM_COUNT wymiarów."
+# ── TAX-003 Ma 32 wymiary ───────────────────────────────────
+if [ "$DIM_COUNT" -eq 32 ]; then
+  pass "TAX-003 Ma 32 wymiary" BLOCKING "Znaleziono $DIM_COUNT wymiarów."
 else
-  fail "TAX-003 Ma 31 wymiarów" BLOCKING "Oczekiwano 31 wymiarów, znaleziono $DIM_COUNT."
+  fail "TAX-003 Ma 32 wymiary" BLOCKING "Oczekiwano 32 wymiary, znaleziono $DIM_COUNT."
 fi
 
 # ── TAX-005 Id wymiarów unikalne ─────────────────────────────
@@ -308,6 +309,111 @@ done | grep -cx 'always')"
 COND_N=$((DIM_COUNT - ALWAYS_N))
 TOTAL_CHECKS="$(printf '%s' "$CHECK_IDS" | wc -l)"
 info "TAX-014 Epistemic governance" "Wymiary: $DIM_COUNT (always=$ALWAYS_N, warunkowe=$COND_N), checki: $TOTAL_CHECKS (INFORMATIONAL)."
+
+# ── TAX-015 Meta-gate: pokrycie check→gate ───────────────────
+# Każdy wymiar `always` (z applicability_matrix) MUSI mieć wpis w
+# config/canonical/check-gate-map.yaml z polem `gate_type`:
+#   - automated    — wymiar egzekwowany przez automatyczny gate (skrypt).
+#                    Wymaga `gate_script` (musi istnieć w tools/verify/).
+#   - human-gated  — wymiar wymaga ludzkiego osądu (oracle). Legalny bez
+#                    skryptu — evidence ludzkiego osądu w StateStore.
+#   - uncovered    — wymiar NIE ma gate'a. TAX-015 raportuje to jako FAIL
+#                    (wymiar zeruje QI przez zero_rule). To jest celowe:
+#                    system ma WYKRYĆ niepokryte wymiary, nie cicho je
+#                    ignorować.
+# Wymiary warunkowe (INT, DATA, API, EVT, EDGE, TEN, AI, EFF) NIE są tu
+# wymagane — wchodzą do QI tylko gdy applicability jest spełniona.
+CHECK_GATE_MAP="config/canonical/check-gate-map.yaml"
+if repo_file "$CHECK_GATE_MAP"; then
+  # Wymiary `always` z applicability_matrix w taxonomy.yaml.
+  ALWAYS_DIMS="$(awk '
+    /^applicability_matrix:/ {in_am=1; next}
+    /^[^ ]/ {in_am=0}
+    in_am && /^  always:/ {
+      line = $0
+      sub(/^  always:[[:space:]]*/, "", line)
+      gsub(/[\[\],]/, "", line)
+      print line
+    }
+  ' "$TAXONOMY")"
+
+  # Wymiary zadeklarowane w check-gate-map.yaml (sekcja dimensions:).
+  MAP_DIMS="$(awk '
+    /^dimensions:/ {in_dim=1; next}
+    /^[^ ]/ {in_dim=0}
+    in_dim && /^  [A-Za-z0-9_-]+:/ {sub(/^  /, ""); sub(/:.*/, ""); print}
+  ' "$CHECK_GATE_MAP")"
+
+  # 1) Każdy wymiar `always` musi mieć wpis w mapie.
+  MISSING_MAP=""
+  for d in $ALWAYS_DIMS; do
+    if ! printf '%s\n' "$MAP_DIMS" | grep -qx "$d"; then
+      MISSING_MAP="$MISSING_MAP $d"
+    fi
+  done
+
+  # 2) Każdy wpis w mapie musi mieć gate_type.
+  MISSING_TYPE=""
+  for d in $MAP_DIMS; do
+    GT="$(awk -v d="$d" '
+      $0 ~ "^  " d ":" {cur=1; next}
+      cur && /^  [A-Za-z0-9_-]+:/ {cur=0}
+      cur && /^    gate_type:/ {sub(/^    gate_type:[[:space:]]*/, ""); print; exit}
+    ' "$CHECK_GATE_MAP")"
+    if [ -z "$GT" ]; then
+      MISSING_TYPE="$MISSING_TYPE $d"
+    fi
+  done
+
+  # 3) Wymiary `automated` muszą mieć istniejący gate_script.
+  MISSING_SCRIPT=""
+  for d in $MAP_DIMS; do
+    GT="$(awk -v d="$d" '
+      $0 ~ "^  " d ":" {cur=1; next}
+      cur && /^  [A-Za-z0-9_-]+:/ {cur=0}
+      cur && /^    gate_type:/ {sub(/^    gate_type:[[:space:]]*/, ""); print; exit}
+    ' "$CHECK_GATE_MAP")"
+    if [ "$GT" = "automated" ]; then
+      GS="$(awk -v d="$d" '
+        $0 ~ "^  " d ":" {cur=1; next}
+        cur && /^  [A-Za-z0-9_-]+:/ {cur=0}
+        cur && /^    gate_script:/ {sub(/^    gate_script:[[:space:]]*/, ""); print; exit}
+      ' "$CHECK_GATE_MAP")"
+      if [ -z "$GS" ] || ! repo_file "tools/verify/$GS"; then
+        MISSING_SCRIPT="$MISSING_SCRIPT $d(${GS:-BRAK})"
+      fi
+    fi
+  done
+
+  # 4) Wymiary `uncovered` — raportowane jako FAIL (celowe wykrycie luki).
+  UNCOVERED=""
+  for d in $MAP_DIMS; do
+    GT="$(awk -v d="$d" '
+      $0 ~ "^  " d ":" {cur=1; next}
+      cur && /^  [A-Za-z0-9_-]+:/ {cur=0}
+      cur && /^    gate_type:/ {sub(/^    gate_type:[[:space:]]*/, ""); print; exit}
+    ' "$CHECK_GATE_MAP")"
+    if [ "$GT" = "uncovered" ]; then
+      UNCOVERED="$UNCOVERED $d"
+    fi
+  done
+
+  if [ -n "$MISSING_MAP" ] || [ -n "$MISSING_TYPE" ] || [ -n "$MISSING_SCRIPT" ]; then
+    fail "TAX-015 Meta-gate: pokrycie check→gate" BLOCKING \
+      "Wymiary always bez wpisu w mapie:$MISSING_MAP | bez gate_type:$MISSING_TYPE | automated bez skryptu:$MISSING_SCRIPT"
+  elif [ -n "$UNCOVERED" ]; then
+    # Wymiary uncovered są legalne w configu, ale TAX-015 raportuje je jako
+    # FAIL — to jest sygnał do działania (dodać gate albo wyłączyć z QI).
+    fail "TAX-015 Meta-gate: pokrycie check→gate" BLOCKING \
+      "Wymiary uncovered (zerują QI przez zero_rule):$UNCOVERED — wymagają decyzji: dodać gate albo zmienić applicability."
+  else
+    pass "TAX-015 Meta-gate: pokrycie check→gate" BLOCKING \
+      "Wszystkie wymiary always mają gate_type; automated mają istniejące skrypty."
+  fi
+else
+  fail "TAX-015 Meta-gate: pokrycie check→gate" BLOCKING \
+    "Brak $CHECK_GATE_MAP — nie można zweryfikować pokrycia check→gate."
+fi
 
 # ── Evidence ─────────────────────────────────────────────────
 if verify_blocked; then

@@ -524,6 +524,34 @@ dimensions:
       - {id: AI-07, desc: "Data for ML — dane treningowe zarządzane; licencje; zero danych bez zgody"}
       - {id: AI-08, desc: "Human oversight — nadzór człowieka nad decyzjami AI; eskalacja do człowieka"}
 
+  # ── Wymiar 32: Efektywność procesu inżynierskiego ────────────────────────
+  # WARUNKOWA — dotyczy optymalności PROCESU INŻYNIERSKIEGO (Change Intelligence /
+  # Engineering Efficiency Gate), nie optymalności produktu (to OPT).
+  # weight 0.0 — nie wchodzi do sumy wag wymiarów `always` (musi być 1.0).
+  - id: EFF
+    name: "Engineering Efficiency"
+    definition: "Optymalność procesu inżynierskiego — czy zmiana była potrzebna, czy wykonano ją najtańszą, najmniej inwazyjną drogą, czy reuse'owano istniejące dowody."
+    source: "Engineering Efficiency / Change Intelligence Gate"
+    applicability: "conditional: EFF"
+    weight: 0.0
+    checks:
+      - id: "EFF-001"
+        desc: "Dependency impact analysis — graf zależności, affected/unaffected, TARGETED BUILD/TEST/VERIFY"
+      - id: "EFF-002"
+        desc: "Build Intelligence — source → dependency graph → affected components → affected tests → affected artifacts → required gates"
+      - id: "EFF-003"
+        desc: "Fingerprint cache — dowodowy cache (source/dependency/compiler/toolchain/config hash, build flags, target, environment)"
+      - id: "EFF-004"
+        desc: "Engineering Optimality — Necessity, Scope, Complexity, Duplication, Performance, Resource cost, Build cost, Operational cost, Maintenance cost"
+      - id: "EFF-005"
+        desc: "Change Impact Prediction — CHANGE PROPOSAL predicted vs ACTUAL, Prediction Accuracy"
+      - id: "EFF-006"
+        desc: "Minimal Change Gate — files/lines/components/dependencies/config/tests/docs, CHANGE_SCOPE_ANOMALY"
+      - id: "EFF-007"
+        desc: "Duplicate Work Gate — REQUEST → CAN I REUSE? → YES verify existing / NO execute"
+      - id: "EFF-008"
+        desc: "Uniwersalność — impact analysis → minimal affected set → reuse valid evidence → execute → invalidate → certify"
+
 # ── Macierz aplikowalności ─────────────────────────────────────────────────
 # Mapuje pola .skeleton.yaml (service.id, tier, surfaces, locales, tenancy,
 # events, ml_features, public_www, data_classes) na wymiary.

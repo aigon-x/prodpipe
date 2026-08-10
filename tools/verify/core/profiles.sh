@@ -74,6 +74,10 @@ VERIFY_MODULES=(
   "i18n:full:BLOCKING"
   "i18n:release:BLOCKING"
   "i18n:genesis:BLOCKING"
+  "efficiency:full:BLOCKING"
+  "efficiency:architecture:BLOCKING"
+  "efficiency:release:BLOCKING"
+  "efficiency:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -85,25 +89,25 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     security)
       echo "git security security-drills"
       ;;
     architecture)
-      echo "architecture contracts semantics taxonomy"
+      echo "architecture contracts semantics taxonomy efficiency"
       ;;
     reproducibility)
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n efficiency"
       ;;
     *)
       echo "git security structure"
@@ -151,6 +155,7 @@ module_script() {
     security-drills)       echo "security/drills.sh" ;;
     taxonomy)              echo "architecture/taxonomy.sh" ;;
     i18n)                  echo "i18n/i18n.sh" ;;
+    efficiency)            echo "efficiency/efficiency.sh" ;;
     *)              echo "" ;;
   esac
 }

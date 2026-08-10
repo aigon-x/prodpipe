@@ -21,7 +21,7 @@ STATE_DATA_DIR="${STATE_DIR}/data"
 STATE_DB="${STATE_DATA_DIR}/canonical-state.db"
 STATE_BACKUP_DIR="${STATE_DATA_DIR}/backups"
 STATE_MIGRATIONS_DIR="${STATE_DIR}/migrations"
-STATE_SCHEMA_VERSION="7"
+STATE_SCHEMA_VERSION="8"
 
 # --- Kolory (jeśli TTY) ----------------------------------------------------
 if [ -t 1 ]; then
@@ -123,14 +123,16 @@ state_generation_bump() {
 
 # --- State hash: hash całego canonical state --------------------------------
 # Hashuje WSZYSTKIE kolumny każdej tabeli canonical (deterministycznie).
-# Pomija tabele meta/snapshot/event/evidence/_init (nie są częścią stanu).
+# Pomija tabele meta/snapshot/event/evidence/gate_runs/waivers/_init oraz
+# tabele Change Intelligence (fingerprint_cache/change_proposals/
+# prediction_accuracy/change_scope/duplicate_work) — nie są częścią stanu.
 state_hash() {
     state_require_sqlite || return 1
     if ! state_db_exists; then
         state_init >/dev/null && state_migrate >/dev/null || return 1
     fi
     local tables
-    tables=$(sqlite3 "$STATE_DB" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('meta','snapshot','event','evidence','gate_runs','waivers','_init') ORDER BY name;")
+    tables=$(sqlite3 "$STATE_DB" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('meta','snapshot','event','evidence','gate_runs','waivers','fingerprint_cache','change_proposals','prediction_accuracy','change_scope','duplicate_work','_init') ORDER BY name;")
     local hash_input=""
     local t
     for t in $tables; do
@@ -146,9 +148,11 @@ state_hash() {
 }
 
 # --- History hash: integralność append-only history (F4) --------------------
-# event + evidence + gate_runs + waivers to engineering telemetry / governance
-# (append-only history), NIE stan. Nie wchodzą do state_hash (stan), ale mają
-# WŁASNY łańcuch integralności, aby manipulacja audytem była wykrywalna.
+# event + evidence + gate_runs + waivers + Change Intelligence
+# (fingerprint_cache/change_proposals/prediction_accuracy/change_scope/
+# duplicate_work) to engineering telemetry / governance (append-only history),
+# NIE stan. Nie wchodzą do state_hash (stan), ale mają WŁASNY łańcuch
+# integralności, aby manipulacja audytem była wykrywalna.
 # Hashuje deterministycznie te tabele (posortowane po kluczu głównym).
 state_history_hash() {
     state_require_sqlite || return 1
@@ -157,7 +161,7 @@ state_history_hash() {
     fi
     local hash_input=""
     local t
-    for t in event evidence gate_runs waivers; do
+    for t in event evidence gate_runs waivers fingerprint_cache change_proposals prediction_accuracy change_scope duplicate_work; do
         local dump
         dump=$(sqlite3 -separator '|' "$STATE_DB" "SELECT * FROM $t ORDER BY 1;" 2>/dev/null)
         hash_input+="${t}:\n${dump}\n"

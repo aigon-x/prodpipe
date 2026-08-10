@@ -1,0 +1,216 @@
+# ============================================================================
+# check-gate-map.yaml — MAPOWANIE CHECK→GATE (meta-gate)
+# ============================================================================
+# Ten plik jest ŹRÓDŁEM PRAWDY dla weryfikacji pokrycia check→gate (TAX-015).
+# Łączy wymiary taksonomii (config/canonical/taxonomy.yaml) z gate'ami
+# (config/canonical/gates.yaml + tools/verify/).
+#
+# PROBLEM, KTÓRY ROZWIĄZUJE:
+#   - taxonomy.yaml definiuje 32 wymiary doskonałości z checkami (INTEG-01..,
+#     VV-01.., SEC-01.., ...).
+#   - gates.yaml definiuje moduły gate'ów (git, security, architecture, ...).
+#   - ID checków gate'ów (GIT-001, D-001, ARCH-001, ...) są ROZŁĄCZNE z ID
+#     checków taxonomy (INTEG-01, VV-01, SEC-01, ...).
+#   - Brak mechanizmu, który mówi "który check z taxonomy jest egzekwowany
+#     przez który gate". To fatalna luka meta-gate: system formalnie "wie",
+#     że wymiar jest niepokryty (QI=0 przez zero_rule), ale NIE MA gate'a,
+#     który by to wykrył i zablokował.
+#
+# ROZWIĄZANIE:
+#   Każdy wymiar `always` (z applicability_matrix) MUSI mieć wpis w sekcji
+#   `dimensions:` z polem `gate_type`:
+#     - automated    — wymiar egzekwowany przez automatyczny gate (skrypt).
+#                      Wymaga `gate_module` + `gate_script` (musi istnieć).
+#     - human-gated  — wymiar wymaga ludzkiego osądu (oracle: MAN/UX/taste/
+#                      judgment/odpowiedzialność prawna). Evidence ludzkiego
+#                      osądu zapisywane w StateStore (tabela evidence).
+#     - uncovered    — wymiar NIE ma gate'a. TAX-015 raportuje to jako FAIL
+#                      (wymiar zeruje QI przez zero_rule). To jest celowe:
+#                      system ma WYKRYĆ niepokryte wymiary, nie cicho je
+#                      ignorować. Wymaga decyzji: dodać gate albo wyłączyć
+#                      z QI (zmienić applicability).
+#
+# ZASADA: TAX-015 NIE wymaga, żeby wszystkie wymiary miały gate'y od razu.
+#         Wymaga, żeby każdy wymiar `always` miał JAWNĄ deklarację gate_type.
+#         Wymiary `uncovered` są legalne w configu, ale TAX-015 raportuje je
+#         jako FAIL — to jest sygnał do działania, nie ciche zerowanie.
+#
+# NIE edytuj tego pliku ręcznie bez przejścia przez gate'y configu.
+# Zmiany mapowania = tylko platform (CODEOWNERS).
+# ============================================================================
+
+schema_version: 1
+
+# ── Mapowanie wymiarów `always` → gate ─────────────────────────────────────
+# Klucz = id wymiaru z taxonomy.yaml (applicability: always).
+# Wymiary warunkowe (INT, DATA, API, EVT, EDGE, TEN, AI, EFF) NIE są tu
+# wymagane — wchodzą do QI tylko gdy applicability jest spełniona.
+dimensions:
+  # ── Pokryte przez automatyczne gate'y ──────────────────────────────────
+  INTEG:
+    gate_type: automated
+    gate_module: architecture
+    gate_script: architecture/architecture.sh
+    coverage: [ARCH-001, ARCH-002, ARCH-003, ARCH-004, ARCH-005, ARCH-006, ARCH-007, ARCH-008]
+    doc: "Spójność szkieletu — architecture.sh (ARCH-001..008)."
+  SEC:
+    gate_type: automated
+    gate_module: security
+    gate_script: security/secrets.sh
+    coverage: [SEC-001, SEC-002, SEC-003, SEC-004]
+    doc: "Sekrety w repo — security/secrets.sh. CZĘŚCIOWE pokrycie wymiaru SEC (tylko sekrety, nie cała macierz 12×4)."
+  RES:
+    gate_type: automated
+    gate_module: reproducibility
+    gate_script: reproducibility/reproducibility.sh
+    coverage: [R-001, R-002, R-003, R-004, R-005]
+    doc: "Reprodukowalność — reproducibility/reproducibility.sh (R-001..005)."
+  CFG:
+    gate_type: automated
+    gate_module: config
+    gate_script: config/config.sh
+    coverage: [CFG-001, CFG-002, CFG-003, CFG-004, CFG-005, CFG-006, CFG-007, CFG-008]
+    doc: "Config Plane self-hosting — config/config.sh (CFG-001..008)."
+  AEST:
+    gate_type: automated
+    gate_module: aesthetics
+    gate_script: aesthetics/aesthetics.sh
+    coverage: [AEST-01, AEST-02, AEST-03, AEST-04, AEST-05, AEST-06, AEST-07, AEST-08, AEST-09, AEST-10]
+    doc: "Estetyka — aesthetics/aesthetics.sh + fitness.sh + spectral.sh."
+  META:
+    gate_type: automated
+    gate_module: taxonomy
+    gate_script: architecture/taxonomy.sh
+    coverage: [TAX-001, TAX-002, TAX-003, TAX-004, TAX-005, TAX-006, TAX-007, TAX-008, TAX-009, TAX-010, TAX-011, TAX-012, TAX-013, TAX-014, TAX-015]
+    doc: "Meta-gate — architecture/taxonomy.sh (TAX-001..015)."
+  MOD:
+    gate_type: automated
+    gate_module: structure
+    gate_script: structure/readme.sh
+    coverage: [STR-001, STR-002, STR-003]
+    doc: "Struktura/README — structure/readme.sh (STR-001..003). CZĘŚCIOWE pokrycie wymiaru MOD."
+  PERF:
+    gate_type: automated
+    gate_module: efficiency
+    gate_script: efficiency/efficiency.sh
+    coverage: [EFF-001, EFF-002, EFF-003, EFF-004, EFF-005, EFF-006, EFF-007, EFF-008, EFF-009, EFF-010, EFF-011, EFF-012, EFF-013, EFF-014, EFF-015, EFF-016, EFF-017, EFF-018, EFF-019, EFF-020, EFF-021, EFF-022, EFF-023, EFF-024]
+    doc: "Efektywność procesu inżynierskiego — efficiency/efficiency.sh (EFF-001..024)."
+  OPS:
+    gate_type: automated
+    gate_module: deployment
+    gate_script: deployment/deployment.sh
+    coverage: [D-001, D-002, D-003, D-004, D-005, D-006, D-007, D-008]
+    doc: "Operacje wdrożeniowe — deployment/deployment.sh (D-001..008). CZĘŚCIOWE pokrycie wymiaru OPS."
+
+  # ── Wymiary wymagające ludzkiego osądu (oracle) ────────────────────────
+  # Te wymiary NIE mogą być w pełni zautomatyzowane — wymagają ludzkiego
+  # osądu (MAN/UX/taste/judgment/odpowiedzialność prawna). Evidence ludzkiego
+  # osądu zapisywane w StateStore (tabela evidence, source_type='human').
+  MAN:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Zarządzanie (MAN) — wymaga ludzkiego osądu (oracle). Evidence: decyzje zarządcze w StateStore."
+  VV:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Weryfikacja i walidacja (VV) — wymaga ludzkiego osądu (oracle). Evidence: przeglądy/akceptacje w StateStore."
+  CORR:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Poprawność (CORR) — wymaga ludzkiego osądu (oracle). Evidence: triage/akceptacje w StateStore."
+  BIZ:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Biznes (BIZ) — wymaga ludzkiego osądu (oracle). Evidence: metryki produktu/akceptacje w StateStore."
+  COMP:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Zgodność (COMP) — wymaga ludzkiego osądu + odpowiedzialności prawnej (oracle). Evidence: audyty/waivery w StateStore."
+  LEG:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Prawo (LEG) — wymaga ludzkiego osądu + odpowiedzialności prawnej (oracle). Evidence: oceny prawne w StateStore."
+  FIN:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Finanse (FIN) — wymaga ludzkiego osądu (oracle). Evidence: przeglądy kosztów w StateStore."
+  EXP:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Doświadczenie (EXP) — wymaga ludzkiego osądu (oracle). Evidence: badania UX w StateStore."
+  SUP:
+    gate_type: human-gated
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Wsparcie (SUP) — wymaga ludzkiego osądu (oracle). Evidence: SLA/feedback w StateStore."
+
+  # ── Wymiary BEZ gate'a (uncovered) ─────────────────────────────────────
+  # TAX-015 raportuje te jako FAIL — wymagają decyzji: dodać gate albo
+  # wyłączyć z QI (zmienić applicability). To jest celowe: system ma WYKRYĆ
+  # niepokryte wymiary, nie cicho je ignorować.
+  PERM:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Uprawnienia (PERM) — brak gate'a. Wymaga decyzji (SoD gate)."
+  CUR:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Aktualność (CUR) — brak gate'a. Wymaga decyzji."
+  OPT:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Optymalność produktu (OPT) — brak gate'a. Wymaga decyzji."
+  CONS:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Spójność standardów (CONS) — brak gate'a. Wymaga decyzji."
+  DX:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Developer Experience (DX) — brak gate'a. Wymaga decyzji."
+  OBS:
+    gate_type: uncovered
+    gate_module: null
+    gate_script: null
+    coverage: []
+    doc: "Obserwowalność (OBS) — brak gate'a w main (obs-baseline w worktree). Wymaga scalenia."
+
+# ── Wymiary warunkowe (informacyjnie) ─────────────────────────────────────
+# Wymiary warunkowe wchodzą do QI tylko gdy applicability jest spełniona.
+# Nie wymagają gate_type w TAX-015, ale gdy są applicable, powinny mieć gate.
+conditional:
+  INT: { applicability: "locales>1", gate_type: automated, gate_script: i18n/i18n.sh }
+  DATA: { applicability: "data_classes present", gate_type: uncovered }
+  API: { applicability: "surfaces include api", gate_type: uncovered }
+  EVT: { applicability: "events true", gate_type: uncovered }
+  EDGE: { applicability: "surfaces include web", gate_type: uncovered }
+  TEN: { applicability: "tenancy multi", gate_type: uncovered }
+  AI: { applicability: "ml_features true", gate_type: uncovered }
+  EFF: { applicability: "conditional: EFF", gate_type: automated, gate_script: efficiency/efficiency.sh }
