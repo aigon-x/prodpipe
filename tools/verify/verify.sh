@@ -44,14 +44,43 @@ PROFILE="${2:-full}"
 # ── Nagłówek ────────────────────────────────────────────────
 verify_header "$SUBCOMMAND/$PROFILE"
 
-# ── Uruchomienie modułów ────────────────────────────────────
-run_module() {
+# ── Mapowanie nazwy modułu → ścieżka skryptu ────────────────
+# Każdy moduł z profiles.sh (git, security, structure, ...) ma
+# odpowiadający skrypt w tools/verify/<kategoria>/<nazwa>.sh.
+# To jest JEDYNE miejsce mapowania — profiles.sh deklaruje moduły,
+# verify.sh je uruchamia. Rozjazd (FALSE GATE) jest tu naprawiony.
+module_script() {
   local module="$1"
-  local script="$VERIFY_DIR/$module"
-  if [ -f "$script" ]; then
+  case "$module" in
+    git)            echo "git/integrity.sh" ;;
+    security)       echo "security/secrets.sh" ;;
+    structure)      echo "structure/readme.sh" ;;
+    architecture)   echo "architecture/architecture.sh" ;;
+    dependencies)   echo "dependencies/dependencies.sh" ;;
+    reproducibility) echo "reproducibility/reproducibility.sh" ;;
+    deployment)     echo "deployment/deployment.sh" ;;
+    contracts)      echo "contracts/contracts.sh" ;;
+    migration)      echo "migration/migration.sh" ;;
+    recovery)       echo "recovery/recovery.sh" ;;
+    *)              echo "" ;;
+  esac
+}
+
+# ── Uruchomienie modułu ─────────────────────────────────────
+# run_module <module>   — moduł profilu (mapowany przez module_script)
+# run_module <path.sh>  — bezpośrednia ścieżka (warstwy reconcile)
+run_module() {
+  local name="$1"
+  local script
+  # Argument z "/" to bezpośrednia ścieżka; w przeciwnym razie mapuj nazwę.
+  case "$name" in
+    */*) script="$VERIFY_DIR/$name" ;;
+    *)   script="$VERIFY_DIR/$(module_script "$name")" ;;
+  esac
+  if [ -n "$script" ] && [ -f "$script" ]; then
     say ""
     say "────────────────────────────────────────────────────────────"
-    say "MODUŁ: $module"
+    say "MODUŁ: $name"
     say "────────────────────────────────────────────────────────────"
     bash "$script"
     local rc=$?
@@ -59,16 +88,35 @@ run_module() {
     # w procesie głównym, więc verify_summary/verify_blocked to wykryje.
     if [ "$rc" -ne 0 ]; then
       VERIFY_FAIL=$((VERIFY_FAIL + 1))
-      fail "verify module $module" BLOCKING "Moduł zakończył się kodem $rc (oczekiwano 0)."
+      fail "verify module $name" BLOCKING "Moduł zakończył się kodem $rc (oczekiwano 0)."
     fi
   else
-    warn "verify module $module" "Brak modułu: $script"
+    warn "verify module $name" "Brak modułu: $script"
   fi
 }
 
+# ── Uruchomienie modułów dla profilu ────────────────────────
+# verify_profile_modules() (z profiles.sh) zwraca listę modułów
+# dla danego profilu. To eliminuje FALSE GATE — PROFILE jest
+# respektowany, a nie parsowany i ignorowany.
+run_profile_modules() {
+  local profile="$1"
+  local modules
+  modules="$(verify_profile_modules "$profile")"
+  local m
+  for m in $modules; do
+    run_module "$m"
+  done
+}
+
+# ── Subkomendy ──────────────────────────────────────────────
+# reconcile = wszystkie moduły profilu + warstwy reconcile.
+# drift/history/debt = tylko odpowiednie warstwy.
 case "$SUBCOMMAND" in
   reconcile)
-    # Wszystkie 4 warstwy + baseline diff
+    # Wszystkie moduły profilu (git, security, structure, ...)
+    run_profile_modules "$PROFILE"
+    # Warstwy reconcile (baseline + orchestrator)
     run_module "reconcile/baseline.sh"
     run_module "reconcile/reconcile.sh"
     run_module "drift/drift.sh"
@@ -94,6 +142,6 @@ case "$SUBCOMMAND" in
 esac
 
 # ── Podsumowanie ────────────────────────────────────────────
-say ""
-verify_summary
-exit $?
+# verify_module_exit wypisuje podsumowanie i propaguje status
+# (exit 0 = PASS, exit 1 = FAIL) do procesu nadrzędnego.
+verify_module_exit
