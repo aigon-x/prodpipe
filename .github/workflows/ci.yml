@@ -63,17 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run unit tests
+      - name: Run unit tests (TESTFORGE runner)
         run: |
-          if [ -f Makefile ] && grep -q '^test:' Makefile; then
-            make test
-          elif [ -f package.json ]; then
-            npm test
-          else
-            echo "Brak zdefiniowanego runnera testów (Makefile test: / package.json)."
-            echo "FAIL: brak testów jednostkowych."
-            exit 1
-          fi
+          chmod +x tools/test
+          bash tools/test unit
 
   gates:
     name: Quality Gates (CI profile)
