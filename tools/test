@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+# ============================================================================
+# test — TESTFORGE single entrypoint
+# ============================================================================
+# AIGON Production Platform — Test System Foundation.
+#
+# "Nie budujesz teraz funkcji biznesowych. Budujesz: system, który
+# automatycznie testuje każdy kolejny system."
+#
+# JEDNO WEJŚCIE dla wszystkich testów. Local-first: `./tools/test full`
+# działa lokalnie identycznie jak w CI (CI wywołuje ten sam runner).
+#
+# Subkomendy:
+#   fast            — L0+L1 (static + unit), <10s
+#   unit            — L1 unit tests
+#   integration     — L4 integration tests
+#   e2e             — L5 end-to-end tests
+#   security        — security tests
+#   drift           — drift detection tests
+#   recovery        — recovery tests
+#   reproducibility — reproducibility test
+#   clean-room      — clean-room test
+#   negative        — negative tests
+#   golden          — golden file tests
+#   snapshot        — snapshot tests
+#   property        — property tests
+#   migration       — migration tests
+#   performance     — performance tests
+#   meta            — meta-tests (testy testów)
+#   mutation        — mutation tests
+#   contract        — L3 contract tests (verify engine)
+#   discover        — skanuje repo i znajduje testy
+#   coverage        — generuje coverage.json
+#   quality         — bramki jakości TEST-001..012
+#   regression      — porównaj z baseline (regressions.json)
+#   regression-save — zapisz bieżący wynik jako baseline
+#   full            — wszystkie poziomy L0-L6 + quality + coverage
+#   certify         — formalna certyfikacja (PASS/FAIL/BLOCKED)
+#
+# Zasady (NO FALSE GREEN):
+#   * set -euo pipefail — żaden błąd nie jest ignorowany.
+#   * Każdy test ma jawny exit code.
+#   * Żaden test nie jest cicho pominięty.
+# ============================================================================
+
+set -euo pipefail
+
+TESTFORGE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/testing" && pwd)"
+TOOLS_DIR="$(dirname "$TESTFORGE_DIR")"
+REPO_ROOT="$(cd "$TOOLS_DIR/.." && pwd)"
+
+# ── Wczytaj biblioteki ─────────────────────────────────────────────────────
+. "$TESTFORGE_DIR/lib.sh"
+. "$TESTFORGE_DIR/manifest.sh"
+. "$TESTFORGE_DIR/discovery.sh"
+. "$TESTFORGE_DIR/runner.sh"
+. "$TESTFORGE_DIR/coverage.sh"
+. "$TESTFORGE_DIR/regression.sh"
+. "$TESTFORGE_DIR/report.sh"
+. "$TESTFORGE_DIR/quality.sh"
+
+cd "$REPO_ROOT"
+
+# ── Pomoc ──────────────────────────────────────────────────────────────────
+usage() {
+  sed -n '2,45p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+# ── Subkomendy ─────────────────────────────────────────────────────────────
+SUBCOMMAND="${1:-help}"
+
+case "$SUBCOMMAND" in
+  help|-h|--help)
+    usage
+    exit 0
+    ;;
+
+  discover)
+    # Test discovery — skanuje repo i znajduje testy.
+    tf_say "=== TESTFORGE DISCOVERY ==="
+    files=$(tf_discover "" 2>/dev/null || rc=$?)
+    if [ -z "$files" ]; then
+      tf_say "Brak testów (*.test.sh) w repo."
+      exit 1
+    fi
+    count=0
+    for f in $files; do
+      tf_say "  $f"
+      count=$((count + 1))
+    done
+    tf_say "Znaleziono $count testów."
+    exit 0
+    ;;
+
+  fast)
+    # L0 (static) + L1 (unit) — szybkie, <10s.
+    tf_run_discovered "FAST" "unit"
+    ;;
+
+  unit)
+    tf_run_discovered "UNIT" "unit"
+    ;;
+
+  integration)
+    tf_run_discovered "INTEGRATION" "integration"
+    ;;
+
+  e2e)
+    tf_run_discovered "E2E" "e2e"
+    ;;
+
+  security)
+    tf_run_discovered "SECURITY" "security"
+    ;;
+
+  drift)
+    tf_run_discovered "DRIFT" "drift"
+    ;;
+
+  recovery)
+    tf_run_discovered "RECOVERY" "recovery"
+    ;;
+
+  reproducibility)
+    tf_run_discovered "REPRODUCIBILITY" "reproducibility"
+    ;;
+
+  clean-room)
+    tf_run_discovered "CLEAN-ROOM" "clean-room"
+    ;;
+
+  negative)
+    tf_run_discovered "NEGATIVE" "negative"
+    ;;
+
+  golden)
+    tf_run_discovered "GOLDEN" "golden"
+    ;;
+
+  snapshot)
+    tf_run_discovered "SNAPSHOT" "snapshot"
+    ;;
+
+  property)
+    tf_run_discovered "PROPERTY" "property"
+    ;;
+
+  migration)
+    tf_run_discovered "MIGRATION" "migration"
+    ;;
+
+  performance)
+    tf_run_discovered "PERFORMANCE" "performance"
+    ;;
+
+  meta)
+    tf_run_discovered "META" "meta"
+    ;;
+
+  mutation)
+    tf_run_discovered "MUTATION" "mutation"
+    ;;
+
+  contract)
+    # L3 contract tests — integracja z verify engine.
+    tf_run_discovered "CONTRACT" "contract"
+    ;;
+
+  coverage)
+    tf_coverage_generate
+    tf_exit "COVERAGE"
+    ;;
+
+  quality)
+    # Bramki jakości TEST-001..012 + quality.json.
+    # Najpierw wygeneruj WSZYSTKIE artefakty (test-results.json, coverage.json,
+    # quality.json), POTEM bramki — TEST-007..009 sprawdzają że te pliki
+    # istnieją, więc muszą być wygenerowane przed bramkami.
+    tf_summary "QUALITY" || rc=$?
+    tf_coverage_generate
+    tf_report_quality
+    tf_quality_gates
+    tf_exit "QUALITY"
+    ;;
+
+  regression)
+    tf_regression_compare
+    tf_exit "REGRESSION"
+    ;;
+
+  regression-save)
+    tf_regression_save_baseline
+    tf_exit "REGRESSION-SAVE"
+    ;;
+
+  full)
+    # Wszystkie poziomy L0-L6 + quality + coverage + regression.
+    tf_say "=== TESTFORGE FULL (L0-L6) ==="
+    all_files=$(tf_discover "" 2>/dev/null || rc=$?)
+    if [ -z "$all_files" ]; then
+      tf_error "FULL" "brak testów w repo"
+      tf_exit "FULL"
+    fi
+    for f in $all_files; do
+      tf_run_test "$f" || rc=$?
+    done
+    # Zapisz wstępny test-results.json (potrzebny przez tf_report_quality).
+    tf_summary "FULL" || rc=$?
+    # Generuj artefakty PRZED bramkami jakości (TEST-007..010 sprawdzają
+    # że test-results.json, coverage.json, quality.json istnieją).
+    tf_coverage_generate
+    tf_report_quality
+    # Bramki jakości.
+    tf_quality_gates
+    tf_report_summary
+    tf_exit "FULL"
+    ;;
+
+  certify)
+    # Formalna certyfikacja: PASS/FAIL/BLOCKED.
+    tf_say "=== TESTFORGE CERTIFICATION ==="
+    all_files=$(tf_discover "" 2>/dev/null || rc=$?)
+    if [ -z "$all_files" ]; then
+      tf_error "CERTIFY" "brak testów w repo"
+      tf_exit "CERTIFY"
+    fi
+    for f in $all_files; do
+      tf_run_test "$f" || rc=$?
+    done
+    # Zapisz wstępny test-results.json + artefakty przed bramkami jakości.
+    tf_summary "CERTIFY" || rc=$?
+    tf_coverage_generate
+    tf_report_quality
+    tf_quality_gates
+    tf_report_quality
+    # Certyfikacja: PASS tylko gdy brak FAIL/ERROR i brak false green.
+    if [ "$TF_FAIL" -eq 0 ] && [ "$TF_ERROR" -eq 0 ]; then
+      tf_sayc "CERTIFICATION: PASS" "$C_GREEN"
+      tf_exit "CERTIFY"
+    else
+      tf_sayc "CERTIFICATION: FAIL" "$C_RED"
+      tf_exit "CERTIFY"
+    fi
+    ;;
+
+  *)
+    tf_say "Nieznana subkomenda: $SUBCOMMAND"
+    usage
+    exit 2
+    ;;
+esac

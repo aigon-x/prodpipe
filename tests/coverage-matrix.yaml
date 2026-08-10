@@ -1,0 +1,60 @@
+# ============================================================================
+# coverage-matrix.yaml — TESTFORGE coverage matrix
+# ============================================================================
+# Mapowanie komponentów na poziomy testów (L0-L6).
+#
+# Poziomy:
+#   L0 STATIC      — lint, format, shellcheck, yamllint, secret scan
+#   L1 UNIT        — testy jednostkowe per moduł
+#   L2 COMPONENT   — testy komponentów
+#   L3 CONTRACT    — testy kontraktów (verify engine)
+#   L4 INTEGRATION — testy integracyjne
+#   L5 E2E         — testy end-to-end
+#   L6 SYSTEM      — soak, chaos, certyfikacja
+#
+# required: true  — komponent MUSI mieć pokrycie na wszystkich poziomach
+# required: false — pokrycie pożądane, ale nie blokuje certyfikacji
+# ============================================================================
+
+version: 1
+
+components:
+  - name: state
+    levels: [L1, L3, L4]
+    required: true
+
+  - name: verify
+    levels: [L3, L4]
+    required: true
+
+  - name: testforge
+    levels: [L1, L3, L4, L5, L6]
+    required: true
+
+  - name: security
+    levels: [L0]
+    required: true
+
+  - name: drift
+    levels: [L4]
+    required: true
+
+  - name: recovery
+    levels: [L6]
+    required: true
+
+  - name: reproducibility
+    levels: [L6]
+    required: true
+
+  - name: clean-room
+    levels: [L6]
+    required: true
+
+  - name: migration
+    levels: [L4]
+    required: true
+
+  - name: performance
+    levels: [L6]
+    required: false

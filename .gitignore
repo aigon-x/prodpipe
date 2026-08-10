@@ -87,6 +87,10 @@ data/**/node-local/
 logs/
 **/logs/
 
+# ── TESTFORGE runtime results — NIE wchodzi do git ───────────
+# Wyniki testów to runtime state (maszynowy output), nie source.
+.testforge-results/
+
 # ── Canonical state DB — NIE wchodzi do git ──────────────────
 # SQLite = canonical operational state. Git trzyma tylko schema + migracje.
 system/control-plane/state/data/*.db
