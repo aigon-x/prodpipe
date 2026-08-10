@@ -60,4 +60,4 @@ else
   pass "SEC-004 No private key files"
 fi
 
-say ""
+verify_module_exit

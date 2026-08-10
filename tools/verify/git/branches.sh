@@ -22,16 +22,19 @@ say "=== GIT BRANCH POLICY ==="
 BRANCH="$(git branch --show-current 2>/dev/null || echo '')"
 
 # GIT-201 Branch prefix policy
+# Dozwolone prefiksy: feature/*, fix/*, migration/*, security/*, release/*,
+# worktree/* i worktree-* (izolowane operacje w git worktree — np. OPERATION
+# RECONCILE ZERO na branchu worktree-reconcile-zero).
 case "$BRANCH" in
   main)
     pass "GIT-201 Branch prefix policy" "main jest kanoniczną linią."
     ;;
-  feature/*|fix/*|migration/*|security/*|release/*)
+  feature/*|fix/*|migration/*|security/*|release/*|worktree/*|worktree-*)
     pass "GIT-201 Branch prefix policy" "Branch '$BRANCH' ma dozwolony prefiks."
     ;;
   *)
     if [ -n "$BRANCH" ]; then
-      fail "GIT-201 Branch prefix policy" BLOCKING "Branch '$BRANCH' nie ma dozwolonego prefiksu. Dozwolone: feature/*, fix/*, migration/*, security/*, release/*"
+      fail "GIT-201 Branch prefix policy" BLOCKING "Branch '$BRANCH' nie ma dozwolonego prefiksu. Dozwolone: feature/*, fix/*, migration/*, security/*, release/*, worktree/*, worktree-*"
     else
       info "GIT-201 Branch prefix policy" "Brak aktywnej gałęzi (detached HEAD?)."
     fi
@@ -53,4 +56,4 @@ else
   fail "GIT-203 No direct push to main" BLOCKING "Brak pre-push hook."
 fi
 
-say ""
+verify_module_exit

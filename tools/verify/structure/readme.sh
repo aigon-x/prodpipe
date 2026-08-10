@@ -42,11 +42,40 @@ SECTIONS=(
 
 # STR-001 Every directory has README.md
 # Root README.md jest wyłączony (platform overview).
+#
+# Katalogi STRUKTURALNE (wykluczone ze skanera) — infrastruktura/konfiguracja/
+# dane generowane/testy, gdzie kontrakt README (12 sekcji) nie ma zastosowania:
+#   .git-hooks, .github, .github/workflows  — infrastruktura git/CI
+#   system/control-plane/state/{migrations,data,tests} — migracje SQL, dane runtime, testy
+#   config/generated, docs/generated, docs/generated/reconciliation — artefakty generowane
+#   docs/git — dokumentacja git (nie moduł domenowy)
+#   .tools — narzędzia pomocnicze
+# Katalogi DOMENOWE (tools/security, tools/verify/*) MUSZĄ mieć README.
+EXCLUDE_STRUCTURAL=(
+  "./.git-hooks"
+  "./.github"
+  "./.github/workflows"
+  "./system/control-plane/state/migrations"
+  "./system/control-plane/state/data"
+  "./system/control-plane/state/tests"
+  "./config/generated"
+  "./docs/generated"
+  "./docs/generated/reconciliation"
+  "./docs/git"
+  "./.tools"
+)
+
 MISSING_README=0
 MISSING_DIRS=""
 while IFS= read -r d; do
   # Pomiń .git i katalogi bez README (root jest wyłączony)
   [ "$d" = "." ] && continue
+  # Pomiń katalogi strukturalne (wykluczone ze skanera)
+  skip=0
+  for ex in "${EXCLUDE_STRUCTURAL[@]}"; do
+    [ "$d" = "$ex" ] && { skip=1; break; }
+  done
+  [ "$skip" -eq 1 ] && continue
   if [ ! -f "$d/README.md" ]; then
     MISSING_README=$((MISSING_README+1))
     MISSING_DIRS="$MISSING_DIRS $d"
@@ -94,4 +123,4 @@ else
   info "STR-003 README has Status marker" "$NO_STATUS README bez markera Status."
 fi
 
-say ""
+verify_module_exit
