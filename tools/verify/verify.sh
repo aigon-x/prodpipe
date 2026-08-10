@@ -54,6 +54,13 @@ run_module() {
     say "MODUŁ: $module"
     say "────────────────────────────────────────────────────────────"
     bash "$script"
+    local rc=$?
+    # Agregacja: każdy FAIL w module (exit != 0) podnosi VERIFY_FAIL
+    # w procesie głównym, więc verify_summary/verify_blocked to wykryje.
+    if [ "$rc" -ne 0 ]; then
+      VERIFY_FAIL=$((VERIFY_FAIL + 1))
+      fail "verify module $module" BLOCKING "Moduł zakończył się kodem $rc (oczekiwano 0)."
+    fi
   else
     warn "verify module $module" "Brak modułu: $script"
   fi
@@ -89,3 +96,4 @@ esac
 # ── Podsumowanie ────────────────────────────────────────────
 say ""
 verify_summary
+exit $?

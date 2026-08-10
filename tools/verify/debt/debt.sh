@@ -117,4 +117,4 @@ else
   warn "DEBT-106 Dług bez terminu spłaty" "$NODATE plików deprecated bez terminu spłaty."
 fi
 
-say ""
+verify_module_exit

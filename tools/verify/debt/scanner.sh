@@ -463,4 +463,4 @@ else
   pass "DEBT-014 Status UNKNOWN" BLOCKING "Wszystkie pliki mają klasyfikację."
 fi
 
-say ""
+verify_module_exit

@@ -81,6 +81,16 @@ verify_summary() {
   fi
 }
 
+# ── Zakończenie modułu (subprocesu) ──────────────────────────
+# Każdy moduł tools/verify/*.sh kończy się tym wywołaniem.
+# Wypisuje podsumowanie i propaguje status przez exit code,
+# dzięki czemu verify.sh (proces nadrzędny) może agregować wyniki.
+# Bez tego liczniki VERIFY_* giną w subprocesie → FALSE GATE.
+verify_module_exit() {
+  verify_summary
+  exit $?
+}
+
 # ── Wykrywanie root repo ─────────────────────────────────────
 verify_root() {
   git rev-parse --show-toplevel 2>/dev/null || { say "FATAL: not a git repository"; exit 2; }

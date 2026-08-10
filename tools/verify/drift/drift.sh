@@ -257,4 +257,4 @@ else
   pass "DRIFT-009 pre-push / remote" BLOCKING "Remote: $REMOTE"
 fi
 
-say ""
+verify_module_exit

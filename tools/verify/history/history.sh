@@ -162,4 +162,4 @@ else
   fail "HIST-007 VERSION" BLOCKING "Brak VERSION."
 fi
 
-say ""
+verify_module_exit

@@ -92,6 +92,11 @@ logs/
 system/control-plane/state/data/*.db
 system/control-plane/state/data/*.sqlite
 system/control-plane/state/data/*.sqlite3
+# Backupi canonical state (F5) — runtime artifacts, NIE wchodzą do git.
+system/control-plane/state/data/backups/
+system/control-plane/state/data/backups/*.db
+system/control-plane/state/data/backups/*.sha256
+system/control-plane/state/data/backups/*.json
 
 # ── AIGON-X-FS runtime data — NIE wchodzi do git ─────────────
 # AIGON-X-FS przechowuje runtime data (knowledge, memory, artifacts,

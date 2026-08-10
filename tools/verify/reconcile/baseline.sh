@@ -142,4 +142,4 @@ recon_baseline_diff \
   "tools/verify/ docs/00-foundation/" \
   "${UNEXPECTED_MOD:-none}"
 
-say ""
+verify_module_exit

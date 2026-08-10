@@ -46,13 +46,13 @@ fi
 
 # --- T2: Migration ---------------------------------------------------------
 echo ""
-echo "--- T2: Migration (0001_initial) ---"
+echo "--- T2: Migration (0001_initial + 0002_history_hash) ---"
 if state_migrate >/dev/null 2>&1; then
     sv=$(sqlite3 "$STATE_DB" "SELECT value FROM meta WHERE key='schema_version';")
-    if [ "$sv" = "1" ]; then
+    if [ "$sv" = "$STATE_SCHEMA_VERSION" ]; then
         t_pass "Migracja zastosowana, schema_version=$sv"
     else
-        t_fail "schema_version=$sv (oczekiwano 1)"
+        t_fail "schema_version=$sv (oczekiwano $STATE_SCHEMA_VERSION)"
     fi
 else
     t_fail "Migracja NIE powiodła się"
@@ -154,17 +154,104 @@ fi
 # --- T10: Rollback migration ------------------------------------------------
 echo ""
 echo "--- T10: Rollback migration (odtworzenie z migracji) ---"
-# Symulacja: usuń bazę, odtwórz z migracji, sprawdź że schema_version=1
+# Symulacja: usuń bazę, odtwórz z migracji, sprawdź że schema_version=docelowa
 rm -f "$STATE_DB"
 if state_init >/dev/null 2>&1 && state_migrate >/dev/null 2>&1; then
     sv2=$(sqlite3 "$STATE_DB" "SELECT value FROM meta WHERE key='schema_version';")
-    if [ "$sv2" = "1" ]; then
+    if [ "$sv2" = "$STATE_SCHEMA_VERSION" ]; then
         t_pass "Rollback/odtworzenie z migracji OK (schema_version=$sv2)"
     else
-        t_fail "Rollback schema_version=$sv2 (oczekiwano 1)"
+        t_fail "Rollback schema_version=$sv2 (oczekiwano $STATE_SCHEMA_VERSION)"
     fi
 else
     t_fail "Rollback/odtworzenie NIE powiodło się"
+fi
+
+# --- T11: History hash deterministyczny (F4) --------------------------------
+echo ""
+echo "--- T11: History hash deterministyczny (F4) ---"
+# Wstaw event + evidence, potem sprawdź że history_hash jest deterministyczny
+sqlite3 "$STATE_DB" "INSERT INTO event (event_id, kind, entity_type, entity_id, payload) VALUES ('e1','test','cluster','c1','{}');" 2>/dev/null
+sqlite3 "$STATE_DB" "INSERT INTO evidence (evidence_id, claim, source_type, source_ref) VALUES ('ev1','test-claim','manual','none');" 2>/dev/null
+hh1=$(state_history_hash)
+hh2=$(state_history_hash)
+if [ -n "$hh1" ] && [ "$hh1" = "$hh2" ]; then
+    t_pass "History hash deterministyczny: $hh1"
+else
+    t_fail "History hash NIE deterministyczny: '$hh1' vs '$hh2'"
+fi
+
+# --- T12: Manipulacja historią -> FAIL (F4) ---------------------------------
+echo ""
+echo "--- T12: Manipulacja historią (event/evidence) -> FAIL (F4) ---"
+# 1. Utwórz snapshot (zapisuje history_hash)
+sid_f4=$(state_snapshot 2>/dev/null)
+if [ -z "$sid_f4" ]; then
+    t_fail "Nie udało się utworzyć snapshotu bazowego dla T12"
+else
+    # 2. Manipuluj historią (audyt) — dodaj fałszywy event
+    sqlite3 "$STATE_DB" "INSERT INTO event (event_id, kind, entity_type, entity_id, payload) VALUES ('e-fake','tamper','cluster','c1','{\"fake\":true}');" 2>/dev/null
+    # 3. state_verify musi wykryć drift historii -> FAIL (exit != 0)
+    if state_verify >/dev/null 2>&1; then
+        t_fail "Manipulacja historią NIE wykryta (verify zwrócił 0)"
+    else
+        t_pass "Manipulacja historią wykryta (verify zwrócił != 0)"
+    fi
+    # 4. Usuń fałszywy event, przywróć integralność
+    sqlite3 "$STATE_DB" "DELETE FROM event WHERE event_id='e-fake';" 2>/dev/null
+    if state_verify >/dev/null 2>&1; then
+        t_pass "Po usunięciu manipulacji verify wraca do PASS"
+    else
+        t_fail "Po usunięciu manipulacji verify NIE wrócił do PASS"
+    fi
+fi
+
+# --- T13: Backup manifest + verify (F5) -------------------------------------
+echo ""
+echo "--- T13: Backup manifest + verify (F5) ---"
+# Utwórz snapshot (tworzy backup z manifestem), potem zweryfikuj integralność.
+sid_f5=$(state_snapshot 2>/dev/null)
+if [ -z "$sid_f5" ]; then
+    t_fail "Nie udało się utworzyć snapshotu dla T13"
+else
+    # Manifest powinien istnieć i zawierać backup_hash.
+    manifest_f5="$STATE_BACKUP_DIR/canonical-state-$sid_f5.json"
+    if [ -f "$manifest_f5" ] && grep -q '"backup_hash"' "$manifest_f5"; then
+        t_pass "Manifest backupu utworzony: $manifest_f5"
+    else
+        t_fail "Manifest backupu NIE utworzony"
+    fi
+    # backup-verify musi przejść (integralny backup).
+    if state_backup_verify "$sid_f5" >/dev/null 2>&1; then
+        t_pass "Backup verify: INTEGRALNY"
+    else
+        t_fail "Backup verify: NIE przeszedł"
+    fi
+fi
+
+# --- T14: Backup restore test (F5) ------------------------------------------
+echo ""
+echo "--- T14: Backup restore test (F5) ---"
+if state_backup_restore_test >/dev/null 2>&1; then
+    t_pass "Backup restore test: PASS (real restore)"
+else
+    t_fail "Backup restore test: FAIL"
+fi
+
+# --- T15: Backup retention (F5) ---------------------------------------------
+echo ""
+echo "--- T15: Backup retention (F5) ---"
+# Utwórz kilka backupów, retention=2 powinno zostawić 2 najnowsze.
+for i in 1 2 3; do
+    state_snapshot >/dev/null 2>&1
+done
+before_count=$(ls "$STATE_BACKUP_DIR"/canonical-state-*.db 2>/dev/null | wc -l)
+state_backup_retention 2 >/dev/null 2>&1
+after_count=$(ls "$STATE_BACKUP_DIR"/canonical-state-*.db 2>/dev/null | wc -l)
+if [ "$after_count" -le 2 ]; then
+    t_pass "Retention: $before_count -> $after_count backupów (keep=2)"
+else
+    t_fail "Retention: $before_count -> $after_count (oczekiwano <=2)"
 fi
 
 # --- Podsumowanie -----------------------------------------------------------

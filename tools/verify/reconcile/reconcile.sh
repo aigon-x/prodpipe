@@ -136,6 +136,5 @@ printf '%-22s %s\n' "Nodes" "$NODES"
 printf '%-22s %s\n' "Agents" "$AGENTS"
 printf '%-22s %s\n' "Reproducible" "$REPRODUCIBLE"
 printf '%-22s %s\n' "Security" "$SECURITY"
-say ""
 
-say ""
+verify_module_exit
