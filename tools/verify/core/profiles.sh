@@ -74,6 +74,26 @@ VERIFY_MODULES=(
   "i18n:full:BLOCKING"
   "i18n:release:BLOCKING"
   "i18n:genesis:BLOCKING"
+  "security-credential-registry:full:BLOCKING"
+  "security-credential-registry:security:BLOCKING"
+  "security-credential-registry:release:BLOCKING"
+  "security-credential-registry:genesis:BLOCKING"
+  "security-rotation:full:BLOCKING"
+  "security-rotation:security:BLOCKING"
+  "security-rotation:release:BLOCKING"
+  "security-rotation:genesis:BLOCKING"
+  "security-retention:full:BLOCKING"
+  "security-retention:security:BLOCKING"
+  "security-retention:release:BLOCKING"
+  "security-retention:genesis:BLOCKING"
+  "security-auth:full:BLOCKING"
+  "security-auth:security:BLOCKING"
+  "security-auth:release:BLOCKING"
+  "security-auth:genesis:BLOCKING"
+  "security-web:full:BLOCKING"
+  "security-web:security:BLOCKING"
+  "security-web:release:BLOCKING"
+  "security-web:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -85,10 +105,10 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     security)
-      echo "git security security-drills"
+      echo "git security security-drills security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     architecture)
       echo "architecture contracts semantics taxonomy"
@@ -97,13 +117,13 @@ verify_profile_modules() {
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills taxonomy i18n security-credential-registry security-rotation security-retention security-auth security-web"
       ;;
     *)
       echo "git security structure"
@@ -136,21 +156,26 @@ verify_module_severity() {
 module_script() {
   local module="$1"
   case "$module" in
-    git)                   echo "git/integrity.sh" ;;
-    security)              echo "security/secrets.sh" ;;
-    structure)             echo "structure/readme.sh" ;;
-    architecture)          echo "architecture/architecture.sh" ;;
-    dependencies)          echo "dependencies/dependencies.sh" ;;
-    reproducibility)       echo "reproducibility/reproducibility.sh" ;;
-    deployment)            echo "deployment/deployment.sh" ;;
-    contracts)             echo "contracts/contracts.sh" ;;
-    migration)             echo "migration/migration.sh" ;;
-    recovery)              echo "recovery/recovery.sh" ;;
-    aesthetics)            echo "aesthetics/aesthetics.sh" ;;
-    semantics)             echo "architecture/semantics.sh" ;;
-    security-drills)       echo "security/drills.sh" ;;
-    taxonomy)              echo "architecture/taxonomy.sh" ;;
-    i18n)                  echo "i18n/i18n.sh" ;;
+    git)                                echo "git/integrity.sh" ;;
+    security)                           echo "security/secrets.sh" ;;
+    structure)                          echo "structure/readme.sh" ;;
+    architecture)                       echo "architecture/architecture.sh" ;;
+    dependencies)                       echo "dependencies/dependencies.sh" ;;
+    reproducibility)                    echo "reproducibility/reproducibility.sh" ;;
+    deployment)                         echo "deployment/deployment.sh" ;;
+    contracts)                          echo "contracts/contracts.sh" ;;
+    migration)                          echo "migration/migration.sh" ;;
+    recovery)                           echo "recovery/recovery.sh" ;;
+    aesthetics)                         echo "aesthetics/aesthetics.sh" ;;
+    semantics)                          echo "architecture/semantics.sh" ;;
+    security-drills)                    echo "security/drills.sh" ;;
+    taxonomy)                           echo "architecture/taxonomy.sh" ;;
+    i18n)                               echo "i18n/i18n.sh" ;;
+    security-credential-registry)       echo "security/sec-credential-registry.sh" ;;
+    security-rotation)                  echo "security/sec-rotation-check.sh" ;;
+    security-retention)                 echo "security/sec-retention-check.sh" ;;
+    security-auth)                      echo "security/sec-auth-check.sh" ;;
+    security-web)                       echo "security/sec-web-check.sh" ;;
     *)              echo "" ;;
   esac
 }

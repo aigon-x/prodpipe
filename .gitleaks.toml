@@ -1,0 +1,167 @@
+# ============================================================================
+# .gitleaks.toml — AIGON Production Platform — SEC-BASELINE
+# Konfiguracja gitleaks (secret scanner) dla template'u Prod-ready.
+# ============================================================================
+# Ten plik jest częścią SEC-BASELINE: rodzi się w KAŻDYM projekcie utworzonym
+# z template'u. Definiuje reguły wykrywania sekretów (SEC-D-07) oraz skan
+# historii git (SEC-R-10).
+#
+# ZASADA TEMPLATE: placeholdery sekretów w tym pliku NIE są realnymi sekretami.
+# Reguły dopasowują się do WZORCÓW (formatów), nie do konkretnych wartości.
+# Self-scan na samym template musi przechodzić (PASS).
+#
+# Użycie:
+#   gitleaks detect --source . --config .gitleaks.toml --no-banner
+#   gitleaks detect --source . --config .gitleaks.toml --no-banner --log-opts="--all"
+# ============================================================================
+
+title = "AIGON Production Platform — SEC-BASELINE secret scan"
+
+# ── Globalne wykluczenia ────────────────────────────────────────────────────
+# Katalogi/pliki, które NIGDY nie powinny być skanowane (testy, fixtures,
+# dokumentacja wzorców, katalogi sekretów z .gitignore).
+[extend]
+useDefault = true
+
+# ── Reguły wykrywania sekretów (SEC-D-07) ──────────────────────────────────
+# Każda reguła: id, description, regex, secretGroup, entropy.
+# Reguły dopasowują się do FORMATU sekretu, nie do wartości.
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''\b(AKIA|ASIA)[0-9A-Z]{16}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+regex = '''(?i)aws.{0,20}?(?:secret|access).{0,20}?['"][0-9a-zA-Z/+]{40}['"]'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "gcp-api-key"
+description = "Google Cloud Platform API Key"
+regex = '''\bAIza[0-9A-Za-z\-_]{35}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "azure-storage-key"
+description = "Azure Storage Account Key"
+regex = '''(?i)AccountKey=[A-Za-z0-9+/=]{40,}'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key"
+regex = '''\bsk-[A-Za-z0-9]{20,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API Key"
+regex = '''\bsk-ant-[A-Za-z0-9\-_]{20,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "deepseek-api-key"
+description = "DeepSeek API Key"
+regex = '''\bsk-[A-Za-z0-9]{32,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "github-token"
+description = "GitHub Personal Access Token"
+regex = '''\bgh[pousr]_[A-Za-z0-9]{36,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "gitlab-token"
+description = "GitLab Personal Access Token"
+regex = '''\bglpat-[A-Za-z0-9\-_]{20,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "slack-token"
+description = "Slack Token"
+regex = '''\bxox[baprs]-[A-Za-z0-9\-]{10,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "stripe-secret-key"
+description = "Stripe Secret Key"
+regex = '''\bsk_live_[0-9a-zA-Z]{24,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "twilio-api-key"
+description = "Twilio API Key"
+regex = '''\bSK[0-9a-fA-F]{32}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "jwt-token"
+description = "JSON Web Token"
+regex = '''\beyJ[A-Za-z0-9\-_]{10,}\.[A-Za-z0-9\-_]{10,}\.[A-Za-z0-9\-_]{10,}\b'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "private-key"
+description = "Private Key (RSA/EC/DSA/OpenSSH/PGP)"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----'''
+secretGroup = 0
+
+[[rules]]
+id = "database-connection-string"
+description = "Database Connection String with credentials"
+regex = '''(?i)(postgres|mysql|mongodb|redis|amqp)://[^:\s]+:[^@\s]+@[^/\s]+'''
+secretGroup = 0
+entropy = 3.5
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key / Secret assignment"
+regex = '''(?i)(api[_-]?key|secret|password|passwd|token|auth[_-]?token|access[_-]?key|private[_-]?key)\s*[:=]\s*["'][A-Za-z0-9_\-]{16,}["']'''
+secretGroup = 0
+entropy = 3.5
+
+# ── Allowlist (wykluczenia) ─────────────────────────────────────────────────
+# Wzorce, które NIE powinny być zgłaszane jako sekrety.
+[allowlist]
+description = "Global allowlist — pliki i wzorce, które nie są sekretami"
+paths = [
+  '''\.gitleaks\.toml$''',
+  '''\.gitignore$''',
+  '''SECURITY\.md$''',
+  '''docs/security/''',
+  '''tests/fixtures/''',
+  '''tools/verify/tests/''',
+  '''\.env\.example$''',
+  '''secrets/templates/''',
+  '''secrets/schemas/''',
+]
+# ── Allowlist regex — oczywiste placeholdery testowe ────────────────────────
+# ZASADA TEMPLATE: placeholdery sekretów w template NIE są realnymi sekretami.
+# Fixtures testowe używają sekwencyjnych, powtarzalnych wartości (np.
+# sk-1234567890abcdef1234567890abcdef), które są oczywiście fałszywe.
+# Te wzorce maskują TYLKO oczywiste placeholdery, nie realne sekrety.
+regexes = [
+  '''sk-1234567890abcdef1234567890abcdef''',
+  '''sk-1234567890abcdef''',
+  '''AKIA1234567890ABCDEF12''',
+  '''ghp_1234567890abcdefghijklmnopqrstuvwxyzABCDEF''',
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0\..{10,}''',
+]
