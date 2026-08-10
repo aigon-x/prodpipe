@@ -128,3 +128,62 @@ repo_files() {
     printf '%s\n' "$files"
   fi
 }
+
+# ── Evidence bridge (P0#1) ─────────────────────────────────
+# Każdy gate zapisuje wynik do StateStore (tabela evidence).
+# Mechanizm bez evidence = 0 punktów (metryka pokrycia).
+# Użycie: evidence_record <claim> <source_type> <source_ref>
+#   claim       — co udowodniono (np. "verify:git:integrity PASS")
+#   source_type — 'verify' | 'gate' | 'module'
+#   source_ref  — identyfikator źródła (np. "git/integrity.sh")
+# Zwraca 0 = zapisano, 1 = brak bazy / błąd (rejestruje WARN).
+VERIFY_EVIDENCE_COUNT=0
+
+evidence_record() {
+  local claim="$1" source_type="${2:-verify}" source_ref="${3:-}"
+  local db="${VERIFY_STATE_DB:-}"
+  if [ -z "$db" ]; then
+    # Root repo z git (niezawodne, niezależne od głębokości źródłowania).
+    db="$(verify_root)/system/control-plane/state/data/canonical-state.db"
+  fi
+  if ! command -v sqlite3 >/dev/null 2>&1; then
+    warn "evidence_record" "sqlite3 niedostępny — evidence NIE zapisane ($claim)"
+    return 1
+  fi
+  if [ ! -f "$db" ]; then
+    # Best-effort: zainicjalizuj bazę, jeśli nie istnieje.
+    local state_dir
+    state_dir="$(dirname "$db")/.."
+    if [ -x "$state_dir/state.sh" ]; then
+      ( cd "$state_dir" && ./state.sh init >/dev/null 2>&1 && ./state.sh migrate >/dev/null 2>&1 )
+    fi
+  fi
+  if [ ! -f "$db" ]; then
+    warn "evidence_record" "Brak bazy StateStore: $db — evidence NIE zapisane ($claim)"
+    return 1
+  fi
+  local eid
+  eid="ev-$(date +%s)-$RANDOM"
+  if sqlite3 "$db" "INSERT INTO evidence (evidence_id, claim, source_type, source_ref) VALUES ('$eid', '$claim', '$source_type', '$source_ref');" 2>/dev/null; then
+    VERIFY_EVIDENCE_COUNT=$((VERIFY_EVIDENCE_COUNT+1))
+    return 0
+  else
+    warn "evidence_record" "INSERT do evidence NIE powiódł się ($claim)"
+    return 1
+  fi
+}
+
+# ── Meta-gate: kompletność evidence (VERIFY-EVIDENCE-COMPLETE) ──
+# Każdy uruchomiony moduł MUSI zapisać evidence do StateStore.
+# Moduł bez evidence = 0 punktów (metryka pokrycia) = FAIL.
+# Użycie: verify_evidence_complete <oczekiwana_liczba>
+verify_evidence_complete() {
+  local expected="$1"
+  if [ "$VERIFY_EVIDENCE_COUNT" -ge "$expected" ]; then
+    pass "VERIFY-EVIDENCE-COMPLETE" BLOCKING "Zapisano $VERIFY_EVIDENCE_COUNT/$expected evidence do StateStore"
+    return 0
+  else
+    fail "VERIFY-EVIDENCE-COMPLETE" BLOCKING "Zapisano $VERIFY_EVIDENCE_COUNT/$expected evidence (oczekiwano $expected) — gate bez evidence = 0 punktów"
+    return 1
+  fi
+}
