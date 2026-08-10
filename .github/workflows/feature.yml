@@ -17,5 +17,7 @@ jobs:
             feature/*|fix/*|migration/*|security/*|release/*) ;;
             *) echo "FAIL: gałąź '$BRANCH' nie ma dozwolonego prefiksu (feature/fix/migration/security/release)"; exit 1 ;;
           esac
-      - name: Placeholder — feature tests
-        run: echo "Feature: brak implementacji (PHASE 9 — TEST SKELETON)"
+      - name: Run quality gates (PRE_PUSH profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates PRE_PUSH

@@ -5,8 +5,8 @@
 # ─────────────────────────────────────────────────────────────
 set -u
 
-# shellcheck source=../../../core/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/../../../core/lib.sh"
+# shellcheck source=../../core/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../../core/lib.sh"
 
 ROOT="$(verify_root)"
 cd "$ROOT"
@@ -48,7 +48,11 @@ if [ -f "./system/control-plane/state/lib.sh" ]; then
   declared=$(grep -E 'STATE_SCHEMA_VERSION=' ./system/control-plane/state/lib.sh | head -1 | sed 's/.*="\([0-9]*\)".*/\1/')
   if [ -d "$MIGRATIONS_DIR" ]; then
     last_migration=$(find "$MIGRATIONS_DIR" -name '*.sql' 2>/dev/null | sort | tail -1 | xargs -r basename | cut -d_ -f1)
-    if [ -n "$declared" ] && [ "$declared" = "$last_migration" ]; then
+    # Porównanie liczbowe: "2" == "0002" (wiodące zera w nazwie pliku migracji
+    # są konwencją nazewniczą, nie wartością — STATE_SCHEMA_VERSION="2").
+    declared_num=$((10#$declared))
+    last_num=$((10#$last_migration))
+    if [ -n "$declared" ] && [ "$declared_num" -eq "$last_num" ]; then
       pass "MIGRATION-003 schema_version spójna" BLOCKING "STATE_SCHEMA_VERSION=$declared == ostatnia migracja $last_migration."
     else
       fail "MIGRATION-003 schema_version spójna" BLOCKING "STATE_SCHEMA_VERSION=$declared != ostatnia migracja $last_migration."

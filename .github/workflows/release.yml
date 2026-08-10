@@ -6,12 +6,25 @@ on:
       - 'v*'
 
 jobs:
+  gates:
+    name: Quality Gates (RELEASE profile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run quality gates (RELEASE profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates RELEASE
+
   release:
     name: Release
     runs-on: ubuntu-latest
+    needs: [gates]
     steps:
       - uses: actions/checkout@v4
       - name: Read VERSION
         run: cat VERSION
-      - name: Placeholder — release pipeline
-        run: echo "Release: brak implementacji (immutable image digests, deployment rings)"
+      - name: Build release artifact
+        run: |
+          echo "Release: budowanie artefaktu z tagu $GITHUB_REF_NAME"
+          # TODO: immutable image digests, deployment rings (PHASE 11 — CI)

@@ -5,8 +5,8 @@
 # ─────────────────────────────────────────────────────────────
 set -u
 
-# shellcheck source=../../../core/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/../../../core/lib.sh"
+# shellcheck source=../../core/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../../core/lib.sh"
 
 ROOT="$(verify_root)"
 cd "$ROOT"

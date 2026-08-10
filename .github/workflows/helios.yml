@@ -10,5 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder — HELIOS gate
-        run: echo "HELIOS: brak implementacji (final gate przed merge)"
+      - name: Run HELIOS final gate (RELEASE profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates RELEASE

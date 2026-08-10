@@ -5,8 +5,8 @@
 # ─────────────────────────────────────────────────────────────
 set -u
 
-# shellcheck source=../../../core/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/../../../core/lib.sh"
+# shellcheck source=../../core/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../../core/lib.sh"
 
 ROOT="$(verify_root)"
 cd "$ROOT"
@@ -16,6 +16,9 @@ say "=== GATE-005 SECURITY ==="
 # ── SECURITY-001: brak hardcoded sekretów ───────────────────
 # Wzorce: sk-... (API keys), AKIA... (AWS), BEGIN PRIVATE KEY,
 # token=..., password=..., secret=...
+# Uwaga: katalog tools/verify/ jest WYŁĄCZONY ze skanowania, bo zawiera
+# wzorce detekcyjne (regex-y) w kodzie narzędzi weryfikacyjnych — to nie są
+# rzeczywiste sekrety, a skanowanie ich powodowałoby fałszywe pozytywy.
 SECRET_COUNT=0
 SECRET_DETAIL=""
 while IFS= read -r f; do
@@ -26,7 +29,7 @@ while IFS= read -r f; do
     SECRET_COUNT=$((SECRET_COUNT+1))
     SECRET_DETAIL="$SECRET_DETAIL $f"
   fi
-done < <(find . -type f -not -path './.git/*' -not -path './node_modules/*' -not -path './.venv/*' 2>/dev/null)
+done < <(find . -type f -not -path './.git/*' -not -path './node_modules/*' -not -path './.venv/*' -not -path './tools/verify/*' 2>/dev/null)
 
 if [ "$SECRET_COUNT" -eq 0 ]; then
   pass "SECURITY-001 brak hardcoded sekretów" BLOCKING "Brak wykrytych sekretów w repo."

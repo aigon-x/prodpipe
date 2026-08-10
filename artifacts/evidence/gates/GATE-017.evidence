@@ -1,0 +1,9 @@
+gate_id=GATE-017
+domain=CI
+name=Workflow CI wywołują verify.sh gates
+command=tools/verify/gates/domains/ci.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T01:39:39Z
+head=338ac56
+output==== GATE-017 CI === [PASS] CI-001 .github/workflows istnieje        Katalog workflows obecny. [PASS] CI-002 ci.yml wywołuje verify.sh gates        ci.yml wywołuje verify.sh gates. [PASS] CI-003 release.yml wywołuje verify.sh gates        release.yml wywołuje verify.sh gates. [PASS] CI-004 brak placeholderów w CI        Brak placeholderów w workflow.  === RESULT === Checks: 4  PASS: 4  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

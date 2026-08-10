@@ -1,0 +1,9 @@
+gate_id=GATE-008
+domain=DEPENDENCIES
+name=Brak nieznanych zależności
+command=tools/verify/gates/domains/dependencies.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T01:39:39Z
+head=338ac56
+output==== GATE-008 DEPENDENCIES === [INFO] DEPENDENCIES-001 manifesty zależności        Brak manifestów zależności (repo bez zależności). [PASS] DEPENDENCIES-002 brak node_modules w repo        Brak node_modules. [PASS] DEPENDENCIES-003 brak vendor/ w repo        Brak vendor/. [INFO] DEPENDENCIES-004 lockfile zacommitowany        Brak lockfile'ów.  === RESULT === Checks: 4  PASS: 2  FAIL: 0  WARN: 0  INFO: 2 CERTIFICATION: PASS

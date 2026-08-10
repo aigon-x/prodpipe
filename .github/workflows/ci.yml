@@ -63,5 +63,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder — unit tests
-        run: echo "Unit tests: brak implementacji (PHASE 9 — TEST SKELETON)"
+      - name: Run unit tests
+        run: |
+          if [ -f Makefile ] && grep -q '^test:' Makefile; then
+            make test
+          elif [ -f package.json ]; then
+            npm test
+          else
+            echo "Brak zdefiniowanego runnera testów (Makefile test: / package.json)."
+            echo "FAIL: brak testów jednostkowych."
+            exit 1
+          fi
+
+  gates:
+    name: Quality Gates (CI profile)
+    runs-on: ubuntu-latest
+    needs: [validate-sot, architecture-boundaries]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run quality gates (CI profile)
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh gates CI

@@ -1,0 +1,9 @@
+gate_id=GATE-003
+domain=CANONICALITY
+name=config/canonical jest jedynym źródłem prawdy
+command=tools/verify/gates/domains/canonicality.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T01:39:39Z
+head=338ac56
+output==== GATE-003 CANONICALITY === [PASS] CANONICALITY-001 config/canonical istnieje        Katalog config/canonical obecny. [PASS] CANONICALITY-002 brak shadow config        Brak duplikacji konfiguracji poza config/canonical. [PASS] CANONICALITY-003 canonical niepusty        3 plików w config/canonical.  === RESULT === Checks: 3  PASS: 3  FAIL: 0  WARN: 0  INFO: 0 CERTIFICATION: PASS

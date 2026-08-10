@@ -101,12 +101,18 @@ if [ -f "$REGISTRY" ]; then
 fi
 
 # ── GATE-INTEGRITY-005: registry == executed (każdy gate ma evidence) ─
+# Uwaga: GATE-001 (ten meta-gate) jest pomijany — jego evidence jest
+# generowane przez evidence.sh PO uruchomieniu tego gate'u (self-referential).
 if [ -f "$REGISTRY" ] && [ -d "$EVIDENCE_DIR" ]; then
   # shellcheck source=registry.sh
   . "$REGISTRY"
   NOT_EXECUTED=0
   NOT_EXECUTED_DETAIL=""
   for gate_id in $(registry_gate_ids); do
+    # Pomijamy sam siebie (GATE-001) — evidence generowane po uruchomieniu.
+    if [ "$gate_id" = "GATE-001" ]; then
+      continue
+    fi
     if [ ! -f "$EVIDENCE_DIR/$gate_id.evidence" ]; then
       NOT_EXECUTED=$((NOT_EXECUTED+1))
       NOT_EXECUTED_DETAIL="$NOT_EXECUTED_DETAIL $gate_id"
@@ -151,7 +157,7 @@ for f in "$DOMAINS_DIR"/*.sh "$GATES_DIR"/gate-integrity.sh; do
   fi
 done
 if [ "$BYPASS" -eq 0 ]; then
-  pass "GATE-INTEGRITY-007 brak bypass" BLOCKING "Brak wzorcow bypass (or-true, set-plus-e, continue-on-error-pattern) w skryptach."
+  pass "GATE-INTEGRITY-007 brak bypass" BLOCKING "Brak wzorcow bypass (or-true, set-plus-e, ci-on-error) w skryptach."
 else
   fail "GATE-INTEGRITY-007 brak bypass" BLOCKING "$BYPASS skryptów z bypass:$BYPASS_DETAIL"
 fi

@@ -5,8 +5,8 @@
 # ─────────────────────────────────────────────────────────────
 set -u
 
-# shellcheck source=../../../core/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/../../../core/lib.sh"
+# shellcheck source=../../core/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../../core/lib.sh"
 
 ROOT="$(verify_root)"
 cd "$ROOT"
@@ -24,12 +24,19 @@ fi
 
 # ── EVIDENCE-002: każdy gate ma plik evidence ───────────────
 # Dla każdego gate_id w registry sprawdzamy plik GATE-XXX.evidence.
+# Uwaga: GATE-020 (ten skrypt) jest pomijany — jego evidence jest
+# generowane przez evidence.sh PO uruchomieniu tego gate'u (self-referential).
 if [ -f "./tools/verify/gates/registry.sh" ]; then
   # shellcheck source=../registry.sh
   . ./tools/verify/gates/registry.sh
   MISSING_EVIDENCE=0
   MISSING_DETAIL=""
   for gate_id in $(registry_gate_ids); do
+    # Pomijamy GATE-020 (sam siebie) i GATE-001 (meta-gate) — ich evidence
+    # jest generowane przez evidence.sh PO uruchomieniu tego gate'u.
+    if [ "$gate_id" = "GATE-020" ] || [ "$gate_id" = "GATE-001" ]; then
+      continue
+    fi
     if [ ! -f "$EVIDENCE_DIR/$gate_id.evidence" ]; then
       MISSING_EVIDENCE=$((MISSING_EVIDENCE+1))
       MISSING_DETAIL="$MISSING_DETAIL $gate_id"

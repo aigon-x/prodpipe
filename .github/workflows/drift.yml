@@ -14,5 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Placeholder — drift reconciliation
-        run: echo "Drift: brak implementacji (reconciliation engine — Git desired vs Runtime actual → PASS/DRIFT)"
+      - name: Run drift reconciliation
+        run: |
+          chmod +x tools/verify/verify.sh
+          bash tools/verify/verify.sh drift
