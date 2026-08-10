@@ -74,10 +74,11 @@ OPTIONAL_SECTIONS=(
 #   tools/security/                → security/secrets.sh
 #   .tools/                        → narzędzia pomocnicze
 #   config/generated/              → generated artifacts (tylko .gitkeep)
+#   docs/graphs/                   → generated artifacts (project-model.json → mermaid)
 # Wzorzec to regex alternatyw (grep -vE), nie lista ze spacjami.
 # Każdy katalog dopasowujemy z opcjonalnym końcowym "/" (bo dirname zwraca
 # katalog bez "/", np. ".git-hooks", a ścieżka pliku ma "/", np. ".git-hooks/x").
-DRIFT_EXCLUDE='^(\.git-hooks/?|\.github/?|system/control-plane/state/?|tools/verify/?|tools/security/?|\.tools/?|config/generated/)'
+DRIFT_EXCLUDE='^(\.git-hooks/?|\.github/?|system/control-plane/state/?|tools/verify/?|tools/security/?|\.tools/?|config/generated/|docs/graphs/)'
 
 # ── DRIFT-001 Root README jest platform overview ────────────
 say ""

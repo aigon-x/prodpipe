@@ -35,7 +35,7 @@ fi
 CANONICAL_CONFIG=$(find config/canonical -type f \( -name '*.yaml' -o -name '*.yml' -o -name '*.json' \) 2>/dev/null || true)
 if [ -n "$CANONICAL_CONFIG" ]; then
   # Hardcoded IP (poza localhost/example/placeholder)
-  if grep -HnE '\b(10\.|100\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' $CANONICAL_CONFIG 2>/dev/null | grep -vE '127\.0\.0\.1|0\.0\.0\.0|localhost|example|placeholder|TODO|UNDEFINED'; then
+  if grep -HnE '\b(10\.|100\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)([0-9]{1,3}\.){2}[0-9]{1,3}\b' $CANONICAL_CONFIG 2>/dev/null | grep -vE '127\.0\.0\.1|0\.0\.0\.0|localhost|example|placeholder|TODO|UNDEFINED'; then
     echo "[validate-sot] FAIL: hardcoded IP w config/canonical (dynamiczne wartości nie mogą być ręcznie utrzymywane)"
     FAIL=1
   fi
