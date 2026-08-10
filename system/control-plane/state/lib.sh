@@ -21,7 +21,7 @@ STATE_DATA_DIR="${STATE_DIR}/data"
 STATE_DB="${STATE_DATA_DIR}/canonical-state.db"
 STATE_BACKUP_DIR="${STATE_DATA_DIR}/backups"
 STATE_MIGRATIONS_DIR="${STATE_DIR}/migrations"
-STATE_SCHEMA_VERSION="10"
+STATE_SCHEMA_VERSION="11"
 
 # --- Kolory (jeśli TTY) ----------------------------------------------------
 if [ -t 1 ]; then

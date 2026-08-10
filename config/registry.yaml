@@ -103,3 +103,21 @@ human:
       task_success_target: 0.85
       conversion_rate_target: 0.6
       friction_budget_default: 30
+
+contracts:
+  # integrity_enabled — czy gate kontraktów (contracts/contracts.sh) jest aktywny.
+  # Gdy false, moduł contracts jest pomijany w certyfikacji.
+  integrity_enabled: true
+
+  # max_breaking — maksymalna liczba łamiących zmian kontraktów (breaking changes)
+  # dozwolona bez blokady. 0 = żadna łamiąca zmiana nie przechodzi.
+  max_breaking: 0
+
+  # contract_locations — lokalizacje, w których szukamy kontraktów API.
+  # Moduł contracts.sh sprawdza te ścieżki (CONTRACT-001).
+  contract_locations:
+    - api/openapi.yaml
+    - openapi.yaml
+    - contracts/openapi.yaml
+    - contracts/*.yaml
+    - contracts/*/contract.md
