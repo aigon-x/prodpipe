@@ -1,0 +1,123 @@
+# ============================================================================
+# glossary.yaml — ŹRÓDŁO PRAWDY dla ARCHITECTURAL SEMANTICS GATE.
+# ============================================================================
+# Rejestr terminów używanych przez system. Każdy termin krytyczny MUSI mieć:
+#   - canonical_definition (definicja kanoniczna)
+#   - source (skąd pochodzi)
+#   - owner (właściciel)
+#   - version (wersja)
+#   - epistemic_status (FACT | INFERENCE | HYPOTHESIS | UNKNOWN)
+#
+# Zasada epistemic governance: FACT / INFERENCE / HYPOTHESIS / UNKNOWN
+# nie mogą się mieszać. Termin bez epistemic_status = UNKNOWN_SEMANTICS.
+#
+# Termin krytyczny z epistemic_status=UNKNOWN → GATE = FAIL (BLOCKING).
+# Termin niekrytyczny bez definicji → WARN.
+#
+# NIE edytuj tego pliku ręcznie bez przejścia przez ARCHITECTURAL SEMANTICS
+# GATE (SEM-001..007). Zmiany glossary = tylko platform (CODEOWNERS).
+# ============================================================================
+
+schema_version: 1
+
+# ── Terminy krytyczne ──────────────────────────────────────────────────────
+# Termin krytyczny = używany w gate'ach, wymaganiach lub architekturze.
+# Brak definicji dla terminu krytycznego = FAIL (BLOCKING).
+terms:
+  # ── SEC D/A/R/C (wymiar #3 Bezpieczeństwo) ─────────────────────────────
+  # STATUS: UNRESOLVED — patrz docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md
+  # CONFLICT-001: design doc mówi "3 niezależne domeny zaufania" (3), ale
+  # SEC matrix definiuje D/A/R/C (4 litery). Rozbieżność nierozstrzygnięta.
+  sec-d:
+    canonical_definition: "Detection — wykrywanie intruzji, anomalii, kompromitacji (PROPOSED — nie zatwierdzone)"
+    source: "docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-a, sec-r, sec-c]
+    implementation: "tools/verify/security/drills.sh (SEC-DEPLOY — pending)"
+    test: "tools/verify/tests/test-security-drills.sh (pending)"
+    documentation: "docs/architecture/sec-deploy-design.md"
+    epistemic_status: HYPOTHESIS
+  sec-a:
+    canonical_definition: "Authorization — czy w tej konkretnej sytuacji wolno wykonać operację (PROPOSED — nie zatwierdzone)"
+    source: "docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-d, sec-r, sec-c]
+    implementation: "tools/verify/security/drills.sh (SEC-DEPLOY — pending)"
+    test: "tools/verify/tests/test-security-drills.sh (pending)"
+    documentation: "docs/architecture/sec-deploy-design.md"
+    epistemic_status: HYPOTHESIS
+  sec-r:
+    canonical_definition: "Recovery — odzyskiwanie po incydencie (PROPOSED — nie zatwierdzone)"
+    source: "docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-d, sec-a, sec-c]
+    implementation: "tools/verify/security/drills.sh (SEC-DEPLOY — pending)"
+    test: "tools/verify/tests/test-security-drills.sh (pending)"
+    documentation: "docs/architecture/sec-deploy-design.md"
+    epistemic_status: HYPOTHESIS
+  sec-c:
+    canonical_definition: "Confidentiality — poufność, ochrona przed wyciekiem (PROPOSED — nie zatwierdzone)"
+    source: "docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-d, sec-a, sec-r]
+    implementation: "tools/verify/security/drills.sh (SEC-DEPLOY — pending)"
+    test: "tools/verify/tests/test-security-drills.sh (pending)"
+    documentation: "docs/architecture/sec-deploy-design.md"
+    epistemic_status: HYPOTHESIS
+
+  # ── SoD (separation of duties) ──────────────────────────────────────────
+  sod:
+    canonical_definition: "Separation of duties — rozdzielenie obowiązków; tester ≠ autor, brak self-approval"
+    source: "docs/architecture/human-plane-design.md (MAN-07)"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-a]
+    implementation: "docs/architecture/human-plane-charter-template.md"
+    test: "pending"
+    documentation: "docs/architecture/human-plane-design.md"
+    epistemic_status: FACT
+
+  # ── Trust domain ────────────────────────────────────────────────────────
+  trust-domain:
+    canonical_definition: "Domena zaufania — granica, w obrębie której obowiązuje wspólna polityka zaufania (DEFINICJA NIEPEŁNA — CONFLICT-001)"
+    source: "docs/architecture/aesthetics-plane-design.md (wiersz 79)"
+    owner: sovereign
+    version: 1
+    introduced_at: "2026-08-10"
+    last_changed: "2026-08-10"
+    related_concepts: [sec-d, sec-a, sec-r, sec-c]
+    implementation: "pending"
+    test: "pending"
+    documentation: "docs/decisions/ARCHITECTURAL-KNOWLEDGE-GAP-SEC-DARC.md"
+    epistemic_status: UNKNOWN
+
+# ── Słowa-slogany ──────────────────────────────────────────────────────────
+# Słowa, które wyglądają jak precyzyjne wymagania, ale często nie mają
+# formalnej definicji. Gate sprawdza, czy każde z nich ma formalną definicję
+# (nie jest gołe). Jeżeli nie → UNKNOWN_SEMANTICS.
+slogan_terms:
+  - "production ready"
+  - "secure"
+  - "trusted"
+  - "safe"
+  - "autonomous"
+  - "critical"
+  - "high risk"
+  - "verified"
+  - "canonical"
+  - "resilient"
+  - "sovereign"

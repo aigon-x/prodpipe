@@ -59,6 +59,14 @@ VERIFY_MODULES=(
   "aesthetics:full:BLOCKING"
   "aesthetics:release:BLOCKING"
   "aesthetics:genesis:BLOCKING"
+  "semantics:full:BLOCKING"
+  "semantics:architecture:BLOCKING"
+  "semantics:release:BLOCKING"
+  "semantics:genesis:BLOCKING"
+  "security-drills:full:BLOCKING"
+  "security-drills:security:BLOCKING"
+  "security-drills:release:BLOCKING"
+  "security-drills:genesis:BLOCKING"
 )
 
 # ── Profile → moduły ─────────────────────────────────────────
@@ -70,25 +78,25 @@ verify_profile_modules() {
       echo "git security structure aesthetics"
       ;;
     full)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills"
       ;;
     security)
-      echo "git security"
+      echo "git security security-drills"
       ;;
     architecture)
-      echo "architecture contracts"
+      echo "architecture contracts semantics"
       ;;
     reproducibility)
       echo "reproducibility dependencies"
       ;;
     release)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills"
       ;;
     genesis)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills"
       ;;
     all)
-      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics"
+      echo "git security structure architecture dependencies reproducibility deployment contracts migration recovery aesthetics semantics security-drills"
       ;;
     *)
       echo "git security structure"
@@ -132,6 +140,8 @@ module_script() {
     migration)             echo "migration/migration.sh" ;;
     recovery)              echo "recovery/recovery.sh" ;;
     aesthetics)            echo "aesthetics/aesthetics.sh" ;;
+    semantics)             echo "architecture/semantics.sh" ;;
+    security-drills)       echo "security/drills.sh" ;;
     *)              echo "" ;;
   esac
 }
