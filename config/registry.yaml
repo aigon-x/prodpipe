@@ -1,0 +1,56 @@
+# ============================================================================
+# config/registry.yaml — CANONICAL CONFIGURATION REGISTRY
+# ============================================================================
+# AIGON Production Platform — kanoniczne źródło prawdy dla konfiguracji.
+# Ten plik jest JEDYNYM źródłem prawdy dla wartości resilience (RTO/RPO,
+# restore drill / game day cadence, floors per tier). Wartości NIE są
+# hardkodowane w skryptach — skrypty czytają stąd (RULE ZERO: prawda ze źródła).
+#
+# Sekcja `resilience:` jest konsumowana przez:
+#   * tools/verify/gates/domains/resilience.sh (GATE-039, checks RES-B-01..04)
+#   * tools/resilience/restore-drill/restore-drill.sh (pipeline restore drill)
+#   * system/control-plane/state/migrations/0009_resilience.sql (resilience_requirements)
+#
+# Jednostki: rto/rpo w minutach, *_max_age w dniach.
+# ============================================================================
+
+resilience:
+  # RTO — Recovery Time Objective: maksymalny dopuszczalny czas przywrócenia
+  # usługi po awarii (minuty).
+  rto: 15
+
+  # RPO — Recovery Point Objective: maksymalna dopuszczalna utrata danych
+  # (minuty). Determines backup cadence.
+  rpo: 5
+
+  # restore_drill_max_age — maksymalny wiek ostatniego udanego restore drill
+  # (dni). Po przekroczeniu resilience.sh (RES-B-02) i cron wymuszają nowy drill.
+  restore_drill_max_age: 7
+
+  # dr_game_day_max_age — maksymalny wiek ostatniego Disaster Recovery game day
+  # (dni). Game day to pełne, zaplanowane ćwiczenie DR (agent B: docs/resilience/game-day/).
+  dr_game_day_max_age: 30
+
+  # floors — minimalne wymagania odporności per tier. Tier-0 to najbardziej
+  # krytyczne usługi (najostrzejsze RTO/RPO), tier-3 najmniej krytyczne.
+  floors:
+    tier-0:
+      rto: 15
+      rpo: 5
+      restore_drill_max_age: 7
+      dr_game_day_max_age: 30
+    tier-1:
+      rto: 30
+      rpo: 15
+      restore_drill_max_age: 14
+      dr_game_day_max_age: 60
+    tier-2:
+      rto: 60
+      rpo: 30
+      restore_drill_max_age: 30
+      dr_game_day_max_age: 90
+    tier-3:
+      rto: 120
+      rpo: 60
+      restore_drill_max_age: 60
+      dr_game_day_max_age: 180

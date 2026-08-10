@@ -1,0 +1,19 @@
+-- ============================================================================
+-- MIGRATION 0008 — CURRENCY / FRESHNESS (dependency currency & EOL)
+-- ============================================================================
+-- AIGON Production Platform — Currency Plane.
+-- Rezerwacja numeru migracji dla warstwy świeżości: dependency_currency,
+-- tech_decisions (TDR), EOL tracker, crypto agility.
+--
+-- Zasada: schema jest MIGRACYJNA. Każda zmiana to nowy plik w migrations/.
+-- NIGDY ręcznych zmian schematu — tylko przez migracje.
+--
+-- DECLARED-INTENT (rezerwacja schematu):
+-- Ta migracja jest świadomie zdefiniowana jako forward-compatible placeholder.
+-- Currency domain model (dependency_currency / tech_decisions / eol_tracker /
+-- crypto_agility) zostanie dodany INKREMENTALNIE w ramach Currency Plane.
+-- Numer 0008 jest zarezerwowany, aby utrzymać ciągłą, logicznie uporządkowaną
+-- sekwencję migracji.
+--
+-- RESERVED_TABLES: dependency_currency tech_decision eol_tracker crypto_agility
+-- ============================================================================
