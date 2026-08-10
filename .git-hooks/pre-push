@@ -15,14 +15,37 @@ BRANCH="$(git branch --show-current)"
 
 # ── 1. Zakaz bezpośredniego push na main ─────────────────────
 # main jest protected — zmiany idą przez PR.
-if [ "$BRANCH" = "main" ]; then
+# WYJĄTEK: lokalny bare repo (origin jako ścieżka, nie URL) to backup/sync,
+# nie publikacja — push na main jest dozwolony. Zdalne origin (http/git@)
+# nadal wymaga PR.
+ORIGIN="$(git remote get-url origin 2>/dev/null || echo '')"
+IS_LOCAL_BARE=0
+case "$ORIGIN" in
+  http://*|https://*|git@*|ssh://*) IS_LOCAL_BARE=0 ;;
+  *) [ -n "$ORIGIN" ] && IS_LOCAL_BARE=1 ;;
+esac
+
+if [ "$BRANCH" = "main" ] && [ "$IS_LOCAL_BARE" -eq 0 ]; then
   echo "[pre-push] FAIL: bezpośredni push na 'main' jest zabroniony."
   echo "[pre-push] Zmiany idą przez PR (feature/fix/migration/security/release → main)."
   exit 1
 fi
+if [ "$BRANCH" = "main" ] && [ "$IS_LOCAL_BARE" -eq 1 ]; then
+  echo "[pre-push] OK: lokalny bare repo (backup/sync) — push na main dozwolony."
+fi
 
 # ── 2. Dozwolone prefiksy branchy ────────────────────────────
+# main jest dozwolony tylko dla lokalnego bare repo (backup/sync).
 case "$BRANCH" in
+  main)
+    if [ "$IS_LOCAL_BARE" -eq 1 ]; then
+      echo "[pre-push] OK: main na lokalny bare repo (backup/sync)."
+    else
+      echo "[pre-push] FAIL: branch 'main' nie ma dozwolonego prefiksu."
+      echo "[pre-push] Dozwolone: feature/*, fix/*, migration/*, security/*, release/*"
+      exit 1
+    fi
+    ;;
   feature/*|fix/*|migration/*|security/*|release/*)
     echo "[pre-push] OK: branch '$BRANCH' ma dozwolony prefiks."
     ;;
