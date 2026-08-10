@@ -87,26 +87,40 @@ Klasy synchronizacji: **CANONICAL / REPLICATED / GENERATED / CACHE / SESSION / E
 4. **Metadata-driven (cel P0)** — definicje gate'ów żyją w configu/bazie, nie w kodzie pipeline'u. Pipeline generowany z definicji, nie hardcoded.
 5. **Metryka pokrycia** — mechanizm liczy się jako wdrożony **wyłącznie**, gdy produkuje evidence w bazie. Placeholder/szkielet = 0 punktów. Pokrycie = (mechanizmy z evidence) / (mechanizmy zadeklarowane).
 
-### 9.2 Mapa gate'ów G0-G8 → stan
+### 9.2 Mapa gate'ów infrastrukturalnych → stan
 
-| Gate | Stan | Evidence |
-|------|------|----------|
-| G0 pre-commit | **REALNY** (blokujący) | tak |
-| G1 pre-push | **REALNY** (blokujący) | tak |
-| G2 build | **MISSING** | nie |
-| G3 commit-msg / signed | **CZĘŚCIOWO** (brak commit-msg + signed) | częściowo |
-| G4 SBOM / SLSA | **PLACEHOLDER** | nie |
-| G5 anti-drift | **PLACEHOLDER** | nie |
-| G6 anti-shadow | **MISSING** | nie |
-| G7 anti-entropy | **MISSING** | nie |
-| G8 governance | **SZKIELET** (event/evidence/debt/drift tables) | częściowo |
-| META SELF-001 | **REALNY** (od tego PR) | tak |
-| META VERIFY-EVIDENCE-COMPLETE | **REALNY** (od tego PR) | tak |
+> **Numeracja:** gate'y infrastrukturalne mają identyfikatory **GATE-XXX** z
+> `tools/verify/gates/registry.sh` (jedyny SoT). Numeracja **G0-G17** jest
+> zarezerwowana wyłącznie dla gate'ów **jakościowych** cyklu życia
+> (LIFECYCLE.md §4, po jednym na fazę F00-F17). Nie ma kolizji: G0-G17 ≠ GATE-XXX.
+
+| Gate (registry) | Nazwa | Stan | Evidence |
+|------|------|------|----------|
+| GATE-018 | pre-commit / pre-push / commit-msg / signed (GIT-HOOKS) | **REALNY** (blokujący) | tak |
+| GATE-017 | build / CI | **CZĘŚCIOWO** (workflow CI wywołują verify.sh gates) | częściowo |
+| GATE-002 | SoT git == desired state | **REALNY** (blokujący) | tak |
+| GATE-003 | canonicality (config/canonical jedyne SoT) | **REALNY** | tak |
+| GATE-004 | configuration (każdy element ma źródło konfiguracji) | **REALNY** | tak |
+| GATE-005 | security (brak hardcoded sekretów) | **REALNY** | tak |
+| GATE-021 | anti-entropy / system-twin (SYSTEM-TWIN) | **REALNY** | tak |
+| GATE-025 | anti-drift / effective-config | **REALNY** | tak |
+| GATE-026 | behavioral-drift | **PROPOSED** (brak implementacji) | nie |
+| GATE-006..016 | structure/architecture/deps/reproducibility/deployment/contracts/migration/recovery/testing/performance/documentation | **REALNY** | tak |
+| GATE-019 | state (StateStore spójny, schema_version zgodna) | **REALNY** | tak |
+| GATE-020 | evidence (każdy gate ma evidence) | **REALNY** | tak |
+| GATE-040 | lifecycle (LIFECYCLE PLANE) | **REALNY** | tak |
+| META SELF-001 | registry==implemented==wired==executed | **REALNY** (od tego PR) | tak |
+| META VERIFY-EVIDENCE-COMPLETE | każdy gate ma evidence | **REALNY** (od tego PR) | tak |
+
+> **Uwaga:** G2 build, G4 SBOM/SLSA, G6 anti-shadow z dawnej mapy G0-G8 nie mają
+> bezpośredniego odpowiednika GATE-XXX — są pokryte przez GATE-017 (CI) i
+> GATE-026 (behavioral-drift, PROPOSED). SBOM/SLSA i anti-shadow pozostają
+> otwartymi pozycjami (patrz 9.3).
 
 ### 9.3 Priorytety (Definition of Done)
 
-- **P0** — evidence bridge (DONE w tym PR) → metadata-driven pipeline → G2 build.
-- **P1** — `gate_runs`/`waivers` + waiver sweeper → SBOM/SLSA → anti-drift.
+- **P0** — evidence bridge (DONE w tym PR) → metadata-driven pipeline → build (GATE-017).
+- **P1** — `gate_runs`/`waivers` + waiver sweeper → SBOM/SLSA → anti-drift (GATE-025/026).
 - **P2** — anti-shadow → ożywienie `debt` (INSERT INTO debt) → docs gate.
 - **P3** — start wyłącznie po P0, wymaga ADR-0001; wejście danych = historia `evidence`/`gate_runs` od P0.
 
