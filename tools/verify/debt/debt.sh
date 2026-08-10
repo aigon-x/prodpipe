@@ -48,6 +48,7 @@ if [ -d "./archive" ]; then
 fi
 if [ "$CONSCIOUS" -gt 0 ]; then
   info "DEBT-101 Dług świadomy (ALLOWED_LEGACY)" "$CONSCIOUS elementów w archive/ — świadomie archiwizowane."
+  recon_record_debt "debt" "Dług świadomy: $CONSCIOUS elementów w archive/" "CONSCIOUS" "CURRENT" "" "" "debt/debt.sh"
 else
   pass "DEBT-101 Dług świadomy (ALLOWED_LEGACY)" BLOCKING "Brak długu świadomego."
 fi
@@ -75,6 +76,7 @@ if [ -d "./archive/quarantine" ]; then
   qcount=$(find ./archive/quarantine -type f -not -name 'README.md' -not -name '.gitkeep' 2>/dev/null | wc -l)
   if [ "$qcount" -gt 0 ]; then
     info "DEBT-104 Dług w quarantine/" "$qcount elementów w quarantine/ — wyizolowane."
+    recon_record_debt "debt" "Dług w quarantine/: $qcount elementów" "QUARANTINED" "CURRENT" "" "" "debt/debt.sh"
   else
     pass "DEBT-104 Dług w quarantine/" BLOCKING "quarantine/ jest puste."
   fi
@@ -92,9 +94,11 @@ if [ -f "./OWNERSHIP.md" ]; then
     pass "DEBT-105 Dług bez właściciela" BLOCKING "OWNERSHIP.md definiuje $owners właścicieli."
   else
     warn "DEBT-105 Dług bez właściciela" "OWNERSHIP.md nie definiuje właścicieli (@owner/)."
+    recon_record_debt "debt" "OWNERSHIP.md nie definiuje właścicieli (@owner/)" "HIDDEN" "DRIFT" "" "" "debt/debt.sh"
   fi
 else
   fail "DEBT-105 Dług bez właściciela" BLOCKING "Brak OWNERSHIP.md."
+  recon_record_debt "debt" "Brak OWNERSHIP.md" "HIDDEN" "DRIFT" "" "" "debt/debt.sh"
 fi
 
 # ── DEBT-106 Dług bez terminu spłaty ────────────────────────
@@ -115,6 +119,12 @@ if [ "$NODATE" -eq 0 ]; then
   pass "DEBT-106 Dług bez terminu spłaty" BLOCKING "Brak długu deprecated bez terminu spłaty."
 else
   warn "DEBT-106 Dług bez terminu spłaty" "$NODATE plików deprecated bez terminu spłaty."
+  recon_record_debt "debt" "Dług bez terminu spłaty: $NODATE plików deprecated" "HIDDEN" "DRIFT" "" "" "debt/debt.sh"
 fi
+
+# ── Evidence: moduł zakończony ──────────────────────────────
+# Meta-gate VERIFY-EVIDENCE-COMPLETE wymaga, żeby każdy moduł
+# zapisał evidence do StateStore. Bez tego gate = 0 punktów.
+evidence_record "verify:debt:reconcile:complete" "module" "debt/debt.sh"
 
 verify_module_exit

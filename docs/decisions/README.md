@@ -14,6 +14,8 @@ Git = desired state (dokumentacja). Dokumentacja jest częścią desired state w
 ## 4. Contains
 Dokumenty decyzji, rozszerzone ADR, analizy opcji, uzasadnienia.
 
+Rejestr ADR (kanoniczny): `governance/decisions/` — patrz [ADR-0001 Risk Prediction (S7)](../governance/decisions/ADR-0001-risk-prediction-s7.md).
+
 ## 5. Does Not Contain
 Nie zawiera stanu runtime, sekretów, danych biznesowych.
 

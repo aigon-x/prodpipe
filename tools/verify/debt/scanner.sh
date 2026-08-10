@@ -202,6 +202,7 @@ for entry in "${LEGACY_PORTS[@]}"; do
 done
 if [ -n "$PORT_HITS" ]; then
   recon_status "DRIFT" "DEBT-001 Legacy porty" "Znaleziono legacy porty: $PORT_HITS"
+  recon_record_debt "history" "Legacy porty: $PORT_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-001 Legacy porty" BLOCKING "Brak legacy portów."
 fi
@@ -223,6 +224,7 @@ for name in "${LEGACY_NAMES[@]}"; do
 done
 if [ -n "$NAME_HITS" ]; then
   recon_status "DRIFT" "DEBT-002 Legacy nazwy usług" "Znaleziono legacy nazwy: $NAME_HITS"
+  recon_record_debt "history" "Legacy nazwy usług: $NAME_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-002 Legacy nazwy usług" BLOCKING "Brak legacy nazw usług."
 fi
@@ -244,6 +246,7 @@ for name in "${LEGACY_NAMES[@]}"; do
 done
 if [ -n "$CONTAINER_HITS" ]; then
   recon_status "DRIFT" "DEBT-003 Legacy nazwy kontenerów" "Znaleziono legacy kontenery: $CONTAINER_HITS"
+  recon_record_debt "history" "Legacy nazwy kontenerów: $CONTAINER_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-003 Legacy nazwy kontenerów" BLOCKING "Brak legacy nazw kontenerów."
 fi
@@ -265,6 +268,7 @@ for name in "${LEGACY_NAMES[@]}"; do
 done
 if [ -n "$IMAGE_HITS" ]; then
   recon_status "DRIFT" "DEBT-004 Legacy tagi obrazów" "Znaleziono legacy obrazy: $IMAGE_HITS"
+  recon_record_debt "history" "Legacy tagi obrazów: $IMAGE_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-004 Legacy tagi obrazów" BLOCKING "Brak legacy tagów obrazów."
 fi
@@ -286,6 +290,7 @@ for host in "${LEGACY_HOSTS[@]}"; do
 done
 if [ -n "$HOST_HITS" ]; then
   recon_status "DRIFT" "DEBT-005 Legacy hostname / node ID" "Znaleziono legacy hosty: $HOST_HITS"
+  recon_record_debt "history" "Legacy hostname / node ID: $HOST_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-005 Legacy hostname / node ID" BLOCKING "Brak legacy hostname / node ID."
 fi
@@ -310,6 +315,7 @@ for ep in "${LEGACY_ENDPOINTS[@]}"; do
 done
 if [ -n "$ENDPOINT_HITS" ]; then
   recon_status "DRIFT" "DEBT-006 Legacy endpointy" "Znaleziono legacy endpointy: $ENDPOINT_HITS"
+  recon_record_debt "history" "Legacy endpointy: $ENDPOINT_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-006 Legacy endpointy" BLOCKING "Brak legacy endpointów."
 fi
@@ -331,6 +337,7 @@ for env in "${LEGACY_ENV[@]}"; do
 done
 if [ -n "$ENV_HITS" ]; then
   recon_status "DRIFT" "DEBT-007 Legacy ENV" "Znaleziono legacy ENV: $ENV_HITS"
+  recon_record_debt "history" "Legacy ENV: $ENV_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-007 Legacy ENV" BLOCKING "Brak legacy ENV."
 fi
@@ -351,6 +358,7 @@ for net in "${LEGACY_NETWORKS[@]}"; do
 done
 if [ -n "$NETWORK_HITS" ]; then
   recon_status "DRIFT" "DEBT-008 Legacy sieci Docker / usługi compose" "Znaleziono legacy sieci: $NETWORK_HITS"
+  recon_record_debt "history" "Legacy sieci Docker / usługi compose: $NETWORK_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-008 Legacy sieci Docker / usługi compose" BLOCKING "Brak legacy sieci Docker / usług compose."
 fi
@@ -371,6 +379,7 @@ for crate in "${LEGACY_CRATES[@]}"; do
 done
 if [ -n "$CRATE_HITS" ]; then
   recon_status "DRIFT" "DEBT-009 Legacy crate'y / feature flagi" "Znaleziono legacy crate'y: $CRATE_HITS"
+  recon_record_debt "history" "Legacy crate'y / feature flagi: $CRATE_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-009 Legacy crate'y / feature flagi" BLOCKING "Brak legacy crate'ów / feature flag."
 fi
@@ -387,6 +396,7 @@ for cfg in "${LEGACY_CONFIGS[@]}"; do
 done
 if [ -n "$CONFIG_HITS" ]; then
   recon_status "DRIFT" "DEBT-010 Legacy configi / schemas / migracje" "Znaleziono legacy configi: $CONFIG_HITS"
+  recon_record_debt "history" "Legacy configi / schemas / migracje: $CONFIG_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-010 Legacy configi / schemas / migracje" BLOCKING "Brak legacy configów / schematów / migracji."
 fi
@@ -403,6 +413,7 @@ for doc in "${LEGACY_DOCS[@]}"; do
 done
 if [ -n "$DOC_HITS" ]; then
   recon_status "DRIFT" "DEBT-011 Legacy docs / skille / instrukcje agentów" "Znaleziono legacy docs: $DOC_HITS"
+  recon_record_debt "history" "Legacy docs / skille / instrukcje agentów: $DOC_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-011 Legacy docs / skille / instrukcje agentów" BLOCKING "Brak legacy docs / skilli / instrukcji agentów."
 fi
@@ -421,6 +432,7 @@ for sot in "${LEGACY_SOT[@]}"; do
 done
 if [ -n "$SOT_HITS" ]; then
   recon_status "DRIFT" "DEBT-012 Legacy API / SoT" "Znaleziono legacy API / SoT: $SOT_HITS"
+  recon_record_debt "history" "Legacy API / SoT: $SOT_HITS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-012 Legacy API / SoT" BLOCKING "Brak legacy API / SoT."
 fi
@@ -432,6 +444,7 @@ say "--- L0 FILESYSTEM: Backupi / symlinki / generated ---"
 SYMLINKS=$(find . -type l -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$SYMLINKS" ]; then
   recon_status "UNKNOWN" "DEBT-013a Symlinki" "Znaleziono symlinki (wymagają klasyfikacji): $SYMLINKS"
+  recon_record_debt "history" "Symlinki (wymagają klasyfikacji): $SYMLINKS" "HIDDEN" "UNKNOWN" "" "" "debt/scanner.sh"
 else
   pass "DEBT-013a Symlinki" BLOCKING "Brak symlinków."
 fi
@@ -440,6 +453,7 @@ fi
 BACKUPS=$(find . -type f \( -name '*.bak' -o -name '*.old' -o -name '*.orig' -o -name '*.tmp' -o -name '*~' \) -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$BACKUPS" ]; then
   recon_status "DRIFT" "DEBT-013b Backupi" "Znaleziono pliki backup: $BACKUPS"
+  recon_record_debt "history" "Pliki backup: $BACKUPS" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-013b Backupi" BLOCKING "Brak plików backup."
 fi
@@ -448,6 +462,7 @@ fi
 GENERATED=$(find . -type d \( -name 'target' -o -name 'node_modules' -o -name 'dist' -o -name 'build' -o -name '.cache' \) -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$GENERATED" ]; then
   recon_status "DRIFT" "DEBT-013c Generated" "Znaleziono katalogi generated: $GENERATED"
+  recon_record_debt "history" "Katalogi generated: $GENERATED" "HIDDEN" "DRIFT" "" "" "debt/scanner.sh"
 else
   pass "DEBT-013c Generated" BLOCKING "Brak katalogów generated."
 fi
@@ -470,8 +485,14 @@ UNKNOWN_FILES=$(repo_files \
   | head -10)
 if [ -n "$UNKNOWN_FILES" ]; then
   recon_status "UNKNOWN" "DEBT-014 Status UNKNOWN" "Pliki bez klasyfikacji: $UNKNOWN_FILES"
+  recon_record_debt "history" "Pliki bez klasyfikacji: $UNKNOWN_FILES" "HIDDEN" "UNKNOWN" "" "" "debt/scanner.sh"
 else
   pass "DEBT-014 Status UNKNOWN" BLOCKING "Wszystkie pliki mają klasyfikację."
 fi
+
+# ── Evidence: moduł zakończony ──────────────────────────────
+# Meta-gate VERIFY-EVIDENCE-COMPLETE wymaga, żeby każdy moduł
+# zapisał evidence do StateStore. Bez tego gate = 0 punktów.
+evidence_record "verify:debt:scanner:complete" "module" "debt/scanner.sh"
 
 verify_module_exit

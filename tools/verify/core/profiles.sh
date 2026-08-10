@@ -9,6 +9,9 @@
 #   L2 REMOTE — CI, niezależna weryfikacja
 #   L3 RELEASE/GENESIS — pełna certyfikacja baseline/release
 # ─────────────────────────────────────────────────────────────
+# GENERATED FILE — DO NOT EDIT. Edytuj config/canonical/gates.yaml
+# i uruchom tools/verify/core/gen-profiles.sh.
+# ─────────────────────────────────────────────────────────────
 
 # ── Moduły i ich klasy ───────────────────────────────────────
 # Format: <module>:<profile>:<severity>
@@ -114,16 +117,16 @@ verify_module_severity() {
 module_script() {
   local module="$1"
   case "$module" in
-    git)            echo "git/integrity.sh" ;;
-    security)       echo "security/secrets.sh" ;;
-    structure)      echo "structure/readme.sh" ;;
-    architecture)   echo "architecture/architecture.sh" ;;
-    dependencies)   echo "dependencies/dependencies.sh" ;;
-    reproducibility) echo "reproducibility/reproducibility.sh" ;;
-    deployment)     echo "deployment/deployment.sh" ;;
-    contracts)      echo "contracts/contracts.sh" ;;
-    migration)      echo "migration/migration.sh" ;;
-    recovery)       echo "recovery/recovery.sh" ;;
+    git)                   echo "git/integrity.sh" ;;
+    security)              echo "security/secrets.sh" ;;
+    structure)             echo "structure/readme.sh" ;;
+    architecture)          echo "architecture/architecture.sh" ;;
+    dependencies)          echo "dependencies/dependencies.sh" ;;
+    reproducibility)       echo "reproducibility/reproducibility.sh" ;;
+    deployment)            echo "deployment/deployment.sh" ;;
+    contracts)             echo "contracts/contracts.sh" ;;
+    migration)             echo "migration/migration.sh" ;;
+    recovery)              echo "recovery/recovery.sh" ;;
     *)              echo "" ;;
   esac
 }

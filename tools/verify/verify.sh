@@ -7,10 +7,11 @@
 #   ./tools/verify [SUBCOMMAND] [PROFILE]
 #
 # Subkomendy:
-#   reconcile  — uruchamia wszystkie 4 warstwy (CANON/DRIFT/HISTORY/DEBT)
+#   reconcile  — uruchamia wszystkie 4 warstwy (CANON/DRIFT/HISTORY/DEBT) + waivers
 #   drift      — tylko warstwa CANON/DRIFT
 #   history    — tylko warstwa HISTORY
 #   debt       — tylko warstwa DEBT
+#   waivers    — tylko Waiver Sweeper (czyszczenie wygasłych wyjątków)
 #   (brak)     — domyślnie reconcile
 #
 # Profile (L0-L4):
@@ -54,10 +55,12 @@ VERIFY_RUN_COUNT=0
 run_module() {
   local name="$1"
   local script
-  # Argument z "/" to bezpośrednia ścieżka; w przeciwnym razie mapuj nazwę.
+  # Argument z "/" lub kończący się na ".sh" to bezpośrednia ścieżka
+  # (np. "reconcile/baseline.sh", "self-profile-integrity.sh"); w przeciwnym
+  # razie mapuj nazwę modułu przez module_script (np. "git" → "git/integrity.sh").
   case "$name" in
-    */*) script="$VERIFY_DIR/$name" ;;
-    *)   script="$VERIFY_DIR/$(module_script "$name")" ;;
+    */*|*.sh) script="$VERIFY_DIR/$name" ;;
+    *)        script="$VERIFY_DIR/$(module_script "$name")" ;;
   esac
   VERIFY_RUN_COUNT=$((VERIFY_RUN_COUNT+1))
   if [ -n "$script" ] && [ -f "$script" ]; then
@@ -122,6 +125,7 @@ case "$SUBCOMMAND" in
     run_module "history/history.sh"
     run_module "debt/scanner.sh"
     run_module "debt/debt.sh"
+    run_module "waivers/sweeper.sh"
     ;;
   drift)
     run_module "drift/drift.sh"
@@ -133,9 +137,12 @@ case "$SUBCOMMAND" in
     run_module "debt/scanner.sh"
     run_module "debt/debt.sh"
     ;;
+  waivers)
+    run_module "waivers/sweeper.sh"
+    ;;
   *)
     say "Nieznana subkomenda: $SUBCOMMAND"
-    say "Dostępne: reconcile | drift | history | debt"
+    say "Dostępne: reconcile | drift | history | debt | waivers"
     exit 2
     ;;
 esac

@@ -1,0 +1,99 @@
+# ============================================================================
+# gates.yaml — Definicje gate'ów (metadata-driven). ŹRÓDŁO PRAWDY dla profiles.sh.
+# ============================================================================
+# Ten plik jest jedynym miejscem, w którym definiuje się moduły/gate'y:
+#   - nazwa modułu (module)
+#   - ścieżka skryptu (script) — względem tools/verify/
+#   - profile, w których moduł działa, oraz severity (BLOCKING | WARNING)
+#
+# profiles.sh jest GENEROWANY z tego pliku przez tools/verify/core/gen-profiles.sh.
+# NIE edytuj profiles.sh ręcznie — edytuj ten plik i uruchom generator.
+#
+# Poziomy profili (L0-L3):
+#   L0 FAST   — pre-commit, <5-10s, oczywiste błędy
+#   L1 FULL   — pre-push, <1-3min, pełna certyfikacja lokalnego drzewa
+#   L2 REMOTE — CI, niezależna weryfikacja
+#   L3 RELEASE/GENESIS — pełna certyfikacja baseline/release
+# ============================================================================
+
+schema_version: 1
+
+# ── Moduły / gate'y ─────────────────────────────────────────────────────────
+# Każdy gate: nazwa modułu, ścieżka skryptu, profile w których działa + severity.
+gates:
+  - module: git
+    script: git/integrity.sh
+    profiles:
+      fast: BLOCKING
+      full: BLOCKING
+      security: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: security
+    script: security/secrets.sh
+    profiles:
+      fast: BLOCKING
+      full: BLOCKING
+      security: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: structure
+    script: structure/readme.sh
+    profiles:
+      fast: BLOCKING
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: architecture
+    script: architecture/architecture.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: dependencies
+    script: dependencies/dependencies.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: reproducibility
+    script: reproducibility/reproducibility.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: deployment
+    script: deployment/deployment.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: contracts
+    script: contracts/contracts.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: migration
+    script: migration/migration.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: recovery
+    script: recovery/recovery.sh
+    profiles:
+      full: WARNING
+      release: BLOCKING
+      genesis: BLOCKING
+
+# ── Profile → domyślna lista modułów (kolejność uruchamiania) ───────────────
+profiles:
+  fast: [git, security, structure]
+  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  security: [git, security]
+  architecture: [architecture, contracts]
+  reproducibility: [reproducibility, dependencies]
+  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]
+  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery]

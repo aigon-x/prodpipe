@@ -14,6 +14,12 @@ Git = desired state (ADR). ADR są częścią governance jako kod.
 ## 4. Contains
 Dokumenty ADR (kontekst, decyzja, konsekwencje), rejestr decyzji.
 
+## 4a. Rejestr ADR
+
+| ADR | Tytuł | Status |
+|---|---|---|
+| [ADR-0001](ADR-0001-risk-prediction-s7.md) | Risk Prediction (S7) w System Quality Gates | PROPOSED |
+
 ## 5. Does Not Contain
 Nie zawiera stanu runtime, sekretów, danych biznesowych.
 

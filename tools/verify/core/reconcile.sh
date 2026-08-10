@@ -137,3 +137,50 @@ recon_reset() {
   RECON_TABLE=""
   RECON_DOMAIN=""
 }
+
+# ── Ścieżka do bazy StateStore ──────────────────────────────
+# Ta sama logika co w evidence_record (lib.sh): respektuje
+# VERIFY_STATE_DB override, inaczej domyślna ścieżka canonical-state.db.
+# Użycie: recon_db
+recon_db() {
+  local db="${VERIFY_STATE_DB:-}"
+  if [ -z "$db" ]; then
+    db="$(verify_root)/system/control-plane/state/data/canonical-state.db"
+  fi
+  printf '%s' "$db"
+}
+
+# ── Rejestracja długu w tabeli debt (StateStore) ────────────
+# Każdy znaleziony dług (DRIFT/UNKNOWN) jest zapisywany do StateStore,
+# żeby gate produkował evidence i dług był śledzony w czasie.
+# Użycie: recon_record_debt <DOMAIN> <DESCRIPTION> <KIND> <STATUS> [OWNER] [DEADLINE] [SOURCE_REF]
+#   DOMAIN      — np. "history", "debt", "drift"
+#   DESCRIPTION — opis znalezionego długu
+#   KIND        — HIDDEN (domyślne) | CONSCIOUS | ARCHIVED | QUARANTINED | ALLOWED_LEGACY
+#   STATUS      — CURRENT | DEPRECATED | UNKNOWN | DRIFT
+#   OWNER       — opcjonalny właściciel
+#   DEADLINE    — opcjonalny termin spłaty
+#   SOURCE_REF  — ścieżka modułu (np. "debt/scanner.sh")
+# Zwraca 0 = zapisano, 1 = brak bazy / błąd (tylko warn, nigdy fail).
+recon_record_debt() {
+  local domain="$1" description="$2" kind="${3:-HIDDEN}" status="${4:-CURRENT}"
+  local owner="${5:-}" deadline="${6:-}" source_ref="${7:-}"
+  local db
+  db="$(recon_db)"
+  if ! command -v sqlite3 >/dev/null 2>&1; then
+    warn "recon_record_debt" "sqlite3 niedostępny — dług NIE zapisany ($domain: $description)"
+    return 1
+  fi
+  if [ ! -f "$db" ]; then
+    warn "recon_record_debt" "Brak bazy StateStore: $db — dług NIE zapisany ($domain: $description)"
+    return 1
+  fi
+  local did
+  did="debt-$(date +%s)-$RANDOM"
+  if sqlite3 "$db" "INSERT INTO debt (debt_id, domain, description, kind, status, owner, repayment_deadline, source_type, source_ref, observed_at) VALUES ('$did', '$domain', '$description', '$kind', '$status', '$owner', '$deadline', 'verify', '$source_ref', datetime('now'));" 2>/dev/null; then
+    return 0
+  else
+    warn "recon_record_debt" "INSERT do debt NIE powiódł się ($domain: $description)"
+    return 1
+  fi
+}
