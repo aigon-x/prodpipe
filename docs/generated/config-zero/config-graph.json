@@ -1,0 +1,174 @@
+{
+  "config_graph": {
+    "schema_version": "1.0.0",
+    "config_id": "aigon-config-graph",
+    "generated_by": "OPERATION CONFIG ZERO",
+    "generated_at": "2026-08-10",
+    "nodes": [
+      {
+        "id": "config/canonical/platform.yaml",
+        "type": "CANONICAL",
+        "owner": "@aigon/architecture",
+        "status": "CANONICAL",
+        "consumers": ["config-compiler.sh", "config/schemas/platform.schema.json"]
+      },
+      {
+        "id": "config/schemas/platform.schema.json",
+        "type": "CANONICAL",
+        "owner": "@aigon/architecture",
+        "status": "CANONICAL",
+        "validates": ["config/canonical/platform.yaml"]
+      },
+      {
+        "id": "tools/config/config-compiler.sh",
+        "type": "TOOL",
+        "owner": "@aigon/architecture",
+        "status": "CANONICAL",
+        "reads": ["config/canonical/platform.yaml", "config/schemas/platform.schema.json"],
+        "writes": ["config/generated/platform.generated.yaml", "config/generated/MANIFEST.generated.txt"]
+      },
+      {
+        "id": "config/generated/platform.generated.yaml",
+        "type": "GENERATED",
+        "owner": "@aigon/architecture",
+        "status": "GENERATED",
+        "source": "config/canonical/platform.yaml"
+      },
+      {
+        "id": "config/generated/MANIFEST.generated.txt",
+        "type": "GENERATED",
+        "owner": "@aigon/architecture",
+        "status": "GENERATED",
+        "source": "config/canonical/platform.yaml"
+      },
+      {
+        "id": "system/control-plane/state/schema.sql",
+        "type": "CANONICAL",
+        "owner": "@aigon/platform",
+        "status": "CANONICAL",
+        "consumers": ["state.sh"]
+      },
+      {
+        "id": "system/control-plane/state/migrations/0001_initial.sql",
+        "type": "CANONICAL",
+        "owner": "@aigon/platform",
+        "status": "CANONICAL",
+        "source": "schema.sql"
+      },
+      {
+        "id": "system/control-plane/state/migrations/0002_history_hash.sql",
+        "type": "CANONICAL",
+        "owner": "@aigon/platform",
+        "status": "CANONICAL",
+        "source": "schema.sql"
+      },
+      {
+        "id": "system/control-plane/state/state.sh",
+        "type": "TOOL",
+        "owner": "@aigon/platform",
+        "status": "CANONICAL",
+        "reads": ["schema.sql", "migrations/*.sql"],
+        "writes": ["system/control-plane/state/data/canonical-state.db"]
+      },
+      {
+        "id": "system/control-plane/state/data/canonical-state.db",
+        "type": "GENERATED",
+        "owner": "@aigon/platform",
+        "status": "GENERATED",
+        "source": "schema.sql + migrations/*.sql"
+      },
+      {
+        "id": "tools/verify/verify.sh",
+        "type": "TOOL",
+        "owner": "@aigon/quality",
+        "status": "CANONICAL",
+        "runs": ["reconcile/baseline.sh", "reconcile/reconcile.sh", "drift/drift.sh", "history/history.sh", "debt/scanner.sh", "debt/debt.sh", "config"]
+      },
+      {
+        "id": "tools/verify/debt/scanner.sh",
+        "type": "TOOL",
+        "owner": "@aigon/quality",
+        "status": "HARDCODED_INVALID",
+        "problem": "40 legacy wartości hardcoded (nie w config)"
+      },
+      {
+        "id": ".git-hooks/validate-sot",
+        "type": "SHADOW",
+        "owner": "@aigon/quality",
+        "status": "SHADOW",
+        "problem": "nie zarejestrowany w config"
+      },
+      {
+        "id": ".git-hooks/pre-commit",
+        "type": "SHADOW",
+        "owner": "@aigon/quality",
+        "status": "SHADOW",
+        "problem": "nie podłączony do .git/hooks/"
+      },
+      {
+        "id": ".git-hooks/pre-push",
+        "type": "SHADOW",
+        "owner": "@aigon/quality",
+        "status": "SHADOW",
+        "problem": "nie podłączony do .git/hooks/"
+      },
+      {
+        "id": ".github/workflows/drift.yml",
+        "type": "MOCK",
+        "owner": "@aigon/quality",
+        "status": "MOCK",
+        "problem": "placeholder — brak implementacji drift detection"
+      },
+      {
+        "id": ".github/workflows/helios.yml",
+        "type": "MOCK",
+        "owner": "@aigon/quality",
+        "status": "MOCK",
+        "problem": "placeholder — brak final gate"
+      },
+      {
+        "id": ".github/workflows/release.yml",
+        "type": "MOCK",
+        "owner": "@aigon/release",
+        "status": "MOCK",
+        "problem": "placeholder — brak release pipeline"
+      },
+      {
+        "id": ".github/workflows/security.yml",
+        "type": "MOCK",
+        "owner": "@aigon/security",
+        "status": "MOCK",
+        "problem": "placeholder — brak security scanning"
+      },
+      {
+        "id": "config/local/",
+        "type": "SHADOW",
+        "owner": "@aigon/architecture",
+        "status": "SHADOW",
+        "problem": "zadeklarowany w kompilatorze, ale nieobecny"
+      }
+    ],
+    "edges": [
+      { "from": "config/canonical/platform.yaml", "to": "config/schemas/platform.schema.json", "type": "validated_by" },
+      { "from": "config/canonical/platform.yaml", "to": "tools/config/config-compiler.sh", "type": "read_by" },
+      { "from": "tools/config/config-compiler.sh", "to": "config/generated/platform.generated.yaml", "type": "generates" },
+      { "from": "tools/config/config-compiler.sh", "to": "config/generated/MANIFEST.generated.txt", "type": "generates" },
+      { "from": "system/control-plane/state/schema.sql", "to": "system/control-plane/state/state.sh", "type": "read_by" },
+      { "from": "system/control-plane/state/state.sh", "to": "system/control-plane/state/data/canonical-state.db", "type": "generates" },
+      { "from": "tools/verify/verify.sh", "to": "tools/verify/debt/scanner.sh", "type": "runs" },
+      { "from": "tools/verify/verify.sh", "to": "tools/config/config-compiler.sh", "type": "runs (config subcommand)" }
+    ],
+    "drift_vectors": {
+      "V1": { "source": "platform.yaml", "target": "generated", "detectable": true, "mechanism": "fingerprint" },
+      "V2": { "source": "Git", "target": "state.db", "detectable": true, "mechanism": "state hash" },
+      "V3": { "source": "legacy", "target": "repo", "detectable": true, "mechanism": "DEBT-002/005/006/007/012/014" },
+      "V4": { "source": "Git", "target": "Runtime", "detectable": true, "mechanism": "reconcile" },
+      "V5": { "source": "CI drift", "target": "repo", "detectable": false, "mechanism": "MOCK" },
+      "V6": { "source": "orphaned modules", "target": "verify", "detectable": false, "mechanism": "FALSE GATE" },
+      "V7": { "source": "GHOST modules", "target": "verify", "detectable": false, "mechanism": "not executed" },
+      "V8": { "source": "git hooks", "target": "repo", "detectable": false, "mechanism": "SHADOW" },
+      "V9": { "source": "hardcoded legacy", "target": "repo", "detectable": true, "mechanism": "DEBT" },
+      "V10": { "source": "config/local", "target": "repo", "detectable": false, "mechanism": "SHADOW" }
+    }
+  }
+}

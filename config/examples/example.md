@@ -1,14 +1,14 @@
 # Config Example — AIGON Production Platform
 
-> **STATUS: UNDEFINED** — przykład w fazie genesis. Placeholder.
+> **STATUS: CANONICAL** — zdefiniowano przykład canonical config.
 
 ## Cel
 Przykłady konfiguracji (bez wartości sekretów).
 
 ## Zakres
-- Przykłady canonical config
-- Przykłady generated config
-- Przykłady local config
+- Przykład canonical config: `config/canonical/platform.yaml`
+- Przykład generated config: `config/generated/platform.generated.yaml` (GENERATED, gitignored)
+- Przykład local config: `config/local/` (LOCAL, NIGDY commitowana)
 
 ## Status
-**STATUS: UNDEFINED** — nie zaimplementowano.
+**STATUS: CANONICAL** — przykład canonical config zdefiniowany w `config/canonical/platform.yaml`.

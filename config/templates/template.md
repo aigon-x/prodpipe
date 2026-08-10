@@ -1,14 +1,14 @@
 # Config Template — AIGON Production Platform
 
-> **STATUS: UNDEFINED** — template w fazie genesis. Placeholder.
+> **STATUS: CANONICAL** — zdefiniowano szablon canonical config.
 
 ## Cel
 Szablony konfiguracji (bez wartości sekretów).
 
 ## Zakres
-- Szablony canonical config
-- Szablony generated config
-- Szablony local config
+- Szablony canonical config (wzorzec `config/canonical/platform.yaml`)
+- Szablony generated config (wzorzec `config/generated/platform.generated.yaml`)
+- Szablony local config (wzorzec `config/local/`)
 
 ## Status
-**STATUS: UNDEFINED** — nie zaimplementowano.
+**STATUS: CANONICAL** — wzorzec canonical config zdefiniowany w `config/canonical/platform.yaml`.

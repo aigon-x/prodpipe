@@ -161,9 +161,28 @@ case "$SUBCOMMAND" in
       fail "gates gate-integrity" BLOCKING "Meta-gate zakończył się kodem $integrity_rc."
     fi
     ;;
+  config)
+    # CONFIG ZERO — walidacja konfiguracji kanonicznej przez kompilator
+    say ""
+    say "────────────────────────────────────────────────────────────"
+    say "MODUŁ: config (config-compiler validate)"
+    say "────────────────────────────────────────────────────────────"
+    if [ -f "$ROOT/tools/config/config-compiler.sh" ]; then
+      bash "$ROOT/tools/config/config-compiler.sh" validate
+      rc=$?
+      if [ "$rc" -ne 0 ]; then
+        VERIFY_FAIL=$((VERIFY_FAIL + 1))
+        fail "config compiler validate" BLOCKING "Kompilator zwrócił kod $rc (oczekiwano 0)."
+      else
+        pass "config compiler validate" BLOCKING "Konfiguracja kanoniczna jest poprawna."
+      fi
+    else
+      warn "config compiler" "Brak kompilatora: $ROOT/tools/config/config-compiler.sh"
+    fi
+    ;;
   *)
     say "Nieznana subkomenda: $SUBCOMMAND"
-    say "Dostępne: reconcile | drift | history | debt | waivers | gates"
+    say "Dostępne: reconcile | drift | history | debt | waivers | gates | config"
     exit 2
     ;;
 esac

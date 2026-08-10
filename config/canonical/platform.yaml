@@ -1,0 +1,262 @@
+# =============================================================================
+# CANONICAL PLATFORM CONFIG — AIGON Production Platform
+# =============================================================================
+# STATUS: CANONICAL — jedyne źródło prawdy konfiguracji platformy.
+# Zasada: CANONICAL → VALIDATED → NORMALIZED → EFFECTIVE → GENERATED → OBSERVED.
+# Override hierarchy: DEFAULT → PROFILE → CANONICAL → ENVIRONMENT → NODE → LOCAL → RUNTIME OVERRIDE.
+# NIGDY nie zawiera sekretów — tylko SECRET_REFERENCE.
+# NIGDY nie zawiera hardcoded IP / hostname / node count / kernel count.
+# =============================================================================
+
+schema_version: "1.0.0"
+config_id: "aigon-platform-canonical"
+status: "CANONICAL"
+
+# -----------------------------------------------------------------------------
+# Platform identity (IMMUTABLE_CONSTANT — nie konfiguracja, stała)
+# -----------------------------------------------------------------------------
+platform:
+  name: "AIGON Production Platform"
+  version: "0.1.0"
+  repository: "/opt/Prod-ready"
+  baseline_tag: "BASELINE-0.1.0"
+
+# -----------------------------------------------------------------------------
+# Config pipeline model (CANONICAL_CONFIG)
+# -----------------------------------------------------------------------------
+pipeline:
+  stages:
+    - CANONICAL      # jedyne źródło prawdy (config/canonical/)
+    - VALIDATED      # walidacja względem schematu (config/schemas/)
+    - NORMALIZED     # normalizacja do kanonicznej formy
+    - EFFECTIVE      # zastosowana konfiguracja (po override hierarchy)
+    - GENERATED      # pochodna (config/generated/), NIGDY ręcznie edytowana
+    - OBSERVED       # zaobserwowana w Runtime (system/control-plane/state/)
+  override_hierarchy:
+    - DEFAULT        # wartość domyślna (nadpisywalna)
+    - PROFILE        # profil wdrożeniowy (RING 0-3)
+    - CANONICAL      # canonical config (config/canonical/)
+    - ENVIRONMENT    # zmienna środowiskowa (ENVIRONMENT)
+    - NODE           # konfiguracja per-node (GENERATED, nie ręczna)
+    - LOCAL          # konfiguracja maszynowa (config/local/, NIGDY commitowana)
+    - RUNTIME_OVERRIDE  # nadpisanie runtime (system/control-plane/state/)
+
+# -----------------------------------------------------------------------------
+# Value classification taxonomy (CANONICAL_CONFIG)
+# -----------------------------------------------------------------------------
+classification:
+  categories:
+    - CANONICAL_CONFIG
+    - DERIVED
+    - IMMUTABLE_CONSTANT
+    - SECURITY_CONSTANT
+    - TEST_FIXTURE
+    - DEFAULT
+    - LOCAL
+    - ENVIRONMENT
+    - SECRET_REFERENCE
+    - GENERATED
+    - HARDCODED_VALID
+    - HARDCODED_INVALID
+    - MOCK
+    - SHADOW
+    - UNKNOWN
+
+# -----------------------------------------------------------------------------
+# State subsystem (CANONICAL_CONFIG — integracja z system/control-plane/state/)
+# -----------------------------------------------------------------------------
+state:
+  database_id: "aigon-canonical-state"
+  schema_version: "2"
+  db_path: "system/control-plane/state/data/canonical-state.db"  # GENERATED
+  backup_retention_default: 5
+  tables:
+    - meta
+    - cluster
+    - node
+    - runtime
+    - service
+    - image
+    - network
+    - port
+    - volume
+    - agent
+    - skill
+    - project
+    - capability
+    - configuration
+    - policy
+    - contract
+    - deployment
+    - baseline
+    - snapshot
+    - event
+    - evidence
+    - drift
+    - debt
+    - decision
+    - artifact
+    - document
+
+# -----------------------------------------------------------------------------
+# Verify engine (CANONICAL_CONFIG — integracja z tools/verify/)
+# -----------------------------------------------------------------------------
+verify:
+  entrypoint: "tools/verify/verify.sh"
+  subcommands:
+    - reconcile
+    - drift
+    - history
+    - debt
+  modules:
+    - name: "reconcile/baseline.sh"
+      severity: "BLOCKING"
+    - name: "reconcile/reconcile.sh"
+      severity: "BLOCKING"
+    - name: "drift/drift.sh"
+      severity: "BLOCKING"
+    - name: "history/history.sh"
+      severity: "BLOCKING"
+    - name: "debt/scanner.sh"
+      severity: "BLOCKING"
+    - name: "debt/debt.sh"
+      severity: "BLOCKING"
+  orphaned_modules:   # FALSE GATE — kończą się say "" zamiast verify_module_exit
+    - "git/integrity.sh"
+    - "git/branches.sh"
+    - "git/history.sh"
+    - "git/tags.sh"
+    - "security/secrets.sh"
+    - "security/credentials.sh"
+    - "security/history.sh"
+    - "structure/readme.sh"
+  ghost_modules:      # zdefiniowane w profiles.sh, nigdy nie wywoływane
+    - "verify_profile_modules"
+
+# -----------------------------------------------------------------------------
+# Deployment rings (CANONICAL_CONFIG)
+# -----------------------------------------------------------------------------
+deployment:
+  rings:
+    - id: "RING_0"
+      name: "development"
+    - id: "RING_1"
+      name: "staging"
+    - id: "RING_2"
+      name: "production"
+    - id: "RING_3"
+      name: "canary"
+  rules:
+    - "immutable_image_digests"   # zakaz :latest w produkcji
+    - "compose_profiles_per_ring"
+    - "promotion_gate_between_rings"
+
+# -----------------------------------------------------------------------------
+# Git model (CANONICAL_CONFIG)
+# -----------------------------------------------------------------------------
+git:
+  canonical_branch: "main"
+  allowed_branch_prefixes:
+    - "feature/*"
+    - "fix/*"
+    - "migration/*"
+    - "security/*"
+    - "release/*"
+  allowed_tag_prefixes:
+    - "baseline-"
+    - "v[0-9]"
+    - "milestone-"
+    - "release-"
+    - "recovery-"
+  merge_chain:
+    - "PR"
+    - "Build"
+    - "Unit"
+    - "Integration"
+    - "Regression"
+    - "SOT"
+    - "Drift"
+    - "Feature"
+    - "Three Witnesses"
+    - "HELIOS"
+    - "BASELINE"
+    - "MERGE"
+
+# -----------------------------------------------------------------------------
+# README contract (CANONICAL_CONFIG — 12 wymaganych sekcji)
+# -----------------------------------------------------------------------------
+readme_contract:
+  required_sections:
+    - "1. Purpose"
+    - "2. Owner"
+    - "3. Source of Truth"
+    - "4. Contains"
+    - "5. Does Not Contain"
+    - "6. Dependencies"
+    - "7. Consumers"
+    - "8. Synchronization"
+    - "9. Lifecycle"
+    - "10. Security"
+    - "11. Recovery"
+    - "12. Drift Detection"
+  optional_sections:
+    - "Examples"
+
+# -----------------------------------------------------------------------------
+# Ownership (CANONICAL_CONFIG — single-owner Source of Truth)
+# -----------------------------------------------------------------------------
+ownership:
+  owners:
+    - id: "@aigon/architecture"
+      domains: ["/", "shared/", "contracts/", "governance/", "docs/"]
+    - id: "@aigon/platform"
+      domains: ["config/", "data/", "deployment/", "operations/", "tools/", "archive/"]
+    - id: "@aigon/security"
+      domains: ["security/", "secrets/"]
+    - id: "@aigon/release"
+      domains: ["VERSION", "artifacts/"]
+    - id: "@aigon/apps"
+      domains: ["apps/"]
+    - id: "@aigon/runtime"
+      domains: ["system/"]
+    - id: "@aigon/fs"
+      domains: ["filesystem/"]
+    - id: "@aigon/mesh"
+      domains: ["mesh/"]
+    - id: "@aigon/agents"
+      domains: ["agents/"]
+    - id: "@aigon/models"
+      domains: ["models/"]
+    - id: "@aigon/observability"
+      domains: ["observability/"]
+    - id: "@aigon/quality"
+      domains: ["tests/"]
+    - id: "@aigon/business"
+      domains: ["business/"]
+  boundaries:
+    - "agent_to_canonical_state: FORBIDDEN"
+    - "business_to_runtime_internals: FORBIDDEN"
+    - "dashboard_to_database_internals: FORBIDDEN"
+    - "node_config_to_global_truth: FORBIDDEN"
+
+# -----------------------------------------------------------------------------
+# Sync classes (CANONICAL_CONFIG)
+# -----------------------------------------------------------------------------
+sync:
+  classes:
+    - CANONICAL
+    - REPLICATED
+    - GENERATED
+    - CACHE
+    - SESSION
+    - EPHEMERAL
+  rule: "shared/ jest kanoniczną materializacją, NIE drugim SoT"
+
+# -----------------------------------------------------------------------------
+# Secrets (SECRET_REFERENCE — NIGDY rzeczywistych sekretów)
+# -----------------------------------------------------------------------------
+secrets:
+  policy: "NIGDY nie przechowuje rzeczywistych sekretów w git"
+  storage: "Vault / secrets manager (actual state)"
+  references: "secrets/templates/, secrets/schemas/"
+  rotation: "rotation policy w deployment/secrets/secrets.md"
