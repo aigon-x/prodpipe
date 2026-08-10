@@ -59,8 +59,9 @@ fi
 # ── BASE-003 Working tree czysty ────────────────────────────
 say ""
 say "--- Working tree ---"
-# Dozwolone zmiany: tools/verify/ (nowy engine), docs/00-foundation/ (nowa foundation)
-ALLOWED_PATHS="tools/verify/ docs/00-foundation/"
+# Dozwolone zmiany: tools/verify/ (nowy engine), docs/00-foundation/ (nowa foundation),
+# docs/git/ (README dla katalogu polityk git), .gitignore (wykluczenia artefaktów roboczych).
+ALLOWED_PATHS="tools/verify/ docs/00-foundation/ docs/git/ .gitignore"
 
 MODIFIED=$(git status --porcelain 2>/dev/null | grep -E '^ M|^M ' | awk '{print $2}' | head -20)
 UNTRACKED=$(git status --porcelain 2>/dev/null | grep -E '^\?\?' | awk '{print $2}' | head -20)
@@ -139,7 +140,7 @@ say ""
 recon_baseline_diff \
   "$BASELINE_TAG" \
   "$(git rev-parse --short HEAD 2>/dev/null)" \
-  "tools/verify/ docs/00-foundation/" \
+  "$ALLOWED_PATHS" \
   "${UNEXPECTED_MOD:-none}"
 
 verify_module_exit

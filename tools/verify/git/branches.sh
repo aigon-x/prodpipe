@@ -53,4 +53,4 @@ else
   fail "GIT-203 No direct push to main" BLOCKING "Brak pre-push hook."
 fi
 
-say ""
+verify_module_exit

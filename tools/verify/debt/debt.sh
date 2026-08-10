@@ -109,7 +109,7 @@ while IFS= read -r f; do
       NODATE=$((NODATE+1))
     fi
   fi
-done < <(find . -name '*.md' -not -path './.git/*' -not -path './tools/verify/*' -not -path './archive/*' 2>/dev/null)
+done < <(repo_files --name '\.md$' | grep -vE '^(tools/verify/|archive/)')
 
 if [ "$NODATE" -eq 0 ]; then
   pass "DEBT-106 Dług bez terminu spłaty" BLOCKING "Brak długu deprecated bez terminu spłaty."

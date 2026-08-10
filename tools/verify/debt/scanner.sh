@@ -47,7 +47,10 @@ cd "$ROOT"
 say "=== HISTORICAL DEBT SCANNER (L4 HISTORY) ==="
 
 # ── Katalogi wykluczone ze skanowania ───────────────────────
-EXCLUDE='./.git/ ./archive/ ./tools/verify/'
+# .qwen/ = artefakty robocze agenta (worktree, nieśledzone) — nie wchodzą do repo.
+# UWAGA: to musi być poprawny regex alternatyw (grep -vE), nie lista ze spacjami —
+# wzorzec ze spacjami był NO-OP i nie wykluczał niczego (ukryty bug).
+EXCLUDE='(\./\.git/|\./archive/|\./tools/verify/|\./\.qwen/)'
 
 # ── Katalogi, w których legacy jest DOZWOLONE (ALLOWED_LEGACY)
 # archive/ = świadomie archiwizowane; tools/verify = nowy engine.
@@ -292,7 +295,10 @@ say ""
 say "--- L4 HISTORY: Legacy endpointy ---"
 ENDPOINT_HITS=""
 for ep in "${LEGACY_ENDPOINTS[@]}"; do
-  hits=$(grep -rniE "\"${ep}\"|'${ep}'|${ep}" \
+  # Endpointy wykrywamy TYLKO w kontekście URL/portu (np. http://host:8080/health,
+  # localhost:8080/health), NIE jako ścieżki katalogów (np. system/health).
+  # Wzorzec wymaga poprzedzenia przez :port lub host, żeby uniknąć false positives.
+  hits=$(grep -rniE "(https?://[^/\"' ]*|:[0-9]{2,5})${ep}" \
     --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' \
     --include='*.toml' --include='*.json' --include='*.env' --include='*.txt' \
     . 2>/dev/null \
@@ -374,7 +380,7 @@ say ""
 say "--- L1 REPOSITORY: Legacy configi / schemas / migracje ---"
 CONFIG_HITS=""
 for cfg in "${LEGACY_CONFIGS[@]}"; do
-  hits=$(find . -name "$cfg" -not -path './.git/*' -not -path './tools/verify/*' 2>/dev/null | head -5)
+  hits=$(repo_files --name "/$cfg$" | grep -vE '^(tools/verify/|archive/)' | head -5)
   if [ -n "$hits" ]; then
     CONFIG_HITS="$CONFIG_HITS [$cfg] $hits"
   fi
@@ -390,7 +396,7 @@ say ""
 say "--- L1 REPOSITORY: Legacy docs / skille / instrukcje agentów ---"
 DOC_HITS=""
 for doc in "${LEGACY_DOCS[@]}"; do
-  hits=$(find . -name "$doc" -not -path './.git/*' -not -path './tools/verify/*' 2>/dev/null | head -5)
+  hits=$(repo_files --name "/$doc$" | grep -vE '^(tools/verify/|archive/)' | head -5)
   if [ -n "$hits" ]; then
     DOC_HITS="$DOC_HITS [$doc] $hits"
   fi
@@ -406,7 +412,9 @@ say ""
 say "--- L1 REPOSITORY: Legacy API / SoT ---"
 SOT_HITS=""
 for sot in "${LEGACY_SOT[@]}"; do
-  hits=$(find . -name "$sot*" -not -path './.git/*' -not -path './tools/verify/*' 2>/dev/null | head -5)
+  # docs/00-foundation/ to kanoniczna lokalizacja dokumentów SoT (SOURCE-OF-TRUTH.md,
+  # OWNERSHIP.md, VERSION) — to NIE jest legacy, to jest zamierzona struktura.
+  hits=$(repo_files --name "/$sot" | grep -vE '^(tools/verify/|archive/|docs/00-foundation/)' | head -5)
   if [ -n "$hits" ]; then
     SOT_HITS="$SOT_HITS [$sot] $hits"
   fi
@@ -421,7 +429,7 @@ fi
 say ""
 say "--- L0 FILESYSTEM: Backupi / symlinki / generated ---"
 # Symlinki
-SYMLINKS=$(find . -type l -not -path './.git/*' 2>/dev/null | head -10)
+SYMLINKS=$(find . -type l -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$SYMLINKS" ]; then
   recon_status "UNKNOWN" "DEBT-013a Symlinki" "Znaleziono symlinki (wymagają klasyfikacji): $SYMLINKS"
 else
@@ -429,7 +437,7 @@ else
 fi
 
 # Backupi (pliki .bak/.old/.orig/.tmp)
-BACKUPS=$(find . -type f \( -name '*.bak' -o -name '*.old' -o -name '*.orig' -o -name '*.tmp' -o -name '*~' \) -not -path './.git/*' 2>/dev/null | head -10)
+BACKUPS=$(find . -type f \( -name '*.bak' -o -name '*.old' -o -name '*.orig' -o -name '*.tmp' -o -name '*~' \) -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$BACKUPS" ]; then
   recon_status "DRIFT" "DEBT-013b Backupi" "Znaleziono pliki backup: $BACKUPS"
 else
@@ -437,7 +445,7 @@ else
 fi
 
 # Generated (target/, node_modules/, dist/, build/, .cache/)
-GENERATED=$(find . -type d \( -name 'target' -o -name 'node_modules' -o -name 'dist' -o -name 'build' -o -name '.cache' \) -not -path './.git/*' 2>/dev/null | head -10)
+GENERATED=$(find . -type d \( -name 'target' -o -name 'node_modules' -o -name 'dist' -o -name 'build' -o -name '.cache' \) -not -path './.git/*' -not -path './.qwen/*' 2>/dev/null | head -10)
 if [ -n "$GENERATED" ]; then
   recon_status "DRIFT" "DEBT-013c Generated" "Znaleziono katalogi generated: $GENERATED"
 else
@@ -448,15 +456,18 @@ fi
 # Elementy, które nie mają klasyfikacji — wymagają świadomej decyzji.
 say ""
 say "--- L4 HISTORY: Status UNKNOWN ---"
-# Pliki bez README w katalogach (nieznany status) — delegowane do structure.
-# Tu sprawdzamy tylko czy są pliki poza znanymi kategoriami.
-UNKNOWN_FILES=$(find . -type f -not -path './.git/*' -not -path './tools/verify/*' \
-  -not -name 'README.md' -not -name '.gitkeep' -not -name '.gitignore' \
-  -not -name '.gitattributes' -not -name '.gitmessage' -not -name 'CODEOWNERS' \
-  -not -name 'LICENSE' -not -name 'VERSION' -not -name 'CHANGELOG.md' \
-  -not -name '*.md' -not -name '*.sh' -not -name '*.yml' -not -name '*.yaml' \
-  -not -name '*.toml' -not -name '*.json' -not -name '*.txt' \
-  2>/dev/null | head -10)
+# Skanujemy TYLKO git-tracked pliki (repo_files), nie nieśledzone artefakty
+# robocze (.qwen/). Wykluczamy katalogi, które mają własne moduły weryfikacji:
+#   .git-hooks/            → git/integrity.sh (GIT-014 Hooks integrity)
+#   system/control-plane/  → state/ (StateStore — schema.sql, migracje, .db)
+#   tools/verify/          → sam engine
+#   archive/               → świadomie archiwizowane
+#   docs/00-foundation/    → kanoniczne dokumenty foundation
+UNKNOWN_FILES=$(repo_files \
+  | grep -vE '^(\.git-hooks/|system/control-plane/|tools/verify/|archive/|docs/00-foundation/)' \
+  | grep -vE '\.(md|sh|yml|yaml|toml|json|txt|sql)$' \
+  | grep -vE '(^|/)(README\.md|\.gitkeep|\.gitignore|\.gitattributes|\.gitmessage|CODEOWNERS|LICENSE|VERSION|CHANGELOG\.md)$' \
+  | head -10)
 if [ -n "$UNKNOWN_FILES" ]; then
   recon_status "UNKNOWN" "DEBT-014 Status UNKNOWN" "Pliki bez klasyfikacji: $UNKNOWN_FILES"
 else

@@ -45,7 +45,9 @@ else
 fi
 
 # SEC-003 No .env files (poza .env.example)
-ENV_FILES=$(find . -name '.env' -not -path './.git/*' -not -name '.env.example' 2>/dev/null)
+# Skanujemy tylko git-tracked pliki (repo_files) — nieśledzone artefakty
+# robocze (np. .qwen/) nie są częścią repo i nie wchodzą do commita.
+ENV_FILES=$(repo_files --name '(^|/)\.env$' | grep -v '\.env\.example$')
 if [ -n "$ENV_FILES" ]; then
   fail "SEC-003 No .env files" BLOCKING "Pliki .env w repo: $ENV_FILES"
 else
@@ -53,11 +55,11 @@ else
 fi
 
 # SEC-004 No private key files
-KEY_FILES=$(find . -type f \( -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.pfx' -o -name '*.jks' \) -not -path './.git/*' 2>/dev/null)
+KEY_FILES=$(repo_files --name '\.(pem|key|p12|pfx|jks)$')
 if [ -n "$KEY_FILES" ]; then
   fail "SEC-004 No private key files" BLOCKING "Pliki kluczy: $KEY_FILES"
 else
   pass "SEC-004 No private key files"
 fi
 
-say ""
+verify_module_exit

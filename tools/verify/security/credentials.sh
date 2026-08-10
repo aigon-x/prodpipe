@@ -84,4 +84,4 @@ else
   pass "SEC-208 No JWT tokens"
 fi
 
-say ""
+verify_module_exit

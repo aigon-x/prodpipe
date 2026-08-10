@@ -76,6 +76,11 @@ venv/
 .DS_Store
 Thumbs.db
 
+# ── Artefakty robocze agenta (Qwen) — NIE wchodzą do repo ───
+# .qwen/ zawiera worktrees, pamięć sesji i artefakty robocze.
+# To nie jest część repo — moduły weryfikacji NIE powinny ich skanować.
+.qwen/
+
 # ── Runtime state / data — NIE wchodzi do git ────────────────
 # Runtime state należy do Runtime, nie do repo.
 data/**/*.db

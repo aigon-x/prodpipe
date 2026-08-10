@@ -84,10 +84,10 @@ run_module() {
     say "────────────────────────────────────────────────────────────"
     bash "$script"
     local rc=$?
-    # Agregacja: każdy FAIL w module (exit != 0) podnosi VERIFY_FAIL
-    # w procesie głównym, więc verify_summary/verify_blocked to wykryje.
+    # Agregacja: każdy FAIL w module (exit != 0) rejestrujemy jako FAIL
+    # w procesie głównym. `fail` inkrementuje VERIFY_FAIL i VERIFY_CHECKS,
+    # więc NIE inkrementujemy VERIFY_FAIL ręcznie (to był podwójny licznik).
     if [ "$rc" -ne 0 ]; then
-      VERIFY_FAIL=$((VERIFY_FAIL + 1))
       fail "verify module $name" BLOCKING "Moduł zakończył się kodem $rc (oczekiwano 0)."
     fi
   else

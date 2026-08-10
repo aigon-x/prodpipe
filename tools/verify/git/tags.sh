@@ -42,4 +42,4 @@ fi
 # Sprawdzamy czy tagi release/baseline nie zostały przesunięte (informational).
 info "GIT-303 Prod tags immutable" "Immutability tagów prod wymaga reflog/remote — informacyjnie."
 
-say ""
+verify_module_exit

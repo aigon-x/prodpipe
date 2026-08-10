@@ -42,4 +42,4 @@ else
   info "SEC-102 No secrets in recent commits" "gitleaks niedostępny — pominięto."
 fi
 
-say ""
+verify_module_exit

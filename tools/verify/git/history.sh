@@ -93,4 +93,4 @@ else
   pass "GIT-108 Commit message quality"
 fi
 
-say ""
+verify_module_exit

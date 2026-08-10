@@ -101,3 +101,30 @@ repo_file() { [ -f "$1" ]; }
 
 # ── Sprawdzenie czy katalog istnieje w repo ──────────────────
 repo_dir() { [ -d "$1" ]; }
+
+# ── Lista plików śledzonych przez git ────────────────────────
+# Zamiast `find .` (który skanuje też nieśledzone artefakty robocze,
+# np. .qwen/, i generuje fałszywe trafienia + zawieszenia), moduły
+# powinny operować wyłącznie na plikach, które faktycznie są w repo.
+# Użycie: repo_files [--dir <katalog>] [--name <wzorzec>]
+repo_files() {
+  local dir="" name=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --dir) dir="$2"; shift 2 ;;
+      --name) name="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  local files
+  if [ -n "$dir" ]; then
+    files="$(git ls-files "$dir" 2>/dev/null)"
+  else
+    files="$(git ls-files 2>/dev/null)"
+  fi
+  if [ -n "$name" ]; then
+    printf '%s\n' "$files" | grep -E "$name" || true
+  else
+    printf '%s\n' "$files"
+  fi
+}

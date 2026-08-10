@@ -112,7 +112,7 @@ while IFS= read -r f; do
       STALE_DETAIL="$STALE_DETAIL [$target] w $f"
     fi
   done < <(grep -oE '\./[A-Za-z0-9_./-]+' "$f" 2>/dev/null | sort -u)
-done < <(find . -name '*.md' -not -path './.git/*' -not -path './tools/verify/*' 2>/dev/null)
+done < <(repo_files --name '\.md$')
 
 if [ "$STALE" -eq 0 ]; then
   pass "HIST-004 Stale refs" BLOCKING "Brak odwołań do nieistniejących ścieżek."
@@ -123,11 +123,22 @@ fi
 # ── HIST-005 Deprecated markery ─────────────────────────────
 say ""
 say "--- L4 HISTORY: Deprecated markery ---"
-DEPRECATED=$(grep -rniE 'DEPRECATED|deprecated|legacy|przestarza' \
-  --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' \
-  . 2>/dev/null \
-  | grep -vE './.git/|./tools/verify/|./archive/' \
-  | head -10)
+# Skanujemy tylko git-tracked pliki (repo_files), nie nieśledzone artefakty
+# robocze (np. .qwen/worktrees/), które generowały fałszywe trafienia.
+DEPRECATED=""
+while IFS= read -r f; do
+  case "$f" in
+    tools/verify/*|archive/*) continue ;;
+  esac
+  case "$f" in
+    *.md|*.sh|*.yml|*.yaml)
+      if grep -niE 'DEPRECATED|deprecated|legacy|przestarza' "$f" 2>/dev/null | grep -q .; then
+        DEPRECATED="$DEPRECATED $f"
+      fi
+      ;;
+  esac
+done < <(repo_files)
+DEPRECATED=$(echo "$DEPRECATED" | head -c 2000)
 if [ -n "$DEPRECATED" ]; then
   info "HIST-005 Deprecated markery" "Znaleziono markery deprecated: $DEPRECATED"
 else

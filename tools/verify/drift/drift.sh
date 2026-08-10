@@ -63,6 +63,22 @@ OPTIONAL_SECTIONS=(
   "## Examples"
 )
 
+# ── Katalogi wykluczone z kontraktu README ──────────────────
+# Katalogi obsługiwane przez własne moduły weryfikacji NIE wymagają
+# README z 12 sekcjami (self-referential loop — np. tools/verify nie może
+# wymagać README, które sam weryfikuje). Wykluczamy też katalogi
+# pomocnicze/robocze (generated, narzędzia).
+#   .git-hooks/, .github/          → git/integrity.sh
+#   system/control-plane/state/    → state/ (StateStore)
+#   tools/verify/                  → sam engine certyfikacji
+#   tools/security/                → security/secrets.sh
+#   .tools/                        → narzędzia pomocnicze
+#   config/generated/              → generated artifacts (tylko .gitkeep)
+# Wzorzec to regex alternatyw (grep -vE), nie lista ze spacjami.
+# Każdy katalog dopasowujemy z opcjonalnym końcowym "/" (bo dirname zwraca
+# katalog bez "/", np. ".git-hooks", a ścieżka pliku ma "/", np. ".git-hooks/x").
+DRIFT_EXCLUDE='^(\.git-hooks/?|\.github/?|system/control-plane/state/?|tools/verify/?|tools/security/?|\.tools/?|config/generated/)'
+
 # ── DRIFT-001 Root README jest platform overview ────────────
 say ""
 say "--- L1 REPOSITORY: README CONTRACT ---"
@@ -90,7 +106,11 @@ WRONG_ORDER_DETAIL=""
 UNKNOWN_DETAIL=""
 
 while IFS= read -r f; do
-  [ "$f" = "./README.md" ] && continue
+  # Root README.md jest wyłączony (platform overview).
+  # git ls-files zwraca ścieżki BEZ prefiksu ./ (np. "README.md", nie "./README.md").
+  [ "$f" = "README.md" ] && continue
+  # Pomiń README w katalogach wykluczonych (obsługiwane przez własne moduły)
+  echo "$f" | grep -qE "$DRIFT_EXCLUDE" && continue
   TOTAL_README=$((TOTAL_README+1))
 
   # REQUIRED_MISSING
@@ -148,7 +168,7 @@ while IFS= read -r f; do
     UNKNOWN_COUNT=$((UNKNOWN_COUNT+1))
     UNKNOWN_DETAIL="$UNKNOWN_DETAIL $f:$local_unknown"
   fi
-done < <(find . -name README.md -not -path './.git/*' -not -path './tools/verify/*' 2>/dev/null)
+done < <(repo_files --name 'README\.md$')
 
 if [ "$MISSING_COUNT" -eq 0 ]; then
   pass "DRIFT-002 README REQUIRED_MISSING" BLOCKING "Wszystkie README mają 12 wymaganych sekcji."

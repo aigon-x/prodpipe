@@ -57,7 +57,9 @@ else
 fi
 
 # GIT-004 No nested git repositories
-NESTED=$(find . -name .git -not -path "./.git" -not -path "./.git/*" 2>/dev/null)
+# Wykluczamy .qwen/ (artefakty robocze agenta — worktree, nie zagnieżdżone repo)
+# oraz .git/ (główny katalog git).
+NESTED=$(find . -name .git -not -path "./.git" -not -path "./.git/*" -not -path "./.qwen/*" 2>/dev/null)
 if [ -n "$NESTED" ]; then
   fail "GIT-004 No nested git repositories" BLOCKING "Znaleziono zagnieżdżone repo: $NESTED"
 else
@@ -106,7 +108,8 @@ else
 fi
 
 # GIT-010 No symlinks (informational)
-SYMLINKS=$(find . -type l -not -path "./.git/*" 2>/dev/null | head -5)
+# Wykluczamy .qwen/ (artefakty robocze agenta — nie wchodzą do repo).
+SYMLINKS=$(find . -type l -not -path "./.git/*" -not -path "./.qwen/*" 2>/dev/null | head -5)
 if [ -n "$SYMLINKS" ]; then
   info "GIT-010 No symlinks" "Symlinki: $SYMLINKS"
 else
@@ -193,4 +196,4 @@ fi
 DENY=$(git config receive.denyNonFastForwards 2>/dev/null || echo "unset")
 info "GIT-019 No force-push policy violation" "receive.denyNonFastForwards=$DENY (informational)."
 
-say ""
+verify_module_exit
