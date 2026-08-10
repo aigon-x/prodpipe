@@ -75,7 +75,50 @@ Klasy synchronizacji: **CANONICAL / REPLICATED / GENERATED / CACHE / SESSION / E
 - **One-tick health contract**
 - **Canonicality matrix**, **sync matrix**, **drift catalog**, **reconciliation engine**
 
-## 9. Granice architektury (CI odrzuca)
+## 9. System Quality Gates
+
+> **STATUS: PARTIAL** — fundament (evidence bridge + SELF-001 + fail-closed) wdrożony w tym PR; G2/G6/G7 missing, G4/G5 placeholdery. Pełna mapa w 9.2, priorytety w 9.3.
+
+### 9.1 Zasady nadrzędne
+
+1. **Evidence → baza (P0#1)** — każdy gate zapisuje wynik do StateStore (tabela `evidence`). Mechanizm bez evidence = 0 punktów. Risk prediction (S7) trenuje się na danych z `evidence`/`gate_runs` — każdy dzień działania gate'ów to dane treningowe.
+2. **Fail-closed** — moduł zadeklarowany w profilu, a nieistniejący = **FAIL (BLOCKING)**, nigdy skip. Ghost moduł blokuje certyfikację, dopóki nie zostanie zaimplementowany (nie usunięty). Chroni przed FALSE GATE na zawsze.
+3. **Wyjątki wygasają** — waiver bez `expires_at` jest nielegalny. Wyjątek to świadome, ograniczone czasowo odstępstwo, nie trwałe obejście.
+4. **Metadata-driven (cel P0)** — definicje gate'ów żyją w configu/bazie, nie w kodzie pipeline'u. Pipeline generowany z definicji, nie hardcoded.
+5. **Metryka pokrycia** — mechanizm liczy się jako wdrożony **wyłącznie**, gdy produkuje evidence w bazie. Placeholder/szkielet = 0 punktów. Pokrycie = (mechanizmy z evidence) / (mechanizmy zadeklarowane).
+
+### 9.2 Mapa gate'ów G0-G8 → stan
+
+| Gate | Stan | Evidence |
+|------|------|----------|
+| G0 pre-commit | **REALNY** (blokujący) | tak |
+| G1 pre-push | **REALNY** (blokujący) | tak |
+| G2 build | **MISSING** | nie |
+| G3 commit-msg / signed | **CZĘŚCIOWO** (brak commit-msg + signed) | częściowo |
+| G4 SBOM / SLSA | **PLACEHOLDER** | nie |
+| G5 anti-drift | **PLACEHOLDER** | nie |
+| G6 anti-shadow | **MISSING** | nie |
+| G7 anti-entropy | **MISSING** | nie |
+| G8 governance | **SZKIELET** (event/evidence/debt/drift tables) | częściowo |
+| META SELF-001 | **REALNY** (od tego PR) | tak |
+| META VERIFY-EVIDENCE-COMPLETE | **REALNY** (od tego PR) | tak |
+
+### 9.3 Priorytety (Definition of Done)
+
+- **P0** — evidence bridge (DONE w tym PR) → metadata-driven pipeline → G2 build.
+- **P1** — `gate_runs`/`waivers` + waiver sweeper → SBOM/SLSA → anti-drift.
+- **P2** — anti-shadow → ożywienie `debt` (INSERT INTO debt) → docs gate.
+- **P3** — start wyłącznie po P0, wymaga ADR-0001; wejście danych = historia `evidence`/`gate_runs` od P0.
+
+### 9.4 Kontrakt modułu verify
+
+Każdy moduł `tools/verify/<kategoria>/<nazwa>.sh` MUSI:
+
+1. **Istnieć** — moduł zadeklarowany w `VERIFY_MODULES` (profiles.sh) bez skryptu = FAIL (SELF-001).
+2. **Być wykonywalny** — brak bitu `x` = WARN (moduły uruchamiane przez `bash`, ale brak `x` to sygnał, że plik nie był przygotowany jako gate).
+3. **Zapisywać evidence** — każdy uruchomiony gate kończy się `evidence_record` do StateStore. Moduł bez evidence = 0 punktów (VERIFY-EVIDENCE-COMPLETE).
+
+## 10. Granice architektury (CI odrzuca)
 
 - agent → canonical state
 - agent → governance mutation
@@ -89,12 +132,12 @@ Klasy synchronizacji: **CANONICAL / REPLICATED / GENERATED / CACHE / SESSION / E
 - `:latest` image
 - unowned crate / config
 
-## 10. Klasyfikacja danych
+## 11. Klasyfikacja danych
 
 **SYSTEM / TENANT / USER / SESSION / CACHE / TEMPORARY**
 
 Runtime data żyje w AIGON-X-FS, nie w gicie.
 
-## 11. Status
+## 12. Status
 
 **STATUS: UNDEFINED** — ramy architektoniczne zdefiniowane; implementacja w fazie genesis.
