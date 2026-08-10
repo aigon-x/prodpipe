@@ -255,35 +255,35 @@ pipelines:
     family: BUILD
     script: build/build.sh
     class: STANDARD
-    status: PROPOSED
+    status: IMPLEMENTED
     depends: [P-028]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
   - id: P-030
     family: BUILD
     script: build/artifact.sh
     class: STANDARD
-    status: PROPOSED
+    status: IMPLEMENTED
     depends: [P-029]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
   - id: P-031
     family: BUILD
     script: build/sbom.sh
     class: RELEASE
-    status: PROPOSED
+    status: IMPLEMENTED
     depends: [P-030]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
   - id: P-032
     family: BUILD
     script: build/reproducibility.sh
     class: RELEASE
-    status: PROPOSED
+    status: IMPLEMENTED
     depends: [P-030]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
   - id: P-033
     family: BUILD
     script: build/release.sh
     class: RELEASE
-    status: PROPOSED
+    status: IMPLEMENTED
     depends: [P-031, P-032]
     contract: [DISCOVER, CONTRACT, EXECUTE, TEST, EVIDENCE, VERIFY, REGISTER, REPORT]
 

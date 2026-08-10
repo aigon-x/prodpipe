@@ -26,6 +26,7 @@ secrets/**/*.yml
 # ── Build artifacts ──────────────────────────────────────────
 target/
 build/
+!tools/automation/build/
 dist/
 out/
 *.o
