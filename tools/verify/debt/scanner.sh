@@ -47,7 +47,12 @@ cd "$ROOT"
 say "=== HISTORICAL DEBT SCANNER (L4 HISTORY) ==="
 
 # ── Katalogi wykluczone ze skanowania ───────────────────────
-EXCLUDE='./.git/ ./archive/ ./tools/verify/'
+# Uwaga: EXCLUDE jest używany jako wzorzec regex w `grep -vE "$EXCLUDE"`.
+# Dlatego musi być poprawną alternacją regex (rozdzieloną `|`), NIE listą
+# ścieżek rozdzielonych spacjami (spacje w regex = dosłowny znak spacji,
+# co nigdy nie pasuje → katalogi NIE były wykluczane → fałszywe trafienia
+# na własnych tablicach definicji skanera).
+EXCLUDE='\./\.git/|\./archive/|\./tools/verify/'
 
 # ── Katalogi, w których legacy jest DOZWOLONE (ALLOWED_LEGACY)
 # archive/ = świadomie archiwizowane; tools/verify = nowy engine.
@@ -136,10 +141,13 @@ LEGACY_DOCS=(
 )
 
 # ── Legacy API / SoT ────────────────────────────────────────
+# UWAGA: SOURCE-OF-TRUTH.md, OWNERSHIP.md, VERSION to KANONICZNE pliki
+# platformy (źródła prawdy), NIE legacy. Nie mogą być flagowane jako dług.
+# DEBT-012 szuka więc tylko legacy API (stare ścieżki API), nie kanonicznych SoT.
 LEGACY_SOT=(
-  "SOURCE-OF-TRUTH"
-  "OWNERSHIP"
-  "VERSION"
+  "legacy-api"
+  "legacy-endpoint"
+  "old-api"
 )
 
 # ── Pomocnicza: czy ścieżka jest w dozwolonym katalogu ──────
@@ -292,7 +300,9 @@ say ""
 say "--- L4 HISTORY: Legacy endpointy ---"
 ENDPOINT_HITS=""
 for ep in "${LEGACY_ENDPOINTS[@]}"; do
-  hits=$(grep -rniE "\"${ep}\"|'${ep}'|${ep}" \
+  # Dopasowujemy endpointy TYLKO jako cytowane stringi (konfiguracja/URL),
+  # NIE jako gołe podciągi — inaczej "/health" łapie "system/health" w README.
+  hits=$(grep -rniE "[\"']${ep}[\"']|https?://[^ \"']*${ep}" \
     --include='*.md' --include='*.sh' --include='*.yml' --include='*.yaml' \
     --include='*.toml' --include='*.json' --include='*.env' --include='*.txt' \
     . 2>/dev/null \
@@ -450,7 +460,11 @@ say ""
 say "--- L4 HISTORY: Status UNKNOWN ---"
 # Pliki bez README w katalogach (nieznany status) — delegowane do structure.
 # Tu sprawdzamy tylko czy są pliki poza znanymi kategoriami.
+# Wykluczamy: .git-hooks (infrastruktura git), state (schema.sql, migracje),
+# .git (worktree — plik), docs/generated (artefakty generowane).
 UNKNOWN_FILES=$(find . -type f -not -path './.git/*' -not -path './tools/verify/*' \
+  -not -path './.git-hooks/*' -not -path './system/control-plane/state/*' \
+  -not -path './docs/generated/*' -not -path './.git' \
   -not -name 'README.md' -not -name '.gitkeep' -not -name '.gitignore' \
   -not -name '.gitattributes' -not -name '.gitmessage' -not -name 'CODEOWNERS' \
   -not -name 'LICENSE' -not -name 'VERSION' -not -name 'CHANGELOG.md' \

@@ -75,6 +75,15 @@ case "$SUBCOMMAND" in
     run_module "history/history.sh"
     run_module "debt/scanner.sh"
     run_module "debt/debt.sh"
+    # Moduły git/security/structure (R6: połączone z reconcile)
+    run_module "git/integrity.sh"
+    run_module "git/branches.sh"
+    run_module "git/history.sh"
+    run_module "git/tags.sh"
+    run_module "security/secrets.sh"
+    run_module "security/credentials.sh"
+    run_module "security/history.sh"
+    run_module "structure/readme.sh"
     ;;
   drift)
     run_module "drift/drift.sh"
