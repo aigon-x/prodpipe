@@ -1,0 +1,634 @@
+# ============================================================================
+# taxonomy.yaml — ŹRÓDŁO PRAWDY dla TAXONOMY REGISTRY (31 wymiarów doskonałości).
+# ============================================================================
+# Maszynowo czytelna, wersjonowana taksonomia wymiarów doskonałości.
+# Każdy wymiar ma: id, nazwa, definicja, source (norma), applicability,
+# wagi, checki. "100%" = "100% taksonomii vX ze świeżym evidence".
+#
+# NIE edytuj tego pliku ręcznie bez przejścia przez TAXONOMY GATE (TAX-001..00N).
+# Zmiany taxonomy = tylko platform (CODEOWNERS).
+#
+# QI_service = 100 × ∏ s_i^w_i dla i ∈ applicable(service)
+#   - wymiary warunkowe (applicability ≠ always) wyłączone z mianownika,
+#     gdy nieapplicable dla danego serwisu.
+#   - dimension score bez świeżego evidence = 0 (nie NULL — ZERO).
+# ============================================================================
+
+schema_version: 1
+taxonomy_version: 1
+
+# ── Wymiary doskonałości ───────────────────────────────────────────────────
+# Wymiary 1-15: istniejące (z aesthetics-plane-design.md + SONDA.md).
+# Wymiary 16-31: nowe rodziny (z deep dive Suwerena).
+# applicability: always | locales>1 | data_classes present | surfaces include api
+#                | events true | surfaces include web | tenancy multi | ml_features true
+dimensions:
+  # ── Wymiar 1: Spójność szkieletu ────────────────────────────────────────
+  - id: INTEG
+    name: "Spójność szkieletu"
+    definition: "Każde połączenie zweryfikowane dwukierunkowo; zero ghostów, zero orphanów"
+    source: "aesthetics-plane-design.md"
+    applicability: always
+    weight: 0.05
+    checks:
+      - {id: INTEG-01, desc: "4-kierunkowy matrix połączeń (service ↔ config ↔ runtime ↔ docs) pusty — zero ghostów, zero orphanów"}
+      - {id: INTEG-02, desc: "Każde połączenie zweryfikowane dwukierunkowo (nie jednostronnie)"}
+      - {id: INTEG-03, desc: "Zero ghost modułów (zadeklarowane, ale nie wykonane)"}
+      - {id: INTEG-04, desc: "Zero orphanów (wykonane, ale nie zadeklarowane)"}
+
+  # ── Wymiar 2: Poprawność ────────────────────────────────────────────────
+  - id: VV
+    name: "Poprawność"
+    definition: "Każdy check ma test pozytywny + negatywny + mutation score"
+    source: "aesthetics-plane-design.md"
+    applicability: always
+    weight: 0.05
+    checks:
+      - {id: VV-01, desc: "Każdy check ma test pozytywny"}
+      - {id: VV-02, desc: "Każdy check ma test negatywny"}
+      - {id: VV-03, desc: "Mutation score ≥ próg z configu"}
+      - {id: VV-04, desc: "VV coverage = 100%"}
+
+  # ── Wymiar 3: Bezpieczeństwo ────────────────────────────────────────────
+  - id: SEC
+    name: "Bezpieczeństwo"
+    definition: "3 niezależne domeny zaufania; decyzje exploit-aware (KEV/EPSS/reachability)"
+    source: "OWASP"
+    applicability: always
+    weight: 0.08
+    checks:
+      - {id: SEC-01, desc: "3 niezależne domeny zaufania zdefiniowane i rozdzielone"}
+      - {id: SEC-02, desc: "Decyzje exploit-aware (KEV/EPSS/reachability)"}
+      - {id: SEC-03, desc: "Macierz 12×4 (domena × kontrola) pełna"}
+      - {id: SEC-04, desc: "Detection drills = 1.0 (wykrywanie ataków testowane)"}
+
+  # ── Wymiar 4: Odporność ─────────────────────────────────────────────────
+  - id: RES
+    name: "Odporność"
+    definition: "Każda domena awarii ma świeży dowód przeżycia"
+    source: "SRE"
+    applicability: always
+    weight: 0.08
+    checks:
+      - {id: RES-01, desc: "Każda domena awarii ma świeży dowód przeżycia"}
+      - {id: RES-02, desc: "Restore drills wykonywane w rytmie per tier"}
+      - {id: RES-03, desc: "Game days (symulacje awarii)"}
+      - {id: RES-04, desc: "RTO_actual ≤ RTO_declared (zmierzone, nie deklarowane)"}
+
+  # ── Wymiar 5: Uprawnienia ───────────────────────────────────────────────
+  - id: PERM
+    name: "Uprawnienia"
+    definition: "Minimalne i wystarczające — mierzone z obu stron"
+    source: "NIST"
+    applicability: always
+    weight: 0.08
+    checks:
+      - {id: PERM-01, desc: "perm_health → 1.0 (uprawnienia minimalne i wystarczające)"}
+      - {id: PERM-02, desc: "Grants bez ścieżki użycia = 0"}
+      - {id: PERM-03, desc: "Uprawnienia mierzone z obu stron (nadane vs używane)"}
+      - {id: PERM-04, desc: "Separation of duties (SoD) na poziomie uprawnień"}
+
+  # ── Wymiar 6: Konfigurowalność ──────────────────────────────────────────
+  - id: CFG
+    name: "Konfigurowalność"
+    definition: "100% parametrów externalized lub explicite exempted"
+    source: "12-factor"
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: CFG-01, desc: "100% parametrów externalized lub explicite exempted"}
+      - {id: CFG-02, desc: "CFG-008 = 100% (pokrycie parametrów)"}
+      - {id: CFG-03, desc: "Snapshot per run (każdy run przypięty do configu)"}
+      - {id: CFG-04, desc: "Jednokanałowy dostęp do configu (config_get, zakaz getenv)"}
+
+  # ── Wymiar 7: Świeżość ──────────────────────────────────────────────────
+  - id: CUR
+    name: "Świeżość"
+    definition: "Nic nie EOL; lag wersji w budżecie; polityka trzypasmowa"
+    source: "SRE"
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: CUR-01, desc: "Zero zależności EOL"}
+      - {id: CUR-02, desc: "Lag wersji w budżecie (per tier)"}
+      - {id: CUR-03, desc: "Polityka trzypasmowa (stable/current/legacy) wdrożona"}
+      - {id: CUR-04, desc: "Currency score per serwis"}
+
+  # ── Wymiar 8: Optymalność ───────────────────────────────────────────────
+  - id: OPT
+    name: "Optymalność"
+    definition: "Każda decyzja tech w TDR z revisit_trigger; perf mierzony, nie opinia"
+    source: "SRE"
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: OPT-01, desc: "Każda decyzja tech w TDR z revisit_trigger"}
+      - {id: OPT-02, desc: "Perf mierzony, nie opinia (budżety perf)"}
+      - {id: OPT-03, desc: "Regresje perf = 0"}
+      - {id: OPT-04, desc: "Kolejność gate'ów z priority(g)"}
+
+  # ── Wymiar 9: Piękno ────────────────────────────────────────────────────
+  - id: AEST
+    name: "Piękno"
+    definition: "5 właściwości × proxy — dead code 0, jeden formatter, docs executable"
+    source: "aesthetics-plane-design.md"
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: AEST-01, desc: "Jeden formatter, zero drift — cały repo przechodzi fmt --check, reguły centralne, wersjonowane"}
+      - {id: AEST-02, desc: "Naming lint — konwencje casing, zakazane skróty, język domeny (ubiquitous language)"}
+      - {id: AEST-03, desc: "Dead code = 0, commented-out code = 0 — wykrywanie automatyczne + auto-PR z usunięciem"}
+      - {id: AEST-04, desc: "TODO/FIXME registry z expires_at — wieczne TODO = FAIL (wzorzec waiverów)"}
+      - {id: AEST-05, desc: "Budżety powierzchni: długość funkcji/pliku, głębokość zagnieżdżenia, liczba parametrów"}
+      - {id: AEST-06, desc: "Executable examples — snippet w docs uruchamiany w CI (doctest); przykład, który nie działa = FAIL"}
+      - {id: AEST-07, desc: "Error message quality — katalog kodów błędów, format standardowy, komunikat actionable"}
+      - {id: AEST-08, desc: "API design lint (spectral/vacuum na OpenAPI): naming, paginacja, format błędów, wersjonowanie"}
+      - {id: AEST-09, desc: "Symetria: ten sam problem = to samo rozwiązanie (fitness functions, odstępstwa = waiver)"}
+      - {id: AEST-10, desc: "PR hygiene — czysta historia, conventional commits, rozmiar PR"}
+      - {id: AEST-11, desc: "(frontend) Design system conformance — design tokens, komponenty z biblioteki, custom CSS = waiver"}
+
+  # ── Wymiar 10: Nowoczesność ─────────────────────────────────────────────
+  - id: MOD
+    name: "Nowoczesność"
+    definition: "Idiomy ery, zero deprecated, stdlib-over-custom"
+    source: ""
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: MOD-01, desc: "Modernize linters wymuszone (pyupgrade, eslint modern, gopls modernize) — nie advisory, BLOCK"}
+      - {id: MOD-02, desc: "Zero deprecated API usage — własnej platformy i zależności"}
+      - {id: MOD-03, desc: "Paradigm conformance — wzorce ery: structured concurrency, brak raw threads tam, gdzie framework daje abstrakcję"}
+      - {id: MOD-04, desc: "Stdlib-over-custom — własny util duplikujący stdlib = flag"}
+      - {id: MOD-05, desc: "Idiom ceiling — kod używa konstrukcji adekwatnych do pinowanej wersji języka"}
+
+  # ── Wymiar 11: Spójność ─────────────────────────────────────────────────
+  - id: CONS
+    name: "Spójność"
+    definition: "Jeden styl org-wide: layout, API, logi, błędy, docs"
+    source: ""
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: CONS-01, desc: "Golden path conformance — layout projektu, struktura katalogów, standardowe targety (make test/verify/deploy wszędzie)"}
+      - {id: CONS-02, desc: "Jeden ruleset lint/format dla całego org — wersjonowany centralnie, drift = FAIL"}
+      - {id: CONS-03, desc: "Konwencje observability — te same nazwy pól logów, poziomy, correlation ID wszędzie"}
+      - {id: CONS-04, desc: "Konwencja error handling per język — jeden wzorzec, odstępstwa = waiver"}
+      - {id: CONS-05, desc: "API style guide org-wide — jeden ruleset OpenAPI dla wszystkich serwisów"}
+      - {id: CONS-06, desc: "Docs structure contract — README 12 sekcji, ADR format, runbook format"}
+      - {id: CONS-07, desc: "Konwencje config — nazwy env, layout plików, klucze registry z prefiksami domen"}
+      - {id: CONS-08, desc: "Jedna biblioteka per zadanie per język (HTTP client, logger)"}
+
+  # ── Wymiar 12: Doświadczenie dewelopera ─────────────────────────────────
+  - id: DX
+    name: "Doświadczenie dewelopera"
+    definition: "Setup jedną komendą; local == CI; day-0 green"
+    source: ""
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: DX-01, desc: "One-command setup — make setup / devcontainer działa; testowany w CI na czystym środowisku"}
+      - {id: DX-02, desc: "Local == CI — te same profile verify uruchamialne lokalnie; 'u mnie działa' = niemożliwe"}
+      - {id: DX-03, desc: "Time-to-first-green mierzone — nowy dev od clone do zielonego pipeline ≤ budżetu z configu"}
+      - {id: DX-04, desc: "System sam ma actionable errors — gate failuje z komunikatem 'co i jak naprawić', nie stacktrace"}
+      - {id: DX-05, desc: "Scaffold day-0 green — nowy serwis z template'u przechodzi WSZYSTKIE gate'y od pierwszego commita"}
+
+  # ── Wymiar 13: Dowodliwość ──────────────────────────────────────────────
+  - id: META
+    name: "Dowodliwość"
+    definition: "System dowodzi sam siebie: fire drills, assurance case, VERIFY-SYSTEM"
+    source: ""
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: META-01, desc: "System dowodzi sam siebie (self-certification)"}
+      - {id: META-02, desc: "Fire drills (wykrywanie testowane)"}
+      - {id: META-03, desc: "Assurance case (mapa claims → evidence)"}
+      - {id: META-04, desc: "VERIFY-SYSTEM (weryfikacja całego systemu)"}
+      - {id: META-05, desc: "Claims ze świeżym evidence (detection = 1.0)"}
+
+  # ── Wymiar 14: Uczenie się ──────────────────────────────────────────────
+  - id: CORR
+    name: "Uczenie się"
+    definition: "Każdy incydent → waiver/gap/missing-gate → backlog sam się pisze"
+    source: ""
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: CORR-01, desc: "Każdy incydent → klasyfikacja (waiver/gap/missing-gate)"}
+      - {id: CORR-02, desc: "Escapes bez closed_at = 0"}
+      - {id: CORR-03, desc: "Backlog sam się pisze z findings"}
+      - {id: CORR-04, desc: "Pętla uczenia się domknięta (finding → gate)"}
+
+  # ── Wymiar 15: Jakość ludzka ────────────────────────────────────────────
+  - id: MAN
+    name: "Jakość ludzka"
+    definition: "Człowiek jako oracle; proces zgatedowany; pokrycie charterami, świeże evidence, task success w budżecie, findings przekute na testy auto"
+    source: "human-plane-design.md"
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: MAN-01, desc: "Pokrycie manualne — każda wymagana ścieżka ma charter (auto lub manual); zero ścieżek bez pokrycia"}
+      - {id: MAN-02, desc: "Sesje testowe z evidence — każda sesja ma charter_id, testera, wynik i evidence_ref"}
+      - {id: MAN-03, desc: "UAT na digest — akceptacja podpisana na konkretny digest artefaktu, nie 'wersja ogólnie'"}
+      - {id: MAN-04, desc: "Świeżość przy releasie — release tier-1 nie przechodzi bez świeżego dowodu manualnego"}
+      - {id: MAN-05, desc: "Rytm eksploracji — cadence per tier zdefiniowany i egzekwowany"}
+      - {id: MAN-06, desc: "Konwersja manual→auto — findings przekute na testy automatyczne; mierzony conversion_rate"}
+      - {id: UX-A-01, desc: "A11y automatyczna — axe-core/pa11y w CI, WCAG 2.2 AA, zero naruszeń"}
+      - {id: UX-A-02, desc: "Core Web Vitals — LCP/INP/CLS w budżecie na krytycznych ścieżkach"}
+      - {id: UX-R-01, desc: "Rytm badań użyteczności — cadence per tier"}
+      - {id: UX-R-02, desc: "Task success rate ≥ target"}
+      - {id: UX-R-04, desc: "SUS/UMUX-Lite tracking — wyniki w ux_studies z evidence"}
+
+  # ── Wymiar 16: Internacjonalizacja ──────────────────────────────────────
+  # INT-01 (i18n-readiness) gate'ujemy ZAWSZE, nawet przy 1 locale —
+  # retrofit kosztuje 10x.
+  - id: INT
+    name: "Internacjonalizacja"
+    definition: "i18n/l10n gotowość od day-0; zero hardcoded stringów; retrofit kosztuje 10x"
+    source: "WCAG / i18n best practices"
+    applicability: locales>1
+    weight: 0.03
+    checks:
+      - {id: INT-01, desc: "i18n-readiness — brak hardcoded stringów w kodzie (nawet przy 1 locale); gate'owane ZAWSZE"}
+      - {id: INT-02, desc: "Externalized strings — wszystkie UI stringi w katalogach tłumaczeń (gettext/ICU/JSON)"}
+      - {id: INT-03, desc: "Locale-aware formatting — daty, liczby, waluty, sortowanie per locale"}
+      - {id: INT-04, desc: "Pluralization — poprawne formy liczby mnogiej per język (ICU MessageFormat)"}
+      - {id: INT-05, desc: "RTL support — layout obsługuje języki prawa-na-lewo (dir, mirroring)"}
+      - {id: INT-06, desc: "Unicode normalization — NFC/NFD, zero mojibake, poprawne kodowanie end-to-end"}
+      - {id: INT-07, desc: "Text expansion budget — UI toleruje +30% długości stringów (bez złamania layoutu)"}
+      - {id: INT-08, desc: "Timezones — wszystkie czasy w UTC z konwersją per użytkownik; zero lokalnego czasu w logice"}
+      - {id: INT-09, desc: "Translation completeness — 100% kluczy przetłumaczonych; brak fallbacku na angielski bez flagi"}
+      - {id: INT-10, desc: "Translation freshness — tłumaczenia wersjonowane z kodem; brak dryfu kluczy"}
+      - {id: INT-11, desc: "Locale detection — poprawne wykrywanie locale użytkownika (Accept-Language, config)"}
+      - {id: INT-12, desc: "i18n in tests — testy pokrywają co najmniej 2 locale (w tym RTL jeśli applicable)"}
+      - {id: INT-13, desc: "Accessibility of translations — tłumaczenia nie łamią a11y (aria-labels, alt-text per locale)"}
+      - {id: INT-14, desc: "i18n regression gate — zmiana stringu bez aktualizacji katalogów = FAIL"}
+
+  # ── Wymiar 17: Dane ─────────────────────────────────────────────────────
+  - id: DATA
+    name: "Dane"
+    definition: "Dane jako aktywo: klasyfikacja, minimalizacja, retencja, integralność, ochrona"
+    source: "GDPR"
+    applicability: data_classes present
+    weight: 0.08
+    checks:
+      - {id: DATA-01, desc: "Data inventory — pełny rejestr klas danych (data_classes) z właścicielem i klasyfikacją"}
+      - {id: DATA-02, desc: "Data classification — każda klasa danych oznaczona (public/internal/confidential/restricted)"}
+      - {id: DATA-03, desc: "Data minimization — zbierane tylko dane niezbędne do celu; zero nadmiarowych pól"}
+      - {id: DATA-04, desc: "Data retention — polityka retencji per klasa; automatyczne usuwanie po TTL"}
+      - {id: DATA-05, desc: "Data integrity — checksumy/immutability dla danych krytycznych; wykrywanie korepcji"}
+      - {id: DATA-06, desc: "Data protection at rest — szyfrowanie per klasa; klucze w Vault, nie w kodzie"}
+      - {id: DATA-07, desc: "Data protection in transit — TLS end-to-end; zero plaintext na wire"}
+      - {id: DATA-08, desc: "Data access audit — logowanie dostępu do danych wrażliwych; kto/co/kiedy"}
+      - {id: DATA-09, desc: "Data portability — eksport danych w otwartym formacie na żądanie (GDPR art. 20)"}
+      - {id: DATA-10, desc: "Data erasure — prawo do bycia zapomnianym; usuwanie kaskadowe (GDPR art. 17)"}
+      - {id: DATA-11, desc: "Data backup — kopie zapasowe per klasa z RPO/RTO; testowane restore"}
+      - {id: DATA-12, desc: "Data lineage — pochodzenie danych śledzone; transformacje udokumentowane"}
+      - {id: DATA-13, desc: "Data quality — walidacja na wejściu; zero danych 'śmieciowych' w systemie"}
+      - {id: DATA-14, desc: "Data breach readiness — plan reagowania na wyciek; powiadomienia w budżecie czasowym"}
+
+  # ── Wymiar 18: Wydajność ────────────────────────────────────────────────
+  - id: PERF
+    name: "Wydajność"
+    definition: "Perf mierzony, nie opinia; budżety; regresje = 0"
+    source: "SRE"
+    applicability: always
+    weight: 0.05
+    checks:
+      - {id: PERF-01, desc: "Perf budget — budżety latencji/przepustowości per endpoint zdefiniowane w configu"}
+      - {id: PERF-02, desc: "Latency SLO — p50/p95/p99 w budżecie; mierzone w CI"}
+      - {id: PERF-03, desc: "Throughput — przepustowość pod obciążeniem; testy load w CI"}
+      - {id: PERF-04, desc: "Resource efficiency — CPU/mem/IO per request w budżecie; zero wycieków"}
+      - {id: PERF-05, desc: "Perf regression gate — regresja perf = FAIL; porównanie z baseline"}
+      - {id: PERF-06, desc: "Startup time — czas startu serwisu w budżecie (cold start)"}
+      - {id: PERF-07, desc: "Scaling behavior — zachowanie pod skokiem obciążenia; brak cliffów"}
+      - {id: PERF-08, desc: "DB query perf — brak N+1, indeksy, plan zapytań weryfikowany"}
+      - {id: PERF-09, desc: "Caching strategy — cache zdefiniowany, TTL, invalidacja; zero stale reads"}
+      - {id: PERF-10, desc: "Perf profiling — profilowanie w CI; hotspoty identyfikowane"}
+      - {id: PERF-11, desc: "Perf in tests — testy perf w pipeline (nie ad-hoc)"}
+      - {id: PERF-12, desc: "Perf observability — metryki perf eksponowane; dashboard per serwis"}
+
+  # ── Wymiar 19: Obserwowalność ───────────────────────────────────────────
+  - id: OBS
+    name: "Obserwowalność"
+    definition: "Logi, metryki, trace'y, alerty — wszystko z evidence i correlation"
+    source: "SRE"
+    applicability: always
+    weight: 0.05
+    checks:
+      - {id: OBS-01, desc: "Structured logs — logi w formacie strukturalnym (JSON), zero free-text"}
+      - {id: OBS-02, desc: "Correlation ID — każdy request ma correlation ID propagowany przez cały łańcuch"}
+      - {id: OBS-03, desc: "Metrics — metryki RED/USE eksponowane; brak luk w pokryciu"}
+      - {id: OBS-04, desc: "Distributed tracing — trace'y end-to-end; sampling zdefiniowany"}
+      - {id: OBS-05, desc: "Alerting — alerty z actionable message; zero alert fatigue; SLO-based"}
+      - {id: OBS-06, desc: "Log retention — retencja logów per klasa; dostęp do historycznych logów"}
+      - {id: OBS-07, desc: "Dashboards — dashboard per serwis; SLO widoczne; brak 'czarnych dziur'"}
+      - {id: OBS-08, desc: "Error tracking — błędy agregowane; stacktrace z kontekstem; deduplikacja"}
+      - {id: OBS-09, desc: "Health checks — liveness/readiness; zero false positives"}
+      - {id: OBS-10, desc: "Observability in tests — testy weryfikują, że logi/metryki/trace'e powstają"}
+
+  # ── Wymiar 20: Operacje ─────────────────────────────────────────────────
+  - id: OPS
+    name: "Operacje"
+    definition: "Runbooki, deploy, rollback, on-call — operacje zdefiniowane i testowane"
+    source: "SRE"
+    applicability: always
+    weight: 0.05
+    checks:
+      - {id: OPS-01, desc: "Runbooks — każda znana awaria ma runbook; zero 'nikt nie wie jak naprawić'"}
+      - {id: OPS-02, desc: "Deploy automation — deploy w pełni zautomatyzowany; zero manualnych kroków"}
+      - {id: OPS-03, desc: "Rollback — rollback jednym poleceniem; testowany; RTO_rollback w budżecie"}
+      - {id: OPS-04, desc: "Config management — konfiguracja wersjonowana; drift wykrywany"}
+      - {id: OPS-05, desc: "On-call — rotacja on-call zdefiniowana; eskalacja jasna"}
+      - {id: OPS-06, desc: "Incident response — proces IR zdefiniowany; postmortem po każdym incydencie"}
+      - {id: OPS-07, desc: "Capacity planning — prognozowanie pojemności; brak zaskoczeń pod obciążeniem"}
+      - {id: OPS-08, desc: "Maintenance windows — okna serwisowe zdefiniowane; komunikacja z użytkownikami"}
+      - {id: OPS-09, desc: "Backup/restore ops — operacje backupu zautomatyzowane; restore testowany"}
+      - {id: OPS-10, desc: "Ops runbook freshness — runbooki aktualne; przegląd per release"}
+
+  # ── Wymiar 21: Interfejsy API ───────────────────────────────────────────
+  - id: API
+    name: "Interfejsy API"
+    definition: "API spójne, wersjonowane, dokumentowane, bezpieczne, z kontraktem"
+    source: ""
+    applicability: surfaces include api
+    weight: 0.05
+    checks:
+      - {id: API-01, desc: "API contract — OpenAPI/AsyncAPI jako źródło prawdy; kontrakt wersjonowany"}
+      - {id: API-02, desc: "API versioning — wersjonowanie jawne; brak breaking change bez major"}
+      - {id: API-03, desc: "API docs — dokumentacja kompletna; przykłady; zero endpointów bez docs"}
+      - {id: API-04, desc: "API auth — autoryzacja na każdym endpointzie; zero publicznych bez auth"}
+      - {id: API-05, desc: "API error format — spójny format błędów; kody; actionable message"}
+      - {id: API-06, desc: "API pagination — paginacja spójna; limit/offset lub cursor; zero unbounded"}
+      - {id: API-07, desc: "API rate limiting — limity per klient; 429 z Retry-After"}
+      - {id: API-08, desc: "API idempotency — operacje mutujące idempotentne; idempotency-key"}
+      - {id: API-09, desc: "API backward compat — kompatybilność wsteczna; deprecation policy"}
+      - {id: API-10, desc: "API contract tests — kontrakt testowany (pact/schema); zero drift kontrakt-kod"}
+
+  # ── Wymiar 22: Eventy ───────────────────────────────────────────────────
+  - id: EVT
+    name: "Eventy"
+    definition: "Event-driven: schematy, kolejność, idempotencja, replay, dead-letter"
+    source: ""
+    applicability: events true
+    weight: 0.04
+    checks:
+      - {id: EVT-01, desc: "Event schema — schemat eventów wersjonowany; ewolucja kompatybilna"}
+      - {id: EVT-02, desc: "Event ordering — gwarancje kolejności zdefiniowane; partition key"}
+      - {id: EVT-03, desc: "Event idempotency — konsumenci idempotentni; zero podwójnego przetworzenia"}
+      - {id: EVT-04, desc: "Event replay — możliwość replayu eventów; deterministyczny wynik"}
+      - {id: EVT-05, desc: "Dead-letter queue — DLQ zdefiniowana; obsługa nieprzetworzonych eventów"}
+      - {id: EVT-06, desc: "Event delivery — at-least-once/exactly-once zdefiniowane; zero utraty"}
+      - {id: EVT-07, desc: "Event observability — trace eventów; metryki produkcji/konsumpcji"}
+      - {id: EVT-08, desc: "Event contract tests — schematy testowane; zero eventów niezgodnych ze schematem"}
+
+  # ── Wymiar 23: Edge/brzeg ───────────────────────────────────────────────
+  - id: EDGE
+    name: "Edge/brzeg"
+    definition: "Frontend/web: a11y, CWV, responsywność, bezpieczeństwo klienta"
+    source: ""
+    applicability: surfaces include web
+    weight: 0.04
+    checks:
+      - {id: EDGE-01, desc: "A11y — WCAG 2.2 AA; axe-core/pa11y w CI; zero naruszeń"}
+      - {id: EDGE-02, desc: "Core Web Vitals — LCP/INP/CLS w budżecie; mierzone w CI"}
+      - {id: EDGE-03, desc: "Responsive — layout działa na mobile/tablet/desktop; brak złamań"}
+      - {id: EDGE-04, desc: "Browser support — wsparcie przeglądarek zdefiniowane; zero deprecated"}
+      - {id: EDGE-05, desc: "Client security — CSP, XSS protection, zero inline unsafe"}
+      - {id: EDGE-06, desc: "Asset optimization — bundle size w budżecie; code-splitting; zero bloat"}
+      - {id: EDGE-07, desc: "Offline/graceful degradation — zachowanie przy braku sieci; fallbacki"}
+      - {id: EDGE-08, desc: "Error handling UI — błędy pokazane userowi; zero białych ekranów"}
+      - {id: EDGE-09, desc: "Form validation — walidacja po stronie klienta i serwera; spójne komunikaty"}
+      - {id: EDGE-10, desc: "State management — stan przewidywalny; zero race w UI"}
+      - {id: EDGE-11, desc: "E2E tests — krytyczne ścieżki użytkownika testowane E2E"}
+      - {id: EDGE-12, desc: "Edge observability — RUM/web vitals zbierane; błędy klienta śledzone"}
+
+  # ── Wymiar 24: Biznes ───────────────────────────────────────────────────
+  - id: BIZ
+    name: "Biznes"
+    definition: "Wartość biznesowa mierzona; metryki produktu; zero 'technologia dla technologii'"
+    source: ""
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: BIZ-01, desc: "Business metrics — metryki produktu zdefiniowane i mierzone (nie vanity)"}
+      - {id: BIZ-02, desc: "Value mapping — każda funkcja mapowana na wartość biznesową; zero 'technologia dla technologii'"}
+      - {id: BIZ-03, desc: "Cost of quality — koszt jakości mierzony; ROI gate'ów widoczny"}
+      - {id: BIZ-04, desc: "Feature flags — funkcje za flagami; bezpieczne wdrożenie i rollback biznesowy"}
+      - {id: BIZ-05, desc: "Business continuity — ciągłość biznesowa; BCP zdefiniowany"}
+      - {id: BIZ-06, desc: "Stakeholder alignment — cele biznesowe i techniczne zsynchronizowane"}
+      - {id: BIZ-07, desc: "Time-to-value — czas od pomysłu do wartości mierzony"}
+      - {id: BIZ-08, desc: "Business risk register — rejestr ryzyk biznesowych; akceptacja świadoma"}
+
+  # ── Wymiar 25: Zgodność ─────────────────────────────────────────────────
+  - id: COMP
+    name: "Zgodność"
+    definition: "Zgodność z normami i standardami; audytowalność; zero nieudokumentowanych odstępstw"
+    source: ""
+    applicability: always
+    weight: 0.03
+    checks:
+      - {id: COMP-01, desc: "Standards conformance — zgodność z deklarowanymi normami (ISO, NIST, OWASP); zero dryfu"}
+      - {id: COMP-02, desc: "Audit trail — pełny ślad audytowy; kto/co/kiedy; niezmienialny"}
+      - {id: COMP-03, desc: "Compliance evidence — dowody zgodności zbierane automatycznie; zero 'na słowo'"}
+      - {id: COMP-04, desc: "Waiver registry — rejestr odstępstw; każdy waiver z właścicielem i expiry"}
+      - {id: COMP-05, desc: "Certification readiness — gotowość do certyfikacji; brak blokerów"}
+      - {id: COMP-06, desc: "Compliance regression — zmiana łamiąca zgodność = FAIL; testowane w CI"}
+
+  # ── Wymiar 26: Prawo ────────────────────────────────────────────────────
+  - id: LEG
+    name: "Prawo"
+    definition: "Zgodność prawna: RODO, umowy, jurysdykcja, retencja prawna"
+    source: "GDPR"
+    applicability: always
+    weight: 0.04
+    checks:
+      - {id: LEG-01, desc: "Legal basis — podstawa prawna przetwarzania danych zdefiniowana (RODO art. 6)"}
+      - {id: LEG-02, desc: "DPA — umowy powierzenia przetwarzania (DPA) z podwykonawcami"}
+      - {id: LEG-03, desc: "Jurisdiction — jurysdykcja danych zdefiniowana; transfery transgraniczne zgodne"}
+      - {id: LEG-04, desc: "Legal retention — retencja prawna (legal hold) nadpisuje TTL; zero usunięcia pod holdem"}
+      - {id: LEG-05, desc: "Consent management — zgody użytkowników zarządzane; wycofanie respektowane"}
+      - {id: LEG-06, desc: "DPIA — ocena skutków dla ochrony danych (DPIA) dla wysokiego ryzyka"}
+      - {id: LEG-07, desc: "Breach notification — powiadomienie o naruszeniu w budżecie (RODO art. 33: 72h)"}
+      - {id: LEG-08, desc: "Legal review — przegląd prawny przy zmianach; zero zmian bez oceny prawnej"}
+
+  # ── Wymiar 27: Finanse ──────────────────────────────────────────────────
+  - id: FIN
+    name: "Finanse"
+    definition: "Koszt infrastruktury mierzony i optymalizowany; FinOps; zero marnotrawstwa"
+    source: "FinOps"
+    applicability: always
+    weight: 0.01
+    checks:
+      - {id: FIN-01, desc: "Cost visibility — koszt per serwis/zespół widoczny; zero 'czarnej skrzynki' kosztów"}
+      - {id: FIN-02, desc: "Cost budget — budżet kosztowy per serwis; alert przy przekroczeniu"}
+      - {id: FIN-03, desc: "Resource right-sizing — zasoby dopasowane do obciążenia; zero over-provisioning"}
+      - {id: FIN-04, desc: "Idle resource cleanup — zero nieużywanych zasobów (orphan volumes, stale instances)"}
+      - {id: FIN-05, desc: "Cost optimization loop — cykliczny przegląd kosztów; oszczędności mierzone"}
+
+  # ── Wymiar 28: Doświadczenie ─────────────────────────────────────────────
+  - id: EXP
+    name: "Doświadczenie"
+    definition: "Doświadczenie użytkownika mierzone; task success; satysfakcja; zero tarcia"
+    source: ""
+    applicability: always
+    weight: 0.02
+    checks:
+      - {id: EXP-01, desc: "Task success rate — skuteczność zadań mierzona; ≥ target"}
+      - {id: EXP-02, desc: "User satisfaction — satysfakcja mierzona (SUS/UMUX-Lite); trend śledzony"}
+      - {id: EXP-03, desc: "Friction points — punkty tarcia identyfikowane i usuwane; zero znanych blokerów"}
+      - {id: EXP-04, desc: "UX research loop — badania użyteczności cykliczne; findings przekute na zmiany"}
+
+  # ── Wymiar 29: Wielodostępność ───────────────────────────────────────────
+  # WARUNKOWA — tylko dla serwisów z tenancy: multi.
+  - id: TEN
+    name: "Wielodostępność"
+    definition: "Izolacja tenantów; zero cross-tenant leak; quota; billing per tenant"
+    source: ""
+    applicability: tenancy multi
+    weight: 0.03
+    checks:
+      - {id: TEN-01, desc: "Tenant isolation — dane tenantów izolowane; zero cross-tenant leak"}
+      - {id: TEN-02, desc: "Tenant quotas — limity per tenant; zero tenant hogging zasobów"}
+      - {id: TEN-03, desc: "Tenant billing — rozliczenie per tenant; metryki zużycia per tenant"}
+      - {id: TEN-04, desc: "Tenant lifecycle — onboarding/offboarding tenanta; zero danych po offboardingu"}
+
+  # ── Wymiar 30: Wsparcie ─────────────────────────────────────────────────
+  - id: SUP
+    name: "Wsparcie"
+    definition: "Wsparcie użytkownika: dokumentacja, helpdesk, SLA, feedback loop"
+    source: ""
+    applicability: always
+    weight: 0.02
+    checks:
+      - {id: SUP-01, desc: "Support docs — dokumentacja wsparcia kompletna; FAQ; zero 'nie wiem'"}
+      - {id: SUP-02, desc: "Support SLA — SLA wsparcia zdefiniowane; czas odpowiedzi mierzony"}
+      - {id: SUP-03, desc: "Feedback loop — feedback użytkownika → backlog; pętla domknięta"}
+      - {id: SUP-04, desc: "Support escalation — eskalacja wsparcia jasna; zero zgubionych zgłoszeń"}
+
+  # ── Wymiar 31: Sztuczna inteligencja ─────────────────────────────────────
+  # WARUNKOWA — tylko dla serwisów z ml_features: true.
+  - id: AI
+    name: "Sztuczna inteligencja"
+    definition: "Modele ML: ewaluacja, bias, bezpieczeństwo, wersjonowanie, koszt, wyjaśnialność"
+    source: ""
+    applicability: ml_features true
+    weight: 0.03
+    checks:
+      - {id: AI-01, desc: "Model evaluation — modele ewaluowane na benchmarkach; zero regresji jakości"}
+      - {id: AI-02, desc: "Bias assessment — ocena błędu systematycznego; zero dyskryminacji"}
+      - {id: AI-03, desc: "Model safety — bezpieczeństwo modelu; jailbreak/poisoning testowane"}
+      - {id: AI-04, desc: "Model versioning — modele wersjonowane; reproducibility; zero 'który model działa'"}
+      - {id: AI-05, desc: "Model cost — koszt inferencji mierzony; budżet; zero niekontrolowanego kosztu"}
+      - {id: AI-06, desc: "Explainability — wyjaśnialność decyzji; zero 'czarnej skrzynki' dla krytycznych"}
+      - {id: AI-07, desc: "Data for ML — dane treningowe zarządzane; licencje; zero danych bez zgody"}
+      - {id: AI-08, desc: "Human oversight — nadzór człowieka nad decyzjami AI; eskalacja do człowieka"}
+
+# ── Macierz aplikowalności ─────────────────────────────────────────────────
+# Mapuje pola .skeleton.yaml (service.id, tier, surfaces, locales, tenancy,
+# events, ml_features, public_www, data_classes) na wymiary.
+# applicability: always → wymiar zawsze w QI.
+# applicability warunkowa → wymiar w QI tylko gdy pole serwisu spełnia warunek.
+applicability_matrix:
+  always:
+    - INTEG
+    - VV
+    - SEC
+    - RES
+    - PERM
+    - CFG
+    - CUR
+    - OPT
+    - AEST
+    - MOD
+    - CONS
+    - DX
+    - META
+    - CORR
+    - MAN
+    - PERF
+    - OBS
+    - OPS
+    - BIZ
+    - COMP
+    - LEG
+    - FIN
+    - EXP
+    - SUP
+  locales>1:
+    - INT
+  data_classes present:
+    - DATA
+  surfaces include api:
+    - API
+  events true:
+    - EVT
+  surfaces include web:
+    - EDGE
+  tenancy multi:
+    - TEN
+  ml_features true:
+    - AI
+
+# ── Formuła QI ─────────────────────────────────────────────────────────────
+# QI_service = 100 × ∏ s_i^w_i dla i ∈ applicable(service)
+#   - s_i = score wymiaru i (0..1), wyliczony z evidence.
+#   - w_i = waga wymiaru i (z configu, per tier).
+#   - applicable(service) = wymiary, których applicability jest spełniona
+#     przez metadane serwisu (.skeleton.yaml).
+#   - Wymiary warunkowe wyłączone z mianownika, gdy nieapplicable.
+#   - Wymiary always zawsze w mianowniku.
+#   - Reguła: dimension score bez świeżego evidence = 0 (nie NULL — ZERO).
+#   - Średnia geometryczna, nie arytmetyczna — jeden wymiar na zero → cały QI na zero.
+#
+# Wyłączenie wymiaru warunkowego wymaga metadanej weryfikowanej:
+#   - serwis z events:false, który produkuje eventy = INTEG/shadow FAIL.
+#   - serwis z tenancy:single, który ma dane wielu tenantów = TEN/shadow FAIL.
+#   - serwis z locales:1, który ma hardcoded stringi = INT-01 FAIL (gate'owane ZAWSZE).
+# Shadow FAIL = wymiar de facto applicable, choć metadana mówi nieapplicable.
+qi_formula:
+  formula: "QI_service = 100 × ∏ s_i^w_i dla i ∈ applicable(service)"
+  mean: "geometryczna (nie arytmetyczna)"
+  zero_rule: "dimension score bez świeżego evidence = 0 (nie NULL — ZERO)"
+  weights_source: "config (per tier)"
+  conditional_exclusion: "wymiary warunkowe wyłączone z mianownika, gdy nieapplicable"
+  shadow_fail:
+    - "serwis z events:false produkujący eventy = INTEG/shadow FAIL"
+    - "serwis z tenancy:single z danymi wielu tenantów = TEN/shadow FAIL"
+    - "serwis z locales:1 z hardcoded stringami = INT-01 FAIL (gate'owane ZAWSZE)"
+    - "serwis z surfaces bez web, który serwuje HTML = EDGE/shadow FAIL"
+
+# ── Priorytety wdrożenia ───────────────────────────────────────────────────
+# Z deep dive Suwerena. P0 = najwyższy priorytet (krytyczne, natychmiastowe).
+priorities:
+  P0:
+    - INT-01
+    - INT-02
+    - INT-07
+    - INT-08
+    - DATA-03
+    - DATA-04
+    - DATA-06
+    - OBS-01
+    - OBS-05
+  P1:
+    - PERF-01
+    - PERF-05
+    - PERF-10
+    - OPS-01
+    - OPS-03
+    - API-01
+    - API-06
+    - DATA-05
+    - DATA-08
+  P2:
+    - "EDGE (pełna rodzina)"
+    - "BIZ (pełna rodzina)"
+    - "EVT (pełna rodzina)"
+    - COMP-02
+  P3:
+    - "FIN (pełna rodzina)"
+    - "EXP (pełna rodzina)"
+    - "TEN (pełna rodzina)"
+    - "SUP (pełna rodzina)"
+    - "AI (pełna rodzina)"

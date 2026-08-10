@@ -107,14 +107,27 @@ gates:
       security: BLOCKING
       release: BLOCKING
       genesis: BLOCKING
+  - module: taxonomy
+    script: architecture/taxonomy.sh
+    profiles:
+      full: BLOCKING
+      architecture: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
+  - module: i18n
+    script: i18n/i18n.sh
+    profiles:
+      full: BLOCKING
+      release: BLOCKING
+      genesis: BLOCKING
 
 # ── Profile → domyślna lista modułów (kolejność uruchamiania) ───────────────
 profiles:
   fast: [git, security, structure, aesthetics]
-  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills]
+  full: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n]
   security: [git, security, security-drills]
-  architecture: [architecture, contracts, semantics]
+  architecture: [architecture, contracts, semantics, taxonomy]
   reproducibility: [reproducibility, dependencies]
-  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills]
-  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills]
-  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills]
+  release: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n]
+  genesis: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n]
+  all: [git, security, structure, architecture, dependencies, reproducibility, deployment, contracts, migration, recovery, aesthetics, semantics, security-drills, taxonomy, i18n]
