@@ -87,6 +87,12 @@ data/**/node-local/
 logs/
 **/logs/
 
+# ── Canonical state DB — NIE wchodzi do git ──────────────────
+# SQLite = canonical operational state. Git trzyma tylko schema + migracje.
+system/control-plane/state/data/*.db
+system/control-plane/state/data/*.sqlite
+system/control-plane/state/data/*.sqlite3
+
 # ── AIGON-X-FS runtime data — NIE wchodzi do git ─────────────
 # AIGON-X-FS przechowuje runtime data (knowledge, memory, artifacts,
 # evidence, user data). To NIE jest repo. Git trzyma tylko schematy.
