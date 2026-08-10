@@ -1,0 +1,9 @@
+gate_id=GATE-039
+domain=RESILIENCE
+name=RESILIENCE PLANE — HA/DR/Backup warstwa odporności
+command=tools/verify/gates/domains/resilience.sh
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-039 RESILIENCE === [PASS] RES-B-01 registry.yaml ma klucze resilience        rto/rpo/restore_drill_max_age/dr_game_day_max_age/floors obecne. [PASS] RES-B-02 state.sh ma backup/restore/backup-restore-test        state.sh obsługuje backup/restore/backup-restore-test. [PASS] RES-B-02 pipeline restore drill istnieje        tools/resilience/restore-drill/restore-drill.sh obecny. [PASS] RES-B-03 backup immutable (hash + backup-verify)        state.sh ma backup-verify; sha256 w state.sh/lib.

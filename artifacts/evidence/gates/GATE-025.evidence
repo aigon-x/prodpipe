@@ -4,6 +4,6 @@ name=Effective Configuration vs Declared State
 command=tools/verify/gates/domains/effective-config.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T02:24:35Z
-head=552fed2
-output==== GATE-025 EFFECTIVE-CONFIG === [PASS] EFFECTIVE-CONFIG-001 declared state        Declared schema_version=3. [PASS] EFFECTIVE-CONFIG-002 effective state        Effective schema_version=3. [PASS] EFFECTIVE-CONFIG-003 brak driftu        Declared=3 == Effective=3. [INFO] EFFECTIVE-CONFIG-004 system_twin bez driftu        Brak nodów w grafie.  === RESULT === Checks: 4  PASS: 3  FAIL: 0  WARN: 0  INFO: 1 CERTIFICATION: PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-025 EFFECTIVE-CONFIG === [PASS] EFFECTIVE-CONFIG-001 declared state        Declared schema_version=9. [PASS] EFFECTIVE-CONFIG-002 effective state        Effective schema_version=9. [PASS] EFFECTIVE-CONFIG-003 brak driftu        Declared=9 == Effective=9. [INFO] EFFECTIVE-CONFIG-004 system_twin bez driftu        Brak nodów w grafie.  === RESULT === Checks: 4  PASS: 3  FAIL: 0  WARN: 0  INFO: 1 CERTIFICATION: PASS

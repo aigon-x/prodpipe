@@ -4,6 +4,6 @@ name=Reprodukowalność build/deploy
 command=tools/verify/gates/domains/reproducibility.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T02:24:35Z
-head=552fed2
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
 output==== GATE-009 REPRODUCIBILITY === [INFO] REPRODUCIBILITY-001 skrypt build        Brak skryptów build (repo bez build). [PASS] REPRODUCIBILITY-002 brak timestampów w build        Brak zależności od czasu w build. [INFO] REPRODUCIBILITY-003 lockfile deterministyczny        Brak lockfile.  === RESULT === Checks: 3  PASS: 1  FAIL: 0  WARN: 0  INFO: 2 CERTIFICATION: PASS

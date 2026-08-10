@@ -4,6 +4,6 @@ name=Action Proof Engine
 command=tools/verify/gates/domains/action-proof.sh
 exit_code=0
 status=PASS
-timestamp=2026-08-10T02:24:35Z
-head=552fed2
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
 output==== GATE-023 ACTION-PROOF === [PASS] ACTION-PROOF-001 rejestr akcji        Katalog akcji obecny. [INFO] ACTION-PROOF-002 każda akcja ma postcondition        Brak zarejestrowanych akcji. [INFO] ACTION-PROOF-003 postcondition weryfikowalny        Brak zarejestrowanych akcji.  === RESULT === Checks: 3  PASS: 1  FAIL: 0  WARN: 0  INFO: 2 CERTIFICATION: PASS

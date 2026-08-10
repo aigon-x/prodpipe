@@ -44,13 +44,22 @@ if [ -f "$STATE_DIR/migrations/0003_system_twin.sql" ]; then
   fi
 fi
 
-# ── SYSTEM-TWIN-004: schema_version=3 w lib.sh ──────────────
+# ── SYSTEM-TWIN-004: schema_version spójna z ostatnią migracją ──
+# STATE_SCHEMA_VERSION w lib.sh musi odpowiadać ostatniej migracji
+# (dynamicznie, nie hardcoded — schema jest migracyjna).
 if [ -f "$STATE_DIR/lib.sh" ]; then
   declared=$(grep -E 'STATE_SCHEMA_VERSION=' "$STATE_DIR/lib.sh" | head -1 | sed 's/.*="\([0-9]*\)".*/\1/')
-  if [ "$declared" = "3" ]; then
-    pass "SYSTEM-TWIN-004 schema_version=3" BLOCKING "STATE_SCHEMA_VERSION=$declared."
+  last_migration=$(find "$STATE_DIR/migrations" -name '*.sql' 2>/dev/null | sort | tail -1 | xargs -r basename | cut -d_ -f1)
+  if [ -n "$declared" ] && [ -n "$last_migration" ]; then
+    declared_num=$((10#$declared))
+    last_num=$((10#$last_migration))
+    if [ "$declared_num" -eq "$last_num" ]; then
+      pass "SYSTEM-TWIN-004 schema_version spójna" BLOCKING "STATE_SCHEMA_VERSION=$declared == ostatnia migracja $last_migration."
+    else
+      fail "SYSTEM-TWIN-004 schema_version spójna" BLOCKING "STATE_SCHEMA_VERSION=$declared != ostatnia migracja $last_migration."
+    fi
   else
-    fail "SYSTEM-TWIN-004 schema_version=3" BLOCKING "STATE_SCHEMA_VERSION=$declared (oczekiwano 3)."
+    fail "SYSTEM-TWIN-004 schema_version spójna" BLOCKING "Nie można odczytać STATE_SCHEMA_VERSION lub migracji."
   fi
 fi
 

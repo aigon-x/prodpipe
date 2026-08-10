@@ -2,8 +2,8 @@ gate_id=GATE-022
 domain=INVARIANT-ENGINE
 name=Invariant Engine
 command=tools/verify/gates/domains/invariant-engine.sh
-exit_code=1
-status=FAIL
-timestamp=2026-08-10T02:24:35Z
-head=552fed2
-output==== GATE-022 INVARIANT-ENGINE === [PASS] INVARIANT-001 schema_version zdefiniowana        STATE_SCHEMA_VERSION=3. [PASS] INVARIANT-002 migracje sekwencyjne        Migracje 0001-0003 obecne. [PASS] INVARIANT-003 state.sh set -euo pipefail        state.sh ma set -euo pipefail. [PASS] INVARIANT-004 registry parsowalny        registry.sh przechodzi bash -n. [PASS] INVARIANT-005 registry==implemented        Każdy gate ma skrypt implementacji. [FAIL] INVARIANT-006 brak sekretów w tools/verify       
+exit_code=0
+status=PASS
+timestamp=2026-08-10T02:56:02Z
+head=26093aa
+output==== GATE-022 INVARIANT-ENGINE === [PASS] INVARIANT-001 schema_version zdefiniowana        STATE_SCHEMA_VERSION=9. [PASS] INVARIANT-002 migracje sekwencyjne        Migracje 0001-0003 obecne. [PASS] INVARIANT-003 state.sh set -euo pipefail        state.sh ma set -euo pipefail. [PASS] INVARIANT-004 registry parsowalny        registry.sh przechodzi bash -n. [PASS] INVARIANT-005 registry==implemented        Każdy gate ma skrypt implementacji. [PASS] INVARIANT-006 brak sekretów w tools/verify       

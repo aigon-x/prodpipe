@@ -29,11 +29,13 @@ if [ -d "$MIGRATIONS_DIR" ]; then
   prev=0
   while IFS= read -r f; do
     num=$(basename "$f" | cut -d_ -f1)
-    if [ "$num" -ne $((prev+1)) ]; then
+    # Wiodące zera (0008) są konwencją nazewniczą — wymuś podstawę 10.
+    num10=$((10#$num))
+    if [ "$num10" -ne $((prev+1)) ]; then
       SEQUENCE_OK=0
       break
     fi
-    prev="$num"
+    prev="$num10"
   done < <(find "$MIGRATIONS_DIR" -name '*.sql' 2>/dev/null | sort)
   if [ "$SEQUENCE_OK" -eq 1 ]; then
     pass "MIGRATION-002 migracje sekwencyjne" BLOCKING "Migracje w ciągłej sekwencji (ostatnia: $prev)."

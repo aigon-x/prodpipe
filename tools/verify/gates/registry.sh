@@ -444,6 +444,22 @@ GATE_REGISTRY=(
     'wszystkie INTEG-001..012 dwukierunkowe checki PASS (brak false gate, orphan, martwa zmienna, dangling ref)' \
     'jakikolwiek rozjazd w macierzy polaczen (false gate, orphan, martwa zmienna, dangling ref, unconnected check)' \
     '0' 'pre-commit' 'true' 'exit_code' 'tools/verify/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_wiring.sh' 'IMPLEMENTED' )"
+
+  # ── RESILIENCE (GATE-039) — RESILIENCE PLANE ────────────────
+  # Weryfikuje warstwę odporności: HA/DR/Backup. Sprawdza że config/registry.yaml
+  # ma klucze resilience (rto/rpo/restore_drill_max_age/dr_game_day_max_age + floors),
+  # że state.sh ma backup/restore/backup-restore-test, że istnieje pipeline restore
+  # drill (tools/resilience/restore-drill/), że migration 0009_resilience.sql istnieje.
+  # Checks RES-B-01..04 (pokrycie backupu, restore drill, immutability, retention).
+  "$(printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+    'GATE-039' 'RESILIENCE' 'RESILIENCE PLANE — HA/DR/Backup warstwa odporności' \
+    'Resilience gate: weryfikuje warstwe odpornosci (HA/DR/Backup). Sprawdza ze config/registry.yaml ma klucze resilience (rto/rpo/restore_drill_max_age/dr_game_day_max_age + floors per tier), ze state.sh ma backup/restore/backup-restore-test, ze istnieje pipeline restore drill (tools/resilience/restore-drill/restore-drill.sh), ze migration 0009_resilience.sql istnieje. Checks RES-B-01..04: pokrycie backupu, restore drill, immutability, retention.' \
+    'platform' 'critical' 'LOCAL_FAST' 'tools/verify/gates/domains/resilience.sh' \
+    'config/, system/control-plane/state/, tools/resilience/' \
+    'artifacts/evidence/gates/GATE-039.evidence' \
+    'wszystkie RES-B-01..04 checki PASS (registry.yaml resilience keys, state.sh backup/restore, restore drill pipeline, migration 0009)' \
+    'brak kluczy resilience w registry.yaml, brak backup/restore w state.sh, brak pipeline restore drill, brak migration 0009' \
+    '0' 'pre-commit' 'true' 'exit_code' 'tools/verify/' '0' 'GATE-INTEGRITY' 'docs/generated/gates/README.md' 'tools/verify/gates/tests/test_resilience.sh' 'IMPLEMENTED' )"
 )
 
 # ── Funkcje zapytań registry ─────────────────────────────────
