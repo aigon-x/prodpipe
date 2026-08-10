@@ -104,3 +104,26 @@ verify_module_severity() {
   done
   echo "WARNING"
 }
+
+# ── Mapowanie nazwy modułu → ścieżka skryptu ────────────────
+# Każdy moduł zadeklarowany w VERIFY_MODULES ma odpowiadający skrypt
+# w tools/verify/<kategoria>/<nazwa>.sh. To jest JEDYNE miejsce mapowania —
+# profiles.sh deklaruje moduły, verify.sh je uruchamia, a SELF-001
+# weryfikuje integralność (każdy zadeklarowany moduł MUSI istnieć).
+# Rozjazd (FALSE GATE) jest tu eliminowany.
+module_script() {
+  local module="$1"
+  case "$module" in
+    git)            echo "git/integrity.sh" ;;
+    security)       echo "security/secrets.sh" ;;
+    structure)      echo "structure/readme.sh" ;;
+    architecture)   echo "architecture/architecture.sh" ;;
+    dependencies)   echo "dependencies/dependencies.sh" ;;
+    reproducibility) echo "reproducibility/reproducibility.sh" ;;
+    deployment)     echo "deployment/deployment.sh" ;;
+    contracts)      echo "contracts/contracts.sh" ;;
+    migration)      echo "migration/migration.sh" ;;
+    recovery)       echo "recovery/recovery.sh" ;;
+    *)              echo "" ;;
+  esac
+}
