@@ -44,31 +44,13 @@ PROFILE="${2:-full}"
 # ── Nagłówek ────────────────────────────────────────────────
 verify_header "$SUBCOMMAND/$PROFILE"
 
-# ── Mapowanie nazwy modułu → ścieżka skryptu ────────────────
-# Każdy moduł z profiles.sh (git, security, structure, ...) ma
-# odpowiadający skrypt w tools/verify/<kategoria>/<nazwa>.sh.
-# To jest JEDYNE miejsce mapowania — profiles.sh deklaruje moduły,
-# verify.sh je uruchamia. Rozjazd (FALSE GATE) jest tu naprawiony.
-module_script() {
-  local module="$1"
-  case "$module" in
-    git)            echo "git/integrity.sh" ;;
-    security)       echo "security/secrets.sh" ;;
-    structure)      echo "structure/readme.sh" ;;
-    architecture)   echo "architecture/architecture.sh" ;;
-    dependencies)   echo "dependencies/dependencies.sh" ;;
-    reproducibility) echo "reproducibility/reproducibility.sh" ;;
-    deployment)     echo "deployment/deployment.sh" ;;
-    contracts)      echo "contracts/contracts.sh" ;;
-    migration)      echo "migration/migration.sh" ;;
-    recovery)       echo "recovery/recovery.sh" ;;
-    *)              echo "" ;;
-  esac
-}
-
 # ── Uruchomienie modułu ─────────────────────────────────────
 # run_module <module>   — moduł profilu (mapowany przez module_script)
 # run_module <path.sh>  — bezpośrednia ścieżka (warstwy reconcile)
+# Każde uruchomienie to GATE: po zakończeniu zapisuje evidence do
+# StateStore (P0#1). Moduł bez evidence = 0 punktów (metryka pokrycia).
+VERIFY_RUN_COUNT=0
+
 run_module() {
   local name="$1"
   local script
@@ -77,6 +59,7 @@ run_module() {
     */*) script="$VERIFY_DIR/$name" ;;
     *)   script="$VERIFY_DIR/$(module_script "$name")" ;;
   esac
+  VERIFY_RUN_COUNT=$((VERIFY_RUN_COUNT+1))
   if [ -n "$script" ] && [ -f "$script" ]; then
     say ""
     say "────────────────────────────────────────────────────────────"
@@ -90,8 +73,17 @@ run_module() {
     if [ "$rc" -ne 0 ]; then
       fail "verify module $name" BLOCKING "Moduł zakończył się kodem $rc (oczekiwano 0)."
     fi
+    # Evidence bridge (P0#1): każdy uruchomiony gate zapisuje wynik.
+    evidence_record "verify:$name:rc=$rc" "verify" "$script"
   else
-    warn "verify module $name" "Brak modułu: $script"
+    # FAIL-CLOSED (anti-drift): moduł zadeklarowany w profilu, a nieistniejący
+    # = FAIL (BLOCKING), NIGDY skip. Wcześniej był to `warn` (FALSE GATE) —
+    # ghost moduły (architecture, dependencies, ...) przechodziły cicho,
+    # a drift wracał po 3 miesiącach. Teraz brak modułu blokuje certyfikację.
+    fail "verify module $name" BLOCKING "Brak modułu: $script (fail-closed — moduł zadeklarowany, a nieistniejący)"
+    # Ghost moduł też rejestruje evidence (FAIL), aby meta-gate wiedział,
+    # że moduł był uruchomiony i zakończył się porażką.
+    evidence_record "verify:$name:MODULE-MISSING" "verify" "$script"
   fi
 }
 
@@ -112,6 +104,13 @@ run_profile_modules() {
 # ── Subkomendy ──────────────────────────────────────────────
 # reconcile = wszystkie moduły profilu + warstwy reconcile.
 # drift/history/debt = tylko odpowiednie warstwy.
+#
+# SELF-001 (self-profile-integrity.sh) jest META-GATE uruchamianym
+# ZAWSZE, przed każdą subkomendą: weryfikuje, że każdy moduł
+# zadeklarowany w profilach istnieje i jest wykonywalny. Ghost moduł
+# = FAIL (BLOCKING), nigdy skip. Chroni przed FALSE GATE na zawsze.
+run_module "self-profile-integrity.sh"
+
 case "$SUBCOMMAND" in
   reconcile)
     # Wszystkie moduły profilu (git, security, structure, ...)
@@ -142,6 +141,12 @@ case "$SUBCOMMAND" in
 esac
 
 # ── Podsumowanie ────────────────────────────────────────────
+# Meta-gate VERIFY-EVIDENCE-COMPLETE (P0#1): każdy uruchomiony moduł
+# MUSI zapisać evidence do StateStore. Moduł bez evidence = 0 punktów.
+# Uruchamiamy go PRZED verify_module_exit, aby jego wynik (PASS/FAIL)
+# wszedł do agregacji i mógł zablokować certyfikację.
+verify_evidence_complete "$VERIFY_RUN_COUNT"
+
 # verify_module_exit wypisuje podsumowanie i propaguje status
 # (exit 0 = PASS, exit 1 = FAIL) do procesu nadrzędnego.
 verify_module_exit
