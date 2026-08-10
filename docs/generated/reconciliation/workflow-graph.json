@@ -1,0 +1,19 @@
+{
+  "type": "workflow-graph",
+  "description": "CI/CD workflows i git hooks",
+  "workflows": [
+    {"file":".github/workflows/ci.yml","calls_verify":false},
+    {"file":".github/workflows/drift.yml","calls_verify":false},
+    {"file":".github/workflows/feature.yml","calls_verify":false},
+    {"file":".github/workflows/helios.yml","calls_verify":false},
+    {"file":".github/workflows/regression.yml","calls_verify":false},
+    {"file":".github/workflows/release.yml","calls_verify":false},
+    {"file":".github/workflows/security.yml","calls_verify":false},
+    {"file":".github/workflows/sot.yml","calls_verify":false}
+  ],
+  "git_hooks": [
+    {"file":".git-hooks/pre-commit","type":"pre-commit","calls_verify":false},
+    {"file":".git-hooks/pre-push","type":"pre-push","calls_verify":false},
+    {"file":".git-hooks/validate-sot","type":"validate-sot","calls_verify":false}
+  ]
+}
